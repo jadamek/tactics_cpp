@@ -1,5 +1,5 @@
 #include "IsometricObject.h"
-#include "../map/IsometricBuffer.h"
+#include "../map/IsometricNode.h"
 
 //----------------------------------------------------------------------------
 // - Isometric Object Contructor

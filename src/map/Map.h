@@ -1,3 +1,6 @@
+#ifndef TACTICS_TILE_MAP_H
+#define TACTICS_TILE_MAP_H
+
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "IsometricBuffer.h"
@@ -12,3 +15,5 @@ class Map : public sf::Drawable
 {
 
 };
+
+#endif
