@@ -40,7 +40,7 @@ Map::~Map()
 // * y : y-coordinate of the tile to grab
 // * z : z-coordinate of the tile to grab. If ommitted, grabs top-most
 //----------------------------------------------------------------------------
-const Tile* Map::at(int x, int y, float z) const
+Tile* Map::getTileAt(int x, int y, float z) const
 {
     if((x < 0 || x >= width_) || (y < 0 || y >= length_))
     {
@@ -66,31 +66,19 @@ const Tile* Map::at(int x, int y, float z) const
 }
 
 //----------------------------------------------------------------------------
-// - Get Tile At (Mutable variant)
+// - Get Tile At (Const-Interface)
+//----------------------------------------------------------------------------
+const Tile* Map::at(int x, int y, float z) const
+{
+    return getTileAt(x, y, z);
+}
+
+//----------------------------------------------------------------------------
+// - Get Tile At (Mutable Interface)
 //----------------------------------------------------------------------------    
 Tile* Map::at(int x, int y, float z)
 {
-    if((x < 0 || x >= width_) || (y < 0 || y >= length_))
-    {
-        return 0;
-    }
-    else if(tiles_[x][y].size() > 0)
-    {
-        return 0;
-    }
-    else
-    {
-        int i = 0;
-        // try to get the tile whose z -> height region contains
-        // z. If z is above the top-most tile, return the top-most.
-        while(z > tiles_[x][y][i]->position().z + tiles_[x][y][i]->getHeight()
-                && i < tiles_[x][y].size() - 1)
-        {            
-            i += 1;
-        }
-
-        return tiles_[x][y][i];
-    }
+    return getTileAt(x, y, z);    
 }
 #include <iostream>
 //----------------------------------------------------------------------------
@@ -145,12 +133,28 @@ bool Map::insert(Tile* tile, int x, int y, int layer)
     {
         return false;
     }
-    else if(layer < 0 || layer >= tiles_[x][y].size())
+    else if(layer < 0 || layer > tiles_[x][y].size())
     {
         return false;
     }
 
     float z = 0;    
+
+    if(layer > 0)
+    {
+        z = tiles_[x][y][layer - 1]->position().z + tiles_[x][y][layer - 1]->getHeight();
+        tiles_[x][y][layer-1]->setOccupant(tile);
+    }
+
+    if(layer < tiles_[x][y].size())
+    {
+        tile->setOccupant(tiles_[x][y][layer]);
+        tile->getOccupant()->rise(tile->getHeight());
+    }
+
+    tile->setPosition(sf::Vector3f(x, y, z));
+    tiles_[x][y].insert(tiles_[x][y].begin() + layer, tile);
+    images_.add(tile);
 
     return true;
 }
@@ -165,6 +169,42 @@ bool Map::insert(Tile* tile, int x, int y, int layer)
 //----------------------------------------------------------------------------
 bool Map::replace(Tile* tile, int x, int y, int layer)
 {
+    if((x < 0 || x >= width_) || (y < 0 || y >= length_))
+    {
+        return false;
+    }
+    else if(layer < 0 || layer >= tiles_[x][y].size())
+    {
+        return false;
+    }
+
+    if(layer > 0)
+    {
+        tiles_[x][y][layer - 1]->setOccupant(tile);
+    }
+
+    tile->setOccupant(tiles_[x][y][layer]->getOccupant());
+
+    if(tile->getOccupant() != 0)
+    {
+        float difference = tile->getHeight() - tiles_[x][y][layer]->getHeight();
+
+        if(difference > 0)
+        {
+            tile->getOccupant()->rise(difference);
+        }
+        else
+        {
+            tile->getOccupant()->lower(difference * -1);
+        }
+    }
+
+    tile->setPosition(tiles_[x][y][layer]->position());
+
+    delete tiles_[x][y][layer];
+    tiles_[x][y][layer] = tile;
+    images_.add(tile);
+
     return true;
 }
 
@@ -177,6 +217,28 @@ bool Map::replace(Tile* tile, int x, int y, int layer)
 //----------------------------------------------------------------------------
 bool Map::remove(int x, int y, int layer)
 {
+    if((x < 0 || x >= width_) || (y < 0 || y >= length_))
+    {
+        return false;
+    }
+    else if(layer < 0 || layer >= tiles_[x][y].size())
+    {
+        return false;
+    }
+
+    if(layer > 0)
+    {
+        tiles_[x][y][layer - 1]->setOccupant(tiles_[x][y][layer]->getOccupant());
+    }
+
+    if(tiles_[x][y][layer]->getOccupant() != 0)
+    {
+        tiles_[x][y][layer]->getOccupant()->lower(tiles_[x][y][layer]->getHeight());
+    }
+
+    delete tiles_[x][y][layer];
+    tiles_[x][y].erase(tiles_[x][y].begin() + layer);
+
     return true;
 }
 

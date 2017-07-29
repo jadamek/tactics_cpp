@@ -32,6 +32,7 @@ public:
 
 protected:
     virtual void    draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    Tile*           getTileAt(int x, int y, float z = FLT_MAX) const;
 
     int             width_;
     int             length_;
