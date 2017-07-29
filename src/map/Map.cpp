@@ -201,6 +201,7 @@ bool Map::replace(Tile* tile, int x, int y, int layer)
 
     tile->setPosition(tiles_[x][y][layer]->position());
 
+    images_.remove(tiles_[x][y][layer]);
     delete tiles_[x][y][layer];
     tiles_[x][y][layer] = tile;
     images_.add(tile);
@@ -225,7 +226,7 @@ bool Map::remove(int x, int y, int layer)
     {
         return false;
     }
-
+    std::cout << "removing tile at (" << x << ", " << y << ", " << layer << ")" << std::endl;
     if(layer > 0)
     {
         tiles_[x][y][layer - 1]->setOccupant(tiles_[x][y][layer]->getOccupant());
@@ -236,6 +237,7 @@ bool Map::remove(int x, int y, int layer)
         tiles_[x][y][layer]->getOccupant()->lower(tiles_[x][y][layer]->getHeight());
     }
 
+    images_.remove(tiles_[x][y][layer]);
     delete tiles_[x][y][layer];
     tiles_[x][y].erase(tiles_[x][y].begin() + layer);
 

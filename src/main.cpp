@@ -7,12 +7,13 @@
 
 int main()
 {
-    sf::Texture soul_texture, grass_texture;
+    sf::Texture soul_texture, grass_texture, dirt_texture;
 
     soul_texture.loadFromFile("resources/graphics/Soul.png");    
     sf::Sprite soul(soul_texture);
 
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
+    dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
     Map map(2, 2, MAP_SCALE);
 
@@ -29,7 +30,14 @@ int main()
 
             map.place(tile, x, y);
         }
-    }    
+    }
+
+    float height = 1;
+
+    SpriteTile* tile_sprite = new SpriteTile(dirt_texture, MAP_SCALE.x, MAP_SCALE.y, MAP_SCALE.z * height);
+    Tile* tile = new Tile(tile_sprite, height);
+
+    map.replace(tile, 1, 1, 0);
 
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
