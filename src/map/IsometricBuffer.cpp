@@ -21,7 +21,7 @@ IsometricBuffer::~IsometricBuffer()
 //----------------------------------------------------------------------------
 // - Get Isometric Scaling Vector
 //----------------------------------------------------------------------------
-const IsometricBuffer::sf::Vector3f& getIsometricScale() const
+const sf::Vector3f& IsometricBuffer::getIsometricScale() const
 {
     return scale_;
 }
@@ -32,10 +32,10 @@ const IsometricBuffer::sf::Vector3f& getIsometricScale() const
 // Converts a 3-Dimensional local coordinate position to a 2-Dimensional
 // isometric pixel coordinate position
 //----------------------------------------------------------------------------
-const sf::Vector2f& IsometricBuffer::localToIso(const sf::Vector3f& position) const
+sf::Vector2f IsometricBuffer::localToIso(const sf::Vector3f& position) const
 {
     float x = 0.5 * scale_.x * (position.x - position.y);
-    float y = 0.5 * scale_.y * (position.x + position.y) - scale.z * position.z;
+    float y = 0.5 * scale_.y * (position.x + position.y) - scale_.z * position.z;
 
     return sf::Vector2f(x, y);
 }
@@ -57,7 +57,7 @@ void IsometricBuffer::add(const IsometricObject* obj)
 //----------------------------------------------------------------------------  
 void IsometricBuffer::remove(const IsometricObject* obj)
 {
-    objects.erase(obj);
+    objects_.erase(obj);
 }
 
 //----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
     for(auto obj : objects_)
     {
         sf::RenderStates state = states;
-		state.transform *= localToIso(obj->position());
+		state.transform.translate(localToIso(obj->position()));
 
 		target.draw(*obj, state);
     }

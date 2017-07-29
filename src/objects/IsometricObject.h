@@ -17,7 +17,7 @@ public:
     ~IsometricObject();
     
     const sf::Vector3f&     position() const;
-    virtual float           getHeight(const sf::Vector2f& position) const;
+    virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const = 0;
     void                    setPosition(const sf::Vector3f& position);
     void                    setHandler(IsometricNode*);

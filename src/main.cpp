@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "settings.h"
 #include "map/Tile.h"
+#include "map/Map.h"
 #include "sprite/map/SpriteTile.h"
 
 int main()
@@ -12,17 +13,23 @@ int main()
     sf::Sprite soul(soul_texture);
 
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
-    SpriteTile grass_tile_sprite(grass_texture);
-    grass_tile_sprite.resetHeight(32);
 
-    Tile grass_tile(&grass_tile_sprite, 2.0);
+    Map map(2, 2, MAP_SCALE);
 
-    std::cout << "(" << grass_tile.getGlobalBounds().left
-        << ", " << grass_tile.getGlobalBounds().top
-        << ", " << grass_tile.getGlobalBounds().width
-        << ", " << grass_tile.getGlobalBounds().height << ")" << std::endl;
+    Tile* tiles[4];
 
-    std::cout << grass_tile.getGlobalBounds().intersects(sf::FloatRect(200, 0, 40, 40)) << std::endl;
+    for(int x = 0; x < 2; x++)
+    {
+        for(int y = 0; y < 2; y++)
+        {
+            float height = 2;
+
+            SpriteTile* tile_sprite = new SpriteTile(grass_texture, MAP_SCALE.x, MAP_SCALE.y, MAP_SCALE.z * height);
+            Tile* tile = new Tile(tile_sprite, height);
+
+            map.place(tile, x, y);
+        }
+    }    
 
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
@@ -42,7 +49,7 @@ int main()
         }
 
         window.clear(sf::Color::Black);
-        window.draw(grass_tile);
+        window.draw(map);
         window.display();
     }
 

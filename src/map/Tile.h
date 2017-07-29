@@ -16,8 +16,10 @@ class Tile : public IsometricObject
 public:
     Tile(const Sprite* sprite = 0, float height = 1.0);
 
-    virtual float           getHeight(const sf::Vector2f& position) const;
+    virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const;
+    const Tile*             getOccupant() const;
+    Tile*                   getOccupant();
     void                    setSprite(const Sprite*);
     void                    setOccupant(Tile*);
     void                    setHeight(float);

@@ -19,7 +19,7 @@ public:
     ~IsometricBuffer();
 
     const sf::Vector3f& getIsometricScale() const;
-    const sf::Vector2f& localToIso(const sf::Vector3f& position) const;
+    sf::Vector2f        localToIso(const sf::Vector3f& position) const;
     void                add(const IsometricObject* obj);
     void                remove(const IsometricObject* obj);
     void                isometricSort();
@@ -27,7 +27,7 @@ public:
 private:
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-    std::vector<const IsometricObject*> objects_;
+    std::set<const IsometricObject*> objects_;
     sf::Vector3f                        scale_;
 };
 
