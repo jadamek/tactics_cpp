@@ -8,7 +8,7 @@
 #include "IsometricBuffer.h"
 
 //================================================================================
-// Map
+// ** Map
 //================================================================================
 // Represents an isometric tilemap, which consists of a 2-D jagged array of 3-D
 // isometric map objects represented as blocks.

@@ -4,13 +4,11 @@
 #include "map/Tile.h"
 #include "map/Map.h"
 #include "sprite/map/SpriteTile.h"
+#include "objects/Actor.h"
 
 int main()
 {
     sf::Texture soul_texture, grass_texture, dirt_texture;
-
-    soul_texture.loadFromFile("resources/graphics/Soul.png");    
-    sf::Sprite soul(soul_texture);
 
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
@@ -32,12 +30,9 @@ int main()
         }
     }
 
-    float height = 1;
-
-    SpriteTile* tile_sprite = new SpriteTile(dirt_texture, MAP_SCALE.x, MAP_SCALE.y, MAP_SCALE.z * height);
-    Tile* tile = new Tile(tile_sprite, height);
-
-    map.replace(tile, 1, 1, 0);
+    soul_texture.loadFromFile("resources/graphics/Soul.png");    
+    sf::Sprite soul_sprite(soul_texture);
+    Actor soul(0, &map);
 
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
