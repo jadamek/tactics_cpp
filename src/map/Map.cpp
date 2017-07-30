@@ -46,7 +46,7 @@ Tile* Map::getTileAt(int x, int y, float z) const
     {
         return 0;
     }
-    else if(tiles_[x][y].size() > 0)
+    else if(tiles_[x][y].empty())
     {
         return 0;
     }
@@ -256,7 +256,9 @@ float Map::height(float x, float y) const
 {
     int x_i = (int)round(x);
     int y_i = (int)round(y);
+
     const Tile* tile = at(x_i, y_i);
+
     if(tile)
     {
         return tile->position().z + tile->getHeight(sf::Vector2f(x - x_i, y - y_i));

@@ -1,6 +1,7 @@
 #include "MobileObject.h"
 #include "../settings.h"
 #include <math.h>
+#include <algorithm>
 
 //----------------------------------------------------------------------------
 // - Mobile Object Constructor
@@ -8,15 +9,14 @@
 // * ground : height map which the object's z-coodinate will be bound to
 //----------------------------------------------------------------------------
 MobileObject::MobileObject(const Map* ground) :
-    speed_(1),
-    frozen_(false),
+    IsometricObject(),
+    AnimatedObject(),
     ground_(ground),
-    clock_(0),
     arrival_(0)
 {
     if(ground)
     {
-        setPosition(sf::Vector3f(0, 0, ground->height(0, 0)));
+        setPosition(sf::Vector3f(0, 0, std::max(0.f, ground->height(0, 0))));
     }
 }
 
@@ -26,62 +26,6 @@ MobileObject::MobileObject(const Map* ground) :
 MobileObject::~MobileObject()
 {
 
-}
-
-//----------------------------------------------------------------------------
-// - Get Speed
-//----------------------------------------------------------------------------
-float MobileObject::getSpeed() const
-{
-    return speed_;
-}
-
-//----------------------------------------------------------------------------
-// - Set Speed
-//----------------------------------------------------------------------------
-// * speed : relative multiplier of time that passes for this object
-//----------------------------------------------------------------------------
-void MobileObject::setSpeed(float speed)
-{
-    // A speed of zero or less is undefined
-    if(speed > 0)
-    {
-        speed_ = speed;
-    }
-}
-
-//----------------------------------------------------------------------------
-// - Is Object Frozen?
-//----------------------------------------------------------------------------
-bool MobileObject::frozen() const
-{
-    return frozen_;
-}
-
-//----------------------------------------------------------------------------
-// - Set Frozen Status
-//----------------------------------------------------------------------------
-// * frozen : sets a flag indicating time is frozen for this object
-//----------------------------------------------------------------------------
-void MobileObject::setFrozen(bool frozen)
-{
-    frozen_ = frozen;
-}
-
-//----------------------------------------------------------------------------
-// - Set Frozen to True
-//----------------------------------------------------------------------------
-void MobileObject::freeze()
-{
-    frozen_ = true;
-}
-
-//----------------------------------------------------------------------------
-// - Set Frozen to False
-//----------------------------------------------------------------------------
-void MobileObject::unfreeze()
-{
-    frozen_ = false;
 }
 
 //----------------------------------------------------------------------------
@@ -129,24 +73,6 @@ void MobileObject::stopMoving()
 }
 
 //----------------------------------------------------------------------------
-// - Update
-//----------------------------------------------------------------------------
-// * elapsed : relative time passed since last update
-//----------------------------------------------------------------------------
-void MobileObject::update(float elapsed)
-{
-    if(!frozen_)
-    {
-        clock_ += speed_ * elapsed * FPS;
-        while(clock_ >= 1)
-        {
-            step();
-            clock_ -= 1;
-        }
-    }
-}
-
-//----------------------------------------------------------------------------
 // - Increment Frame
 //----------------------------------------------------------------------------
 // Propagates the object's motion along a height map, or 'ground'
@@ -190,5 +116,5 @@ void MobileObject::step()
 int MobileObject::computeArrival(const sf::Vector3f& position)
 {
     double distance = sqrt(pow((position.x - position_.x), 2) + pow((position.y - position_.y), 2));
-    return (int)(ceil(distance * FPS));
+    return (int)(ceil(distance * getFPS()));
 }

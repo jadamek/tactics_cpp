@@ -1,10 +1,12 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <cstdlib>
 #include "settings.h"
 #include "map/Tile.h"
 #include "map/Map.h"
 #include "sprite/map/SpriteTile.h"
 #include "objects/Actor.h"
+#include "sprite/SpriteActor.h"
 
 int main()
 {
@@ -21,7 +23,7 @@ int main()
     {
         for(int y = 0; y < 2; y++)
         {
-            float height = 2;
+            float height = 1 + (rand() % 4);
 
             SpriteTile* tile_sprite = new SpriteTile(grass_texture, MAP_SCALE.x, MAP_SCALE.y, MAP_SCALE.z * height);
             Tile* tile = new Tile(tile_sprite, height);
@@ -31,8 +33,13 @@ int main()
     }
 
     soul_texture.loadFromFile("resources/graphics/Soul.png");    
-    sf::Sprite soul_sprite(soul_texture);
-    Actor soul(0, &map);
+    sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
+    SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
+    soul_sprite->move(-12, -40);
+
+    Actor soul(soul_sprite, &map);
+
+    map.addObject(&soul);
 
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
@@ -42,6 +49,10 @@ int main()
 
     window.setView(view);
 
+    // Clock and Animation
+    sf::Clock clock;
+    float elapsed = 0;
+
     while(window.isOpen())
     {
         sf::Event event;
@@ -50,6 +61,46 @@ int main()
             if(event.type == sf::Event::Closed)
                 window.close();
         }
+
+        // Keyboard Input handles
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            if(!soul.moving())
+            {
+                soul.moveTo(soul.position() + sf::Vector3f(-1.0, 0, 0));
+            }
+        }
+
+        // Keyboard Input handles
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            if(!soul.moving())
+            {
+                soul.moveTo(soul.position() + sf::Vector3f(1.0, 0, 0));
+            }
+        }
+
+        // Keyboard Input handles
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            if(!soul.moving())
+            {
+                soul.moveTo(soul.position() + sf::Vector3f(0, -1.0, 0));
+            }
+        }
+
+        // Keyboard Input handles
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            if(!soul.moving())
+            {
+                soul.moveTo(soul.position() + sf::Vector3f(0, 1.0, 0));
+            }
+        }
+
+        // Timing updates
+        elapsed = clock.restart().asSeconds();
+        soul.update(elapsed);
 
         window.clear(sf::Color::Black);
         window.draw(map);
