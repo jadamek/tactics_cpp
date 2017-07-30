@@ -1,5 +1,5 @@
-#ifndef TACTICS_ISOMETRIC_BUFFER_H
-#define TACTICS_ISOMETRIC_BUFFER_H
+#ifndef TACTICS_ISOMETRIC_NODE_H
+#define TACTICS_ISOMETRIC_NODE_H
 
 #include "../objects/IsometricObject.h"
 
@@ -11,13 +11,16 @@
 class IsometricNode
 {
 public:
-    IsometricNode();
+    IsometricNode(IsometricObject* target);
     ~IsometricNode();
     
-    void update();
+    const IsometricObject*  target() const;
+    IsometricObject*        target();
+    void alert();
 
 private:
-    bool dirty_;
+    IsometricObject*    target_;
+    bool                dirty_;
 };
 
 #endif

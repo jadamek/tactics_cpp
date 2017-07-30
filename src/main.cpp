@@ -17,8 +17,6 @@ int main()
 
     Map map(2, 2, MAP_SCALE);
 
-    Tile* tiles[4];
-
     for(int x = 0; x < 2; x++)
     {
         for(int y = 0; y < 2; y++)
@@ -40,6 +38,9 @@ int main()
     Actor soul(soul_sprite, &map);
 
     map.addObject(&soul);
+
+    map.images_.update(1.f);
+
 
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");

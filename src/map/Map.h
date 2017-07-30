@@ -30,13 +30,13 @@ public:
     int             getWidth() const;
     int             getLength() const;
 
+    IsometricBuffer images_;
 protected:
     virtual void    draw(sf::RenderTarget& target, sf::RenderStates states) const;
     Tile*           getTileAt(int x, int y, float z = FLT_MAX) const;
 
     int             width_;
     int             length_;
-    IsometricBuffer images_;
     std::vector<std::vector<std::vector<Tile*>>> tiles_;
 };
 

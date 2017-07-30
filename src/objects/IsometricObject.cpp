@@ -49,7 +49,7 @@ void IsometricObject::setPosition(const sf::Vector3f& position)
     if(position != position_ && handler_ != 0)
     {
         // Alert handler of change
-        handler_->update(); 
+        handler_->alert(); 
     }
 
     position_ = position;
@@ -66,11 +66,9 @@ void IsometricObject::setHandler(IsometricNode* node)
 }
 
 //----------------------------------------------------------------------------
-// - Remove Handler
+// - Get Handler
 //----------------------------------------------------------------------------
-// Sets the IsometricNode handler to NULL
-//----------------------------------------------------------------------------
-void IsometricObject::removeHandler()
+IsometricNode* IsometricObject::getHandler() const
 {
-    handler_ = 0;
+    return handler_;
 }

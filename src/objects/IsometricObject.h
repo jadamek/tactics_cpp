@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 class IsometricNode;
+class IsometricBuffer;
 
 //================================================================================
 // ** IsometricObject
@@ -20,12 +21,17 @@ public:
     virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const = 0;
     void                    setPosition(const sf::Vector3f& position);
-    void                    setHandler(IsometricNode*);
-    void                    removeHandler();
+
+    friend class            IsometricNode;
+    friend class            IsometricBuffer;
 
 protected: 
     sf::Vector3f            position_;
     IsometricNode*          handler_;
+
+private:
+    IsometricNode*          getHandler() const;
+    void                    setHandler(IsometricNode*);
 };
 
 #endif

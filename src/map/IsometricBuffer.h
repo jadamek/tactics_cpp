@@ -4,15 +4,15 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <set>
-#include "../objects/IsometricObject.h"
 #include "IsometricNode.h"
+#include "../objects/AnimatedObject.h"
 
 //================================================================================
 // ** IsometricBuffer
 //================================================================================
 // Represents a depth buffer of drawable isometric objects
 //================================================================================
-class IsometricBuffer : public sf::Drawable
+class IsometricBuffer : public sf::Drawable, public AnimatedObject
 {
 public:
     IsometricBuffer(const sf::Vector3f& scale = sf::Vector3f(1, 1, 1));    
@@ -26,9 +26,10 @@ public:
 
 private:
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    void                step();
 
-    std::set<const IsometricObject*> objects_;
-    sf::Vector3f                        scale_;
+    sf::Vector3f        scale_;
+    std::set<IsometricNode*> objects_;
 };
 
 #endif

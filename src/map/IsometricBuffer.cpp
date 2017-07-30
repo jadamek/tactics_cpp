@@ -1,4 +1,5 @@
 #include "IsometricBuffer.h"
+#include "../settings.h"
 #include <algorithm>
 
 //----------------------------------------------------------------------------
@@ -7,6 +8,7 @@
 // * scale : (x,y,z) pixels per local unit scaling vector
 //----------------------------------------------------------------------------
 IsometricBuffer::IsometricBuffer(const sf::Vector3f& scale) :
+    AnimatedObject(1.f),
     scale_(sf::Vector3f(std::max(1.f, scale.x), std::max(1.f, scale.y), std::max(1.f, scale.z)))
     {}
 
@@ -15,7 +17,10 @@ IsometricBuffer::IsometricBuffer(const sf::Vector3f& scale) :
 //----------------------------------------------------------------------------  
 IsometricBuffer::~IsometricBuffer()
 {
-
+    for(auto node : objects_)
+    {
+        delete node;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -47,7 +52,8 @@ sf::Vector2f IsometricBuffer::localToIso(const sf::Vector3f& position) const
 //----------------------------------------------------------------------------  
 void IsometricBuffer::add(const IsometricObject* obj)
 {
-    objects_.insert(obj);
+    IsometricNode* node = new IsometricNode(const_cast<IsometricObject*>(obj));
+    objects_.insert(node);
 }
 
 //----------------------------------------------------------------------------
@@ -57,7 +63,7 @@ void IsometricBuffer::add(const IsometricObject* obj)
 //----------------------------------------------------------------------------  
 void IsometricBuffer::remove(const IsometricObject* obj)
 {
-    objects_.erase(obj);
+    objects_.erase(obj->getHandler());
 }
 
 //----------------------------------------------------------------------------
@@ -79,11 +85,21 @@ void IsometricBuffer::isometricSort()
 //----------------------------------------------------------------------------
 void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    for(auto obj : objects_)
+    for(auto node : objects_)
     {
         sf::RenderStates state = states;
-		state.transform.translate(localToIso(obj->position()));
+		state.transform.translate(localToIso(node->target()->position()));
 
-		target.draw(*obj, state);
+		target.draw(*node->target(), state);
     }
+}
+#include <iostream>
+//----------------------------------------------------------------------------
+// - Increment Frame
+//----------------------------------------------------------------------------
+// Calls the isometric sort event if any nodes require re-sorting
+//----------------------------------------------------------------------------
+void IsometricBuffer::step()
+{
+    std::cout << "Sorting :" << std::endl;
 }
