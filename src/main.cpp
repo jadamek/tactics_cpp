@@ -15,7 +15,7 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(20, 20, MAP_SCALE);
+    Map map(30, 30, MAP_SCALE);
 
     for(int x = 0; x < map.width(); x++)
     {
@@ -55,7 +55,7 @@ int main()
     map.images_.isometricSort();
     sort_time = clock.restart().asMilliseconds();
     
-    std::cout << "In : " << sort_time << " us" << std::endl;
+    std::cout << "In : " << sort_time << " ms" << std::endl;
 
     while(window.isOpen())
     {

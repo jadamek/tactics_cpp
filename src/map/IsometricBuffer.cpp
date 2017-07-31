@@ -84,8 +84,6 @@ void IsometricBuffer::isometricSort()
     {
         node->detach();
     }
-
-    std::cout << "Sorting :" << std::endl;
     
     // Connect nodes with intersecting bounding boxes using directed edges
     for(auto node_it = objects_.begin(); node_it != objects_.end(); node_it++)
@@ -98,13 +96,6 @@ void IsometricBuffer::isometricSort()
         node_bounds.left += isometric_position.x;
         node_bounds.top += isometric_position.y;
         
-        std::cout << "   " << (*node_it) << " (" << (*node_it)->target()->position().x << ", " << (*node_it)->target()->position().y << ", "
-            << (*node_it)->target()->position().z << ", " << ") x " << (*node_it)->target()->getHeight()
-            << " [" << node_bounds.left << ", " << node_bounds.top << ", "
-            << node_bounds.width << ", " << node_bounds.height << "]"
-            << " => " << (*node_it)->target() << std::endl;
-        
-
         for(++neighbor_it; neighbor_it != objects_.end(); neighbor_it++)
         {
             // Compute isometric bounding box for potential neighbor
@@ -123,21 +114,9 @@ void IsometricBuffer::isometricSort()
         if((*node_it)->children().empty())
         {
             sinks_.insert(*node_it);
-        }
-        
-        for(auto child : (*node_it)->children())
-        {
-            std::cout << "     > " << child << std::endl;
-        }
-        
+        }        
     }
     
-    std::cout << std::endl << "Sinks: " << std::endl;
-    for(auto sink : sinks_)
-    {
-        std::cout << " " << sink << std::endl;
-    }
-
     if(!sinks_.empty())
     {
         // Topologically sort
@@ -153,14 +132,8 @@ void IsometricBuffer::isometricSort()
     else
     {
         // Report error in sorting: no sinks found
-        std::cout << "No sinks, which should be impossible and is therefore a big issue zzz" << std::endl;
     }
-
-    std::cout << "Sorted order:" << std::endl;
-    for(auto obj : sorted_)
-    {
-        std::cout << "  " << obj << std::endl;
-    }
+    
 }
 
 //----------------------------------------------------------------------------
