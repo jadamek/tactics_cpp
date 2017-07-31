@@ -63,10 +63,10 @@ int main()
     float elapsed = 0, sort_time;
 
     clock.restart();
-    map.images_.isometricSort();
-    sort_time = clock.restart().asMilliseconds();
+    map.images_.sort();
+    sort_time = clock.restart().asMicroseconds();
 
-    std::cout << "Full sort in : " << sort_time << " ms" << std::endl;
+    std::cout << "Full sort in : " << sort_time << " us" << std::endl;
 
     for(int i = 0; i < souls.size(); i++)
     {
@@ -76,11 +76,13 @@ int main()
         souls[i]->setPosition(sf::Vector3f(x, y, map.height(x, y)));
     }
 
+    map.remove(0, 1, 0);
+
     clock.restart();
     map.images_.update(1.f);
-    sort_time = clock.restart().asMilliseconds();
+    sort_time = clock.restart().asMicroseconds();
     
-    std::cout << "Partial sort in : " << sort_time << " ms" << std::endl;
+    std::cout << "Partial sort in : " << sort_time << " us" << std::endl;
 
     while(window.isOpen())
     {

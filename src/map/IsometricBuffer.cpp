@@ -65,7 +65,23 @@ void IsometricBuffer::add(const IsometricObject* obj)
 //----------------------------------------------------------------------------  
 void IsometricBuffer::remove(const IsometricObject* obj)
 {
-    IsometricNode* node = obj->getHandler();
+    remove(obj->getHandler());
+    delete obj->getHandler();
+}
+
+//----------------------------------------------------------------------------
+// - Remove Node from Buffer
+//----------------------------------------------------------------------------
+// * node : node to clean up before destruction
+//----------------------------------------------------------------------------  
+void IsometricBuffer::remove(IsometricNode* node)
+{
+    // Remove node's target object from sorted images
+    auto toRemove = std::find(sorted_.begin(), sorted_.end(), node->target());
+    if(toRemove != sorted_.end())
+    {
+        sorted_.erase(toRemove);
+    }
 
     // Remove any incoming edges for the extinct node
     for(auto neighbor : objects_)
@@ -73,15 +89,7 @@ void IsometricBuffer::remove(const IsometricObject* obj)
         neighbor->removeChild(node);
     }
 
-    // Remove object's node
-    objects_.erase(node);
-
-    // Remove object from sorted images
-    auto toRemove = std::find(sorted_.begin(), sorted_.end(), obj);
-    if(toRemove != sorted_.end())
-    {
-        sorted_.erase(toRemove);
-    }
+    objects_.erase(node);    
 }
 
 //----------------------------------------------------------------------------
@@ -92,8 +100,6 @@ void IsometricBuffer::alert()
     dirty_ = true;
 }
 
-#include <iostream>
-
 //----------------------------------------------------------------------------
 // - Isometrical Sort (Full)
 //----------------------------------------------------------------------------  
@@ -101,7 +107,7 @@ void IsometricBuffer::alert()
 // on a bounding rectangle intersection graph, using directed edges defined by
 // an isometric view ordering
 //----------------------------------------------------------------------------
-void IsometricBuffer::isometricSort()
+void IsometricBuffer::sort()
 {    
     // Remove any pre-existing edges for all nodes
     for(auto node : objects_)
@@ -137,14 +143,6 @@ void IsometricBuffer::isometricSort()
         (*node_it)->resolve();
     }
 
-    for(auto node : objects_)
-    {
-        if(node->dirty())
-        {
-            std::cout << "Dirt??" << std::endl;
-        }
-    }
-
     // Clear any previous sorting
     sorted_.clear();
 
@@ -162,7 +160,7 @@ void IsometricBuffer::isometricSort()
 // Re-sorts isometric nodes into drawing order using a topological sort,
 // limiting re-attachment and bounding box computation to dirty nodes
 //----------------------------------------------------------------------------
-void IsometricBuffer::partialIsometricSort(const std::set<IsometricNode*>& dirty_nodes)
+void IsometricBuffer::partialSort(const std::set<IsometricNode*>& dirty_nodes)
 {
     for(auto node : dirty_nodes)
     {
@@ -295,12 +293,12 @@ void IsometricBuffer::step()
         
         if(dirty.size() > objects_.size() / 2)
         {
-            isometricSort();
+            sort();
         }
         // Otherwise, execute a partial sort only on the dirty nodes
         else
         {
-            partialIsometricSort(dirty);
+            partialSort(dirty);
         }
     }       
 }

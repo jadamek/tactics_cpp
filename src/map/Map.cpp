@@ -80,7 +80,7 @@ Tile* Map::at(int x, int y, float z)
 {
     return getTileAt(x, y, z);    
 }
-#include <iostream>
+
 //----------------------------------------------------------------------------
 // - Place Tile
 //----------------------------------------------------------------------------
@@ -100,7 +100,6 @@ bool Map::place(Tile* tile, int x, int y)
     // Place on the exact top of the highest tile at (x, y)
     if(tiles_[x][y].size() > 0)
     {
-        std::cout << "   already a tile here ... " << std::endl;
         z = tiles_[x][y].back()->position().z + tiles_[x][y].back()->getHeight();
         tile->setOccupant(tiles_[x][y].back()->getOccupant());
         tiles_[x][y].back()->setOccupant(tile);
@@ -226,7 +225,7 @@ bool Map::remove(int x, int y, int layer)
     {
         return false;
     }
-    std::cout << "removing tile at (" << x << ", " << y << ", " << layer << ")" << std::endl;
+
     if(layer > 0)
     {
         tiles_[x][y][layer - 1]->setOccupant(tiles_[x][y][layer]->getOccupant());

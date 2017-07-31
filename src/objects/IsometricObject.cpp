@@ -15,6 +15,7 @@ IsometricObject::~IsometricObject()
 {
     if(handler_)
     {
+        handler_->deactivate();
         delete handler_;
     }
 }

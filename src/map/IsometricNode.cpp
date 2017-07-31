@@ -18,14 +18,8 @@ IsometricNode::IsometricNode(IsometricObject* target, IsometricBuffer* container
 // - Isometric Node Destructor
 //----------------------------------------------------------------------------
 IsometricNode::~IsometricNode()
-{
+{    
     target_->setHandler(0);
-    detach();
-    
-    if(container_)
-    {
-        container_->remove(target_);
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -171,4 +165,15 @@ const sf::FloatRect& IsometricNode::getBounds() const
 void IsometricNode::setBounds(const sf::FloatRect& bounds)
 {
     bounds_ = bounds;
+}
+
+//----------------------------------------------------------------------------
+// - Remove Node from Buffer for Deletion
+//----------------------------------------------------------------------------
+void IsometricNode::deactivate()
+{        
+    if(container_)
+    {
+        container_->remove(this);
+    }
 }

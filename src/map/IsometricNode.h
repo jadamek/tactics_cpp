@@ -27,6 +27,7 @@ public:
     bool                            dirty() const;
     const sf::FloatRect&            getBounds() const;
     void                            setBounds(const sf::FloatRect& bounds);
+    void                            deactivate();
 
 private:
     bool                            compare(const IsometricObject* a, const IsometricObject* b) const;

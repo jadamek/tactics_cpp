@@ -23,11 +23,12 @@ public:
     sf::Vector2f        localToIso(const sf::Vector3f& position) const;
     void                add(const IsometricObject* obj);
     void                remove(const IsometricObject* obj);
+    void                remove(IsometricNode* node);
     void                alert();
-    void                isometricSort();
+    void                sort();
 
 private:
-    void                partialIsometricSort(const std::set<IsometricNode*>& dirty_nodes);
+    void                partialSort(const std::set<IsometricNode*>& dirty_nodes);
     void                topologicalSort();
     void                topologicalTraverse(IsometricNode* node, std::set<IsometricNode*>& visited);
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
