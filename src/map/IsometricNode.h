@@ -23,6 +23,7 @@ public:
     void                            detach();
     const std::set<IsometricNode*>& parents() const;
     const std::set<IsometricNode*>& children() const;
+    bool                            dirty() const;
 
 private:
     bool                            compare(const IsometricObject* a, const IsometricObject* b) const;

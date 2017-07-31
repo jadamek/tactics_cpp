@@ -134,13 +134,21 @@ bool IsometricNode::compare(const IsometricObject* a, const IsometricObject* b) 
     else
     {
         // Otherwise, compare x + y coordinates (isometric)
-        if(a->position().x + a->position.().y != b->position().x + b->position().y)
+        if(a->position().x + a->position().y != b->position().x + b->position().y)
         {
-            return a->position().x + a->position.().y > b->position().x + b->position().y
+            return a->position().x + a->position().y > b->position().x + b->position().y;
         }
         // Finally, compare y arbitrarily if isometric sums are the same
         else{
             return a->position().y >= b->position().y;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// - Get Sorting Status
+//----------------------------------------------------------------------------
+bool IsometricNode::dirty() const
+{
+    dirty_;
 }

@@ -10,7 +10,7 @@
 IsometricBuffer::IsometricBuffer(const sf::Vector3f& scale) :
     AnimatedObject(1.f),
     scale_(sf::Vector3f(std::max(1.f, scale.x), std::max(1.f, scale.y), std::max(1.f, scale.z)))
-    {}
+{}
 
 //----------------------------------------------------------------------------
 // - Isometric Buffer Destructor
@@ -65,6 +65,7 @@ void IsometricBuffer::remove(const IsometricObject* obj)
 {
     objects_.erase(obj->getHandler());
 }
+#include <iostream>
 
 //----------------------------------------------------------------------------
 // - Isometrical Sort
@@ -75,7 +76,66 @@ void IsometricBuffer::remove(const IsometricObject* obj)
 //----------------------------------------------------------------------------
 void IsometricBuffer::isometricSort()
 {
+    std::cout << "Sorting :" << std::endl;
+    sorted_.clear();
+    sinks_.clear();
 
+    // Connect nodes with intersecting bounding boxes using directed edges
+    for(auto node_it = objects_.begin(); node_it != objects_.end(); node_it++)
+    {
+        auto neighbor_it = node_it;
+
+        // Compute isometric bounding box for this node
+        sf::FloatRect node_bounds = (*node_it)->target()->getGlobalBounds();
+        sf::Vector2f isometric_position = localToIso((*node_it)->target()->position());
+        node_bounds.left += isometric_position.x;
+        node_bounds.top += isometric_position.y;
+
+        /*
+        std::cout << "   " << (*node_it) << " (" << (*node_it)->target()->position().x << ", " << (*node_it)->target()->position().y << ", "
+            << (*node_it)->target()->position().z << ", " << ") x " << (*node_it)->target()->getHeight()
+            << " [" << node_bounds.left << ", " << node_bounds.top << ", "
+            << node_bounds.width << ", " << node_bounds.height << "]" << std::endl;
+        */
+
+        for(++neighbor_it; neighbor_it != objects_.end(); neighbor_it++)
+        {
+            // Compute isometric bounding box for potential neighbor
+            sf::FloatRect neighbor_bounds = (*neighbor_it)->target()->getGlobalBounds();
+            isometric_position = localToIso((*neighbor_it)->target()->position());
+            neighbor_bounds.left += isometric_position.x;
+            neighbor_bounds.top += isometric_position.y;
+
+            // If bounding boxes intersect, establish a directed connection (parent-child)
+            if(node_bounds.intersects(neighbor_bounds)){
+                (*node_it)->attach(*neighbor_it);                
+            }
+        }
+        
+        /*
+        for(auto parent : (*node_it)->parents())
+        {
+            std::cout << "     < " << parent << std::endl;
+        }
+
+        for(auto child : (*node_it)->children())
+        {
+            std::cout << "     > " << child << std::endl;
+        }
+        */
+
+        // Will decide if this is sink or source later >_> ...
+        if((*node_it)->children().empty())
+        {
+            sinks_.insert(*node_it);
+        }
+    }
+
+    std::cout << std::endl << "Sinks: " << std::endl;
+    for(auto sink : sinks_)
+    {
+        std::cout << " " << sink << std::endl;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -93,7 +153,7 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 		target.draw(*node->target(), state);
     }
 }
-#include <iostream>
+
 //----------------------------------------------------------------------------
 // - Increment Frame
 //----------------------------------------------------------------------------
@@ -101,5 +161,12 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 //----------------------------------------------------------------------------
 void IsometricBuffer::step()
 {
-    std::cout << "Sorting :" << std::endl;
+    for(IsometricNode* node : objects_)
+    {
+        if(node->dirty())
+        {
+            isometricSort();        
+            break;
+        }
+    }
 }
