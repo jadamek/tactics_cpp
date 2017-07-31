@@ -52,6 +52,21 @@ IsometricObject* IsometricNode::target()
 void IsometricNode::alert()
 {
     dirty_ = true;
+
+    if(container_)
+    {
+        container_->alert();
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Resolve Sorting Status
+//----------------------------------------------------------------------------
+// Clears the dirty_ flag to indicate object re-sorting resolved
+//----------------------------------------------------------------------------
+void IsometricNode::resolve()
+{
+    dirty_ = false;
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +94,16 @@ void IsometricNode::attach(IsometricNode* node)
 void IsometricNode::detach()
 {        
     children_.clear();
+}
+
+//----------------------------------------------------------------------------
+// - Remove Child Node
+//----------------------------------------------------------------------------
+// * child : child node to be removed from children set
+//----------------------------------------------------------------------------
+void IsometricNode::removeChild(IsometricNode* child)
+{
+    children_.erase(child);
 }
 
 //----------------------------------------------------------------------------
@@ -126,5 +151,24 @@ bool IsometricNode::compare(const IsometricObject* a, const IsometricObject* b) 
 //----------------------------------------------------------------------------
 bool IsometricNode::dirty() const
 {
-    dirty_;
+    return dirty_;
+}
+
+//----------------------------------------------------------------------------
+// - Get Bounding Box
+//----------------------------------------------------------------------------
+const sf::FloatRect& IsometricNode::getBounds() const
+{
+    return bounds_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Bounding Box
+//----------------------------------------------------------------------------
+// * bounds : computed bounding box for this node during isometric sorting
+// Used by isometric sort in IsometricBuffer as a temporary store
+//----------------------------------------------------------------------------
+void IsometricNode::setBounds(const sf::FloatRect& bounds)
+{
+    bounds_ = bounds;
 }

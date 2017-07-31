@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <cstdlib>
+#include <vector>
 #include "settings.h"
 #include "map/Tile.h"
 #include "map/Map.h"
@@ -15,7 +16,7 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(30, 30, MAP_SCALE);
+    Map map(50, 50, MAP_SCALE);
 
     for(int x = 0; x < map.width(); x++)
     {
@@ -31,14 +32,24 @@ int main()
     }
 
     soul_texture.loadFromFile("resources/graphics/Soul.png");    
-    sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
-    SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
-    soul_sprite->move(-12, -40);
+    std::vector<Actor*> souls;
 
-    Actor soul(soul_sprite, &map);
+    for(int i = 0; i < 10; i++)
+    {
+        sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
+        SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
+        soul_sprite->move(-12, -40);
 
-    map.addObject(&soul);
+        Actor* soul = new Actor(soul_sprite, &map);
+        float x = 2*(i % 3) + 1;
+        float y = 2*(i / 3) + 1;
 
+        soul->setPosition(sf::Vector3f(x, y, map.height(x, y)));
+
+        map.addObject(soul);
+        souls.push_back(soul);
+    }
+    
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
 
@@ -54,8 +65,22 @@ int main()
     clock.restart();
     map.images_.isometricSort();
     sort_time = clock.restart().asMilliseconds();
+
+    std::cout << "Full sort in : " << sort_time << " ms" << std::endl;
+
+    for(int i = 0; i < souls.size(); i++)
+    {
+        float x = 4*(i % 3);
+        float y = 4*(i / 3);
+
+        souls[i]->setPosition(sf::Vector3f(x, y, map.height(x, y)));
+    }
+
+    clock.restart();
+    map.images_.update(1.f);
+    sort_time = clock.restart().asMilliseconds();
     
-    std::cout << "In : " << sort_time << " ms" << std::endl;
+    std::cout << "Partial sort in : " << sort_time << " ms" << std::endl;
 
     while(window.isOpen())
     {
@@ -65,7 +90,7 @@ int main()
             if(event.type == sf::Event::Closed)
                 window.close();
         }
-
+        /*
         // Keyboard Input handles
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
@@ -101,10 +126,11 @@ int main()
                 soul.moveTo(soul.position() + sf::Vector3f(0, 1.0, 0));
             }
         }
+        */
 
         // Timing updates
         elapsed = clock.restart().asSeconds();
-        soul.update(elapsed);
+        //soul.update(elapsed);
 
         window.clear(sf::Color::Black);
         window.draw(map);
