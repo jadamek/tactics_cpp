@@ -21,7 +21,6 @@ public:
     void                            alert();
     void                            attach(IsometricNode* node);
     void                            detach();
-    const std::set<IsometricNode*>& parents() const;
     const std::set<IsometricNode*>& children() const;
     bool                            dirty() const;
 
@@ -32,7 +31,6 @@ private:
     IsometricObject*                target_;
     IsometricBuffer*                container_;
     bool                            dirty_;
-    std::set<IsometricNode*>        parents_;
     std::set<IsometricNode*>        children_;
 };
 

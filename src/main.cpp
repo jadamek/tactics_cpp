@@ -15,11 +15,11 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(2, 2, MAP_SCALE);
+    Map map(20, 20, MAP_SCALE);
 
-    for(int x = 0; x < 2; x++)
+    for(int x = 0; x < map.width(); x++)
     {
-        for(int y = 0; y < 2; y++)
+        for(int y = 0; y < map.length(); y++)
         {
             float height = 1 + (rand() % 4);
 
@@ -39,8 +39,6 @@ int main()
 
     map.addObject(&soul);
 
-    map.images_.update(1.f);
-
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
 
@@ -51,7 +49,13 @@ int main()
 
     // Clock and Animation
     sf::Clock clock;
-    float elapsed = 0;
+    float elapsed = 0, sort_time;
+
+    clock.restart();
+    map.images_.isometricSort();
+    sort_time = clock.restart().asMilliseconds();
+    
+    std::cout << "In : " << sort_time << " us" << std::endl;
 
     while(window.isOpen())
     {

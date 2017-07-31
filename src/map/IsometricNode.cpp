@@ -65,10 +65,8 @@ void IsometricNode::attach(IsometricNode* node)
     if(compare(target_, node->target()))
     {
         children_.insert(node);
-        node->parents_.insert(this);
     }
     else{
-        parents_.insert(node);
         node->children_.insert(this);
     }
 }
@@ -76,33 +74,11 @@ void IsometricNode::attach(IsometricNode* node)
 //----------------------------------------------------------------------------
 // - Detach from Node
 //----------------------------------------------------------------------------
-// Removes this node from all children parents' sets, and then empties this
-// node's sets preparing it for re-attachment.
+// Empties this node's child set preparing it for re-attachment.
 //----------------------------------------------------------------------------
 void IsometricNode::detach()
-{
-    for(auto parent : parents_)
-    {
-        parent->parents_.erase(this);
-        parent->children_.erase(this);
-    }
-
-    for(auto child : children_)
-    {
-        child->parents_.erase(this);
-        child->children_.erase(this);
-    }
-
-    parents_.clear();
+{        
     children_.clear();
-}
-
-//----------------------------------------------------------------------------
-// - Get Parent Set
-//----------------------------------------------------------------------------
-const std::set<IsometricNode*>& IsometricNode::parents() const
-{
-    return parents_;
 }
 
 //----------------------------------------------------------------------------

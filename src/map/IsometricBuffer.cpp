@@ -76,10 +76,17 @@ void IsometricBuffer::remove(const IsometricObject* obj)
 //----------------------------------------------------------------------------
 void IsometricBuffer::isometricSort()
 {
-    std::cout << "Sorting :" << std::endl;
+    // Clear any previous sorting
     sorted_.clear();
     sinks_.clear();
 
+    for(auto node : objects_)
+    {
+        node->detach();
+    }
+
+    std::cout << "Sorting :" << std::endl;
+    
     // Connect nodes with intersecting bounding boxes using directed edges
     for(auto node_it = objects_.begin(); node_it != objects_.end(); node_it++)
     {
@@ -90,13 +97,13 @@ void IsometricBuffer::isometricSort()
         sf::Vector2f isometric_position = localToIso((*node_it)->target()->position());
         node_bounds.left += isometric_position.x;
         node_bounds.top += isometric_position.y;
-
-        /*
+        
         std::cout << "   " << (*node_it) << " (" << (*node_it)->target()->position().x << ", " << (*node_it)->target()->position().y << ", "
             << (*node_it)->target()->position().z << ", " << ") x " << (*node_it)->target()->getHeight()
             << " [" << node_bounds.left << ", " << node_bounds.top << ", "
-            << node_bounds.width << ", " << node_bounds.height << "]" << std::endl;
-        */
+            << node_bounds.width << ", " << node_bounds.height << "]"
+            << " => " << (*node_it)->target() << std::endl;
+        
 
         for(++neighbor_it; neighbor_it != objects_.end(); neighbor_it++)
         {
@@ -111,31 +118,73 @@ void IsometricBuffer::isometricSort()
                 (*node_it)->attach(*neighbor_it);                
             }
         }
-        
-        /*
-        for(auto parent : (*node_it)->parents())
-        {
-            std::cout << "     < " << parent << std::endl;
-        }
 
-        for(auto child : (*node_it)->children())
-        {
-            std::cout << "     > " << child << std::endl;
-        }
-        */
-
-        // Will decide if this is sink or source later >_> ...
+        // Nodes with no children are sinks (all edges directed toward it)
         if((*node_it)->children().empty())
         {
             sinks_.insert(*node_it);
         }
+        
+        for(auto child : (*node_it)->children())
+        {
+            std::cout << "     > " << child << std::endl;
+        }
+        
     }
-
+    
     std::cout << std::endl << "Sinks: " << std::endl;
     for(auto sink : sinks_)
     {
         std::cout << " " << sink << std::endl;
     }
+
+    if(!sinks_.empty())
+    {
+        // Topologically sort
+        std::set<IsometricNode*> visited;
+        for(auto node : objects_)
+        {
+            if(visited.count(node) == 0)
+            {
+                topologicalSort(node, visited);            
+            }
+        }
+    }
+    else
+    {
+        // Report error in sorting: no sinks found
+        std::cout << "No sinks, which should be impossible and is therefore a big issue zzz" << std::endl;
+    }
+
+    std::cout << "Sorted order:" << std::endl;
+    for(auto obj : sorted_)
+    {
+        std::cout << "  " << obj << std::endl;
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Topological Sort (Recursive)
+//---------------------------------------------------------------------------- 
+// * node : current node being recursively sorted
+// * visited : set which tracks all recursively visited nodes
+//---------------------------------------------------------------------------- 
+void IsometricBuffer::topologicalSort(IsometricNode* node, std::set<IsometricNode*>& visited)
+{
+    // Visit this node
+    visited.insert(node);
+
+    // Recur for each non-visited child
+    for(auto child : node->children())
+    {
+        if(visited.count(child) == 0)
+        {
+            topologicalSort(child, visited);            
+        }
+    }
+
+    // Push current node to the sorted drawing queue
+    sorted_.push_back(node->target());
 }
 
 //----------------------------------------------------------------------------
@@ -145,12 +194,12 @@ void IsometricBuffer::isometricSort()
 //----------------------------------------------------------------------------
 void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    for(auto node : objects_)
+    for(auto obj : sorted_)
     {
         sf::RenderStates state = states;
-		state.transform.translate(localToIso(node->target()->position()));
+		state.transform.translate(localToIso(obj->position()));
 
-		target.draw(*node->target(), state);
+		target.draw(*obj, state);
     }
 }
 

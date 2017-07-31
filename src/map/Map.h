@@ -28,8 +28,8 @@ public:
     bool            remove(int x, int y, int layer);
     float           height(float x, float y) const;
     void            addObject(const IsometricObject* obj);
-    int             getWidth() const;
-    int             getLength() const;
+    int             width() const;
+    int             length() const;
 
     IsometricBuffer images_;
     

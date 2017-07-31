@@ -26,6 +26,7 @@ public:
     void                isometricSort();
 
 private:
+    void                topologicalSort(IsometricNode* node, std::set<IsometricNode*>& visited);
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void                step();
 

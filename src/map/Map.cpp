@@ -282,7 +282,7 @@ void Map::addObject(const IsometricObject* obj)
 //----------------------------------------------------------------------------
 // - Get Map Width
 //----------------------------------------------------------------------------
-int Map::getWidth() const
+int Map::width() const
 {
     return width_;
 }
@@ -290,7 +290,7 @@ int Map::getWidth() const
 //----------------------------------------------------------------------------
 // - Get Map Length
 //----------------------------------------------------------------------------
-int Map::getLength() const
+int Map::length() const
 {
     return length_;
 }
