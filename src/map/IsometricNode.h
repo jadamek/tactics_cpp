@@ -2,6 +2,7 @@
 #define TACTICS_ISOMETRIC_NODE_H
 
 #include "../objects/IsometricObject.h"
+#include <set>
 
 //================================================================================
 // ** IsometricNode
@@ -10,17 +11,28 @@
 //================================================================================
 class IsometricNode
 {
+// Methods
 public:
-    IsometricNode(IsometricObject* target);
+    IsometricNode(IsometricObject* target, IsometricBuffer* container);
     ~IsometricNode();
     
-    const IsometricObject*  target() const;
-    IsometricObject*        target();
-    void alert();
+    const IsometricObject*          target() const;
+    IsometricObject*                target();
+    void                            alert();
+    void                            attach(IsometricNode* node);
+    void                            detach();
+    const std::set<IsometricNode*>& parents() const;
+    const std::set<IsometricNode*>& children() const;
 
 private:
-    IsometricObject*    target_;
-    bool                dirty_;
+    bool                            compare(const IsometricObject* a, const IsometricObject* b) const;
+
+// Members
+    IsometricObject*                target_;
+    IsometricBuffer*                container_;
+    bool                            dirty_;
+    std::set<IsometricNode*>        parents_;
+    std::set<IsometricNode*>        children_;
 };
 
 #endif

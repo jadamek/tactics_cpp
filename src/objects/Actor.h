@@ -11,6 +11,7 @@
 //================================================================================
 class Actor : public MobileObject
 {
+// Methods
 public:
     Actor(const Sprite* sprite = 0, const Map* ground = 0);
     ~Actor();
@@ -22,6 +23,7 @@ public:
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+// Members
     const Sprite*           sprite_;
 };
 

@@ -13,7 +13,9 @@
 //================================================================================
 class MobileObject : public IsometricObject, public AnimatedObject
 {
+// Methods
 public:
+
     MobileObject(const Map* ground = 0);
     ~MobileObject();
 
@@ -26,8 +28,9 @@ protected:
     virtual void    step();
     int             computeArrival(const sf::Vector3f& position);
 
-    const Map*      ground_;
-    int             arrival_;
+// Members
+    const Map*              ground_;
+    int                     arrival_;
     std::list<sf::Vector3f> destination_;
 };
 

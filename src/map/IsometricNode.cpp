@@ -1,13 +1,15 @@
-#include "IsometricNode.h"
+#include "IsometricBuffer.h"
 
 //----------------------------------------------------------------------------
 // - Isometric Node Contructor
 //----------------------------------------------------------------------------
 // * target : Drawable Isometric Object this node handles
+// * container : Isometric Buffer this node belongs to
 //----------------------------------------------------------------------------
-IsometricNode::IsometricNode(IsometricObject* target) :
+IsometricNode::IsometricNode(IsometricObject* target, IsometricBuffer* container) :
     target_(target),
-    dirty_(false)
+    container_(container),
+    dirty_(true)
 {
     target_->setHandler(this);
 }
@@ -18,6 +20,12 @@ IsometricNode::IsometricNode(IsometricObject* target) :
 IsometricNode::~IsometricNode()
 {
     target_->setHandler(0);
+    detach();
+    
+    if(container_)
+    {
+        container_->remove(target_);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -44,4 +52,95 @@ IsometricObject* IsometricNode::target()
 void IsometricNode::alert()
 {
     dirty_ = true;
+}
+
+//----------------------------------------------------------------------------
+// - Attach Nodes
+//----------------------------------------------------------------------------
+// * node : node to link to, either as a parent or child depending on sorting
+// criteria
+//----------------------------------------------------------------------------
+void IsometricNode::attach(IsometricNode* node)
+{
+    if(compare(target_, node->target()))
+    {
+        children_.insert(node);
+        node->parents_.insert(this);
+    }
+    else{
+        parents_.insert(node);
+        node->children_.insert(this);
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Detach from Node
+//----------------------------------------------------------------------------
+// Removes this node from all children parents' sets, and then empties this
+// node's sets preparing it for re-attachment.
+//----------------------------------------------------------------------------
+void IsometricNode::detach()
+{
+    for(auto parent : parents_)
+    {
+        parent->parents_.erase(this);
+        parent->children_.erase(this);
+    }
+
+    for(auto child : children_)
+    {
+        child->parents_.erase(this);
+        child->children_.erase(this);
+    }
+
+    parents_.clear();
+    children_.clear();
+}
+
+//----------------------------------------------------------------------------
+// - Get Parent Set
+//----------------------------------------------------------------------------
+const std::set<IsometricNode*>& IsometricNode::parents() const
+{
+    return parents_;
+}
+
+//----------------------------------------------------------------------------
+// - Get Child Set
+//----------------------------------------------------------------------------
+const std::set<IsometricNode*>& IsometricNode::children() const
+{
+    return children_;
+}
+
+//----------------------------------------------------------------------------
+// - Compare Target Priority
+//----------------------------------------------------------------------------
+// * a : "left" node to compare
+// * b : "right" node to compare
+// Returns true if a >= b, and false otherwise
+//----------------------------------------------------------------------------
+bool IsometricNode::compare(const IsometricObject* a, const IsometricObject* b) const
+{
+    // First check if either object is over the other
+    if(a->position().z >= b->position().z + b->getHeight())
+    {
+        return true;
+    }
+    else if(b->position().z >= a->position().z + a->getHeight())
+    {
+        return false;
+    }
+    else
+    {
+        // Otherwise, compare x + y coordinates (isometric)
+        if(a->position().x + a->position.().y != b->position().x + b->position().y)
+        {
+            return a->position().x + a->position.().y > b->position().x + b->position().y
+        }
+        // Finally, compare y arbitrarily if isometric sums are the same
+        else{
+            return a->position().y >= b->position().y;
+        }
+    }
 }

@@ -10,6 +10,7 @@
 // A sprite of a single (continuous or discrete) tile column.
 //================================================================================
 class SpriteTile : public Sprite{
+// Methods
 public:
     SpriteTile(const sf::Texture&, float width = 0, float length = 0, float height = 0, bool continuous = false);
     ~SpriteTile();
@@ -20,6 +21,7 @@ public:
 protected:
     void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+// Members
     float           width_;
     float           length_;
     float           height_;

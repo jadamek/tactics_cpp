@@ -41,7 +41,6 @@ int main()
 
     map.images_.update(1.f);
 
-
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
 

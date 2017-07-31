@@ -11,6 +11,7 @@
 //================================================================================
 class SpriteActor : public Sprite
 {
+// Methods
 public:
     SpriteActor(const sf::Sprite* sprite = 0);
     ~SpriteActor();
@@ -21,6 +22,7 @@ public:
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+// Members
     const sf::Sprite*       sprite_;
 };
 

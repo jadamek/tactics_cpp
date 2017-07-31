@@ -2,7 +2,7 @@
 #define TACTICS_ISOMETRIC_BUFFER_H
 
 #include <SFML/Graphics.hpp>
-#include <vector>
+#include <list>
 #include <set>
 #include "IsometricNode.h"
 #include "../objects/AnimatedObject.h"
@@ -14,6 +14,7 @@
 //================================================================================
 class IsometricBuffer : public sf::Drawable, public AnimatedObject
 {
+// Methods
 public:
     IsometricBuffer(const sf::Vector3f& scale = sf::Vector3f(1, 1, 1));    
     ~IsometricBuffer();
@@ -28,8 +29,11 @@ private:
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void                step();
 
-    sf::Vector3f        scale_;
-    std::set<IsometricNode*> objects_;
+// Members
+    sf::Vector3f                        scale_;
+    std::set<IsometricNode*>            objects_;
+    std::list<const IsometricObject*>   sorted_;
+    std::set<IsometricNode*>            sinks_;
 };
 
 #endif

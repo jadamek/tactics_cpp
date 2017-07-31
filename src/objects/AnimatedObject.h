@@ -12,6 +12,7 @@
 //================================================================================
 class AnimatedObject
 {
+// Methods
 public:
     AnimatedObject(float fps = FPS);
 
@@ -28,6 +29,7 @@ public:
 protected:
     virtual void    step() = 0;
 
+// Members
     float           fps_;
     float           speed_;
     float           clock_;

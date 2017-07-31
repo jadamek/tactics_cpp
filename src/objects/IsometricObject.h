@@ -13,6 +13,7 @@ class IsometricBuffer;
 //================================================================================
 class IsometricObject : public sf::Drawable
 {
+// Methods    
 public:
     IsometricObject();
     ~IsometricObject();
@@ -25,13 +26,14 @@ public:
     friend class            IsometricNode;
     friend class            IsometricBuffer;
 
-protected: 
-    sf::Vector3f            position_;
-    IsometricNode*          handler_;
-
 private:
     IsometricNode*          getHandler() const;
     void                    setHandler(IsometricNode*);
+
+// Members
+protected: 
+    sf::Vector3f            position_;
+    IsometricNode*          handler_;
 };
 
 #endif

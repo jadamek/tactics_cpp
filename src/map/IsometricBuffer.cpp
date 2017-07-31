@@ -52,7 +52,7 @@ sf::Vector2f IsometricBuffer::localToIso(const sf::Vector3f& position) const
 //----------------------------------------------------------------------------  
 void IsometricBuffer::add(const IsometricObject* obj)
 {
-    IsometricNode* node = new IsometricNode(const_cast<IsometricObject*>(obj));
+    IsometricNode* node = new IsometricNode(const_cast<IsometricObject*>(obj), this);
     objects_.insert(node);
 }
 

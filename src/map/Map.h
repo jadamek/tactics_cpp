@@ -15,6 +15,7 @@
 //================================================================================
 class Map : public sf::Drawable
 {
+// Methods
 public:
     Map(int width = 10, int length = 10, const sf::Vector3f& scale = sf::Vector3f(1, 1, 1));
     ~Map();
@@ -31,10 +32,12 @@ public:
     int             getLength() const;
 
     IsometricBuffer images_;
+    
 protected:
     virtual void    draw(sf::RenderTarget& target, sf::RenderStates states) const;
     Tile*           getTileAt(int x, int y, float z = FLT_MAX) const;
 
+// Members
     int             width_;
     int             length_;
     std::vector<std::vector<std::vector<Tile*>>> tiles_;

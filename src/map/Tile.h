@@ -13,6 +13,7 @@
 //================================================================================
 class Tile : public IsometricObject
 {
+// Methods
 public:
     Tile(const Sprite* sprite = 0, float height = 1.0);
     ~Tile();
@@ -30,6 +31,7 @@ public:
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+// Members
     const Sprite*           sprite_;
     Tile*                   occupant_;
     float                   height_;
