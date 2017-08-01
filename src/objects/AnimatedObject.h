@@ -24,7 +24,7 @@ public:
     void            setFrozen(bool frozen);
     void            freeze();
     void            unfreeze();
-    void            update(float elapsed);
+    virtual void    update(float elapsed);
 
 protected:
     virtual void    step() = 0;

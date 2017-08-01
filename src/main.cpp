@@ -16,7 +16,7 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(50, 50, MAP_SCALE);
+    Map map(35, 35, MAP_SCALE);
 
     for(int x = 0; x < map.width(); x++)
     {
@@ -32,23 +32,14 @@ int main()
     }
 
     soul_texture.loadFromFile("resources/graphics/Soul.png");    
-    std::vector<Actor*> souls;
 
-    for(int i = 0; i < 10; i++)
-    {
-        sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
-        SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
-        soul_sprite->move(-12, -40);
+    
+    sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
+    SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
+    soul_sprite->move(-12, -40);
 
-        Actor* soul = new Actor(soul_sprite, &map);
-        float x = 2*(i % 3) + 1;
-        float y = 2*(i / 3) + 1;
-
-        soul->setPosition(sf::Vector3f(x, y, map.height(x, y)));
-
-        map.addObject(soul);
-        souls.push_back(soul);
-    }
+    Actor* soul = new Actor(soul_sprite, &map);
+    map.addObject(soul);
     
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
@@ -63,26 +54,12 @@ int main()
     float elapsed = 0, sort_time;
 
     clock.restart();
-    map.images_.sort();
+    map.getDepthBuffer().sort();
     sort_time = clock.restart().asMicroseconds();
 
-    std::cout << "Full sort in : " << sort_time << " us" << std::endl;
+    std::cout << "Full sort in : " << sort_time << " us " << std::endl;
 
-    for(int i = 0; i < souls.size(); i++)
-    {
-        float x = 4*(i % 3);
-        float y = 4*(i / 3);
-
-        souls[i]->setPosition(sf::Vector3f(x, y, map.height(x, y)));
-    }
-
-    map.remove(0, 1, 0);
-
-    clock.restart();
-    map.images_.update(1.f);
-    sort_time = clock.restart().asMicroseconds();
-    
-    std::cout << "Partial sort in : " << sort_time << " us" << std::endl;
+    bool closing = false;
 
     while(window.isOpen())
     {
@@ -92,47 +69,58 @@ int main()
             if(event.type == sf::Event::Closed)
                 window.close();
         }
-        /*
-        // Keyboard Input handles
+        
+        // Keyboard Input handles : LEFT
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            if(!soul.moving())
+            if(!soul->moving())
             {
-                soul.moveTo(soul.position() + sf::Vector3f(-1.0, 0, 0));
+                soul->moveTo(soul->position() + sf::Vector3f(-1.0, 0, 0));
             }
         }
 
-        // Keyboard Input handles
+        // Keyboard Input handles : RIGHT
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
-            if(!soul.moving())
+            if(!soul->moving())
             {
-                soul.moveTo(soul.position() + sf::Vector3f(1.0, 0, 0));
+                soul->moveTo(soul->position() + sf::Vector3f(1.0, 0, 0));
             }
         }
 
-        // Keyboard Input handles
+        // Keyboard Input handles : UP
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            if(!soul.moving())
+            if(!soul->moving())
             {
-                soul.moveTo(soul.position() + sf::Vector3f(0, -1.0, 0));
+                soul->moveTo(soul->position() + sf::Vector3f(0, -1.0, 0));
             }
         }
 
-        // Keyboard Input handles
+        // Keyboard Input handles : DOWN
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            if(!soul.moving())
+            if(!soul->moving())
             {
-                soul.moveTo(soul.position() + sf::Vector3f(0, 1.0, 0));
+                soul->moveTo(soul->position() + sf::Vector3f(0, 1.0, 0));
             }
         }
-        */
+        
+        // Keyboard Input handles : ESC
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            closing = true;
+        }
+
+        if(closing)
+        {
+            window.close();
+        }
 
         // Timing updates
         elapsed = clock.restart().asSeconds();
-        //soul.update(elapsed);
+        soul->update(elapsed);
+        map.getDepthBuffer().update(elapsed);
 
         window.clear(sf::Color::Black);
         window.draw(map);

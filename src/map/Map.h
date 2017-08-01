@@ -20,26 +20,26 @@ public:
     Map(int width = 10, int length = 10, const sf::Vector3f& scale = sf::Vector3f(1, 1, 1));
     ~Map();
 
-    const Tile*     at(int x, int y, float z = FLT_MAX) const;
-    Tile*           at(int x, int y, float z = FLT_MAX);
-    bool            place(Tile* tile, int x, int y);
-    bool            insert(Tile* tile, int x, int y, int layer);
-    bool            replace(Tile* tile, int x, int y, int layer);
-    bool            remove(int x, int y, int layer);
-    float           height(float x, float y) const;
-    void            addObject(const IsometricObject* obj);
-    int             width() const;
-    int             length() const;
-
-    IsometricBuffer images_;
+    const Tile*         at(int x, int y, float z = FLT_MAX) const;
+    Tile*               at(int x, int y, float z = FLT_MAX);
+    bool                place(Tile* tile, int x, int y);
+    bool                insert(Tile* tile, int x, int y, int layer);
+    bool                replace(Tile* tile, int x, int y, int layer);
+    bool                remove(int x, int y, int layer);
+    float               height(float x, float y) const;
+    void                addObject(const IsometricObject* obj);
+    int                 width() const;
+    int                 length() const;
+    IsometricBuffer&    getDepthBuffer();
     
 protected:
-    virtual void    draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    Tile*           getTileAt(int x, int y, float z = FLT_MAX) const;
+    virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    Tile*               getTileAt(int x, int y, float z = FLT_MAX) const;
 
 // Members
-    int             width_;
-    int             length_;
+    int                 width_;
+    int                 length_;
+    IsometricBuffer     images_;
     std::vector<std::vector<std::vector<Tile*>>> tiles_;
 };
 
