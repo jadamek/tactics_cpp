@@ -1,0 +1,31 @@
+N - number of nodes
+d - max degree (around 8)
+
+CONNECT :					~12,000 us	for 35 x 35 on 20
+-	N calls to clear set of d
+-	N calls to
+		N/2 calls to
+			intersect compute
+			arithmetic
+			set insert		
+		set dirty			
+
+- clear vector of N			0 us
+SORT :						~ 1,000 us
+- N object variable sets	~300 us
+- N accesses				~300 us
+- N vector pushes			173 us
+
+
+10000 inserts + set creation	~7,000 us
+create array of 10000 bools		45 us
+	set all false
+	set all true
+
+10k accesses of 10k bool array		    19 us
+10k checks of count in 10k set		    2981 us
+iteration over 10k set			        300 us
+set all objects in 10k set true + false	501 us
+set temp id for all objects in 10k set	300 us
+10k obj property access			        22 us
+10k vector pushes			            173 us

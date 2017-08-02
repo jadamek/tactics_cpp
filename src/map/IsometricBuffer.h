@@ -30,7 +30,7 @@ public:
 private:
     void                partialSort(const std::set<IsometricNode*>& dirty_nodes);
     void                topologicalSort();
-    void                topologicalTraverse(IsometricNode* node, std::set<IsometricNode*>& visited);
+    void                topologicalTraverse(IsometricNode* node);
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void                step();
 

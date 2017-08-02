@@ -1,0 +1,33 @@
+#include <iostream>
+#include <SFML/Graphics.hpp>
+#include <vector>
+#include <set>
+
+class Obj
+{
+public:
+    bool whatever;
+    int id;
+};
+
+int main()
+{
+    sf::Clock timer;
+    float elapsed;
+
+    bool** adjMatrix = new bool*[10000];
+    timer.restart();            
+    for(int i = 0; i < 10000; i++)
+    {
+        adjMatrix[i] = new bool[10000];
+        for(int j = 0; j < 10000; j++)
+        {
+            adjMatrix[i][j] = false;
+        }
+    }
+    elapsed = timer.restart().asMicroseconds();
+
+    std::cout << "Execution time: " << elapsed << " us " << std::endl;
+
+    return 0;
+}

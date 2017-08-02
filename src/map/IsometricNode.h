@@ -28,7 +28,9 @@ public:
     const sf::FloatRect&            getBounds() const;
     void                            setBounds(const sf::FloatRect& bounds);
     void                            deactivate();
-
+    int                             visited() const;
+    void                            setVisited(bool visited);
+    
 private:
     bool                            compare(const IsometricObject* a, const IsometricObject* b) const;
 
@@ -38,6 +40,7 @@ private:
     bool                            dirty_;
     std::set<IsometricNode*>        children_;
     sf::FloatRect                   bounds_;
+    bool                            visited_;
 };
 
 #endif

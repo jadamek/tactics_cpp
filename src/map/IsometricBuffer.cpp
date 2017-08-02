@@ -8,7 +8,7 @@
 // * scale : (x,y,z) pixels per local unit scaling vector
 //----------------------------------------------------------------------------
 IsometricBuffer::IsometricBuffer(const sf::Vector3f& scale) :
-    AnimatedObject(FPS / 3.f),
+    AnimatedObject(1.f),
     scale_(sf::Vector3f(std::max(1.f, scale.x), std::max(1.f, scale.y), std::max(1.f, scale.z))),
     dirty_(false)
 {}
@@ -114,17 +114,6 @@ void IsometricBuffer::sort()
     {
         node->detach();
     }
-
-    // Compute bounding box for every node
-    for(auto node : objects_)
-    {
-        sf::FloatRect node_bounds = node->target()->getGlobalBounds();
-        sf::Vector2f isometric_position = localToIso(node->target()->position());
-        node_bounds.left += isometric_position.x;
-        node_bounds.top += isometric_position.y;
-
-        node->setBounds(node_bounds);
-    }
     
     // Connect nodes with intersecting bounding boxes using directed edges
     for(auto node_it = objects_.begin(); node_it != objects_.end(); node_it++)
@@ -172,14 +161,6 @@ void IsometricBuffer::partialSort(const std::set<IsometricNode*>& dirty_nodes)
         {
             parent->removeChild(node);
         }
-
-        // Re-compute bounding box        
-        sf::FloatRect node_bounds = node->target()->getGlobalBounds();
-        sf::Vector2f isometric_position = localToIso(node->target()->position());
-        node_bounds.left += isometric_position.x;
-        node_bounds.top += isometric_position.y;
-
-        node->setBounds(node_bounds);
     }
 
     // Reconnect all edges to dirty nodes
@@ -221,12 +202,18 @@ void IsometricBuffer::partialSort(const std::set<IsometricNode*>& dirty_nodes)
 //---------------------------------------------------------------------------- 
 void IsometricBuffer::topologicalSort()
 {
-    std::set<IsometricNode*> visited;
+    // Clear all visited flags
     for(auto node : objects_)
     {
-        if(visited.count(node) == 0)
+        node->setVisited(false);
+    }
+
+    // Sort each non-visited node
+    for(auto node : objects_)
+    {
+        if(!node->visited())
         {
-            topologicalTraverse(node, visited);            
+            topologicalTraverse(node);            
         }
     }
 }
@@ -237,17 +224,17 @@ void IsometricBuffer::topologicalSort()
 // * node : current node being recursively traversed for sorting
 // * visited : set which tracks all recursively visited nodes
 //---------------------------------------------------------------------------- 
-void IsometricBuffer::topologicalTraverse(IsometricNode* node, std::set<IsometricNode*>& visited)
+void IsometricBuffer::topologicalTraverse(IsometricNode* node)
 {
     // Visit this node
-    visited.insert(node);
+    node->setVisited(true);
 
     // Recur for each non-visited child
     for(auto child : node->children())
     {
-        if(visited.count(child) == 0)
+        if(!child->visited())
         {
-            topologicalTraverse(child, visited);            
+            topologicalTraverse(child);            
         }
     }
 
@@ -270,7 +257,7 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 		target.draw(*obj, state);
     }
 }
-
+#include <iostream>
 //----------------------------------------------------------------------------
 // - Increment Frame
 //----------------------------------------------------------------------------
@@ -298,6 +285,7 @@ void IsometricBuffer::step()
         // Otherwise, execute a partial sort only on the dirty nodes
         else
         {
+            std::cout << "partially sorting " << dirty.size() << " objects ... " << std::endl;
             partialSort(dirty);
         }
     }       

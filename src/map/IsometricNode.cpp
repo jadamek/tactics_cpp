@@ -9,9 +9,21 @@
 IsometricNode::IsometricNode(IsometricObject* target, IsometricBuffer* container) :
     target_(target),
     container_(container),
-    dirty_(true)
+    dirty_(true),
+    visited_(0)    
 {
     target_->setHandler(this);
+
+    if(target_ && container_)
+    {
+        // Compute bounding box
+        sf::FloatRect bounds = target_->getGlobalBounds();
+        sf::Vector2f isometric_position = container_->localToIso(target_->position());
+        bounds.left += isometric_position.x;
+        bounds.top += isometric_position.y;
+
+        setBounds(bounds);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -49,6 +61,15 @@ void IsometricNode::alert()
 
     if(container_)
     {
+        // Re-compute bounding box
+        sf::FloatRect bounds = target_->getGlobalBounds();
+        sf::Vector2f isometric_position = container_->localToIso(target_->position());
+        bounds.left += isometric_position.x;
+        bounds.top += isometric_position.y;
+
+        setBounds(bounds);
+
+        // Alert buffer of need for re-sort
         container_->alert();
     }
 }
@@ -176,4 +197,23 @@ void IsometricNode::deactivate()
     {
         container_->remove(this);
     }
+}
+
+//----------------------------------------------------------------------------
+// - Get Visited Status
+//----------------------------------------------------------------------------
+int IsometricNode::visited() const
+{
+    return visited_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Visited Status
+//----------------------------------------------------------------------------
+// * visited : visitation status for depth-first traversal during topological
+//      sorting procedure
+//----------------------------------------------------------------------------
+void IsometricNode::setVisited(bool visited)
+{
+    visited_ = visited;
 }

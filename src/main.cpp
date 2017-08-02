@@ -16,7 +16,7 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(35, 35, MAP_SCALE);
+    Map map(50, 50, MAP_SCALE);
 
     for(int x = 0; x < map.width(); x++)
     {
@@ -31,9 +31,24 @@ int main()
         }
     }
 
-    soul_texture.loadFromFile("resources/graphics/Soul.png");    
+    soul_texture.loadFromFile("resources/graphics/Soul.png");
+    std::vector<Actor*> souls;
 
-    
+    // Create test objects
+    for(int i = 0; i < 20; i++)
+    {
+        sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
+        SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
+        soul_sprite->move(-12, -40);
+
+        float x = 3 * (i % 10) + 2;
+        float y = 3 * (i / 10) + 2;
+
+        Actor* soul = new Actor(soul_sprite, &map);
+        souls.push_back(soul);
+        map.addObject(soul);
+    }
+
     sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
     SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
     soul_sprite->move(-12, -40);
@@ -58,6 +73,19 @@ int main()
     sort_time = clock.restart().asMicroseconds();
 
     std::cout << "Full sort in : " << sort_time << " us " << std::endl;
+
+    for(int i = 0; i < souls.size (); i++)
+    {
+        float x = 3 * (i % 10) + 1;
+        float y = 3 * (i / 10) + 1;
+        souls[i]->setPosition(sf::Vector3f(x, y, map.height(x, y)));
+    }
+
+    clock.restart();
+    map.getDepthBuffer().update(1);
+    sort_time = clock.restart().asMicroseconds();
+
+    std::cout << "Partial sort in : " << sort_time << " us " << std::endl;
 
     bool closing = false;
 
@@ -120,7 +148,7 @@ int main()
         // Timing updates
         elapsed = clock.restart().asSeconds();
         soul->update(elapsed);
-        map.getDepthBuffer().update(elapsed);
+        //map.getDepthBuffer().update(elapsed);
 
         window.clear(sf::Color::Black);
         window.draw(map);
