@@ -47,13 +47,15 @@ float IsometricObject::getHeight(const sf::Vector2f& position) const
 //----------------------------------------------------------------------------
 void IsometricObject::setPosition(const sf::Vector3f& position)
 {
-    if(position != position_ && handler_ != 0)
+    bool changed = position != position_;
+
+    position_ = position;
+
+    if(changed && handler_ != 0)
     {
         // Alert handler of change
         handler_->alert(); 
     }
-
-    position_ = position;
 }
 
 //----------------------------------------------------------------------------

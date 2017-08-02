@@ -1,7 +1,7 @@
 N - number of nodes
 d - max degree (around 8)
 
-CONNECT :					~12,000 us	for 35 x 35 on 20
+CONNECT :					~12,000 us	for 50 x 50 on 20, ~6,000 us for 35 x 35 on 20
 -	N calls to clear set of d
 -	N calls to
 		N/2 calls to
@@ -15,6 +15,13 @@ SORT :						~ 1,000 us
 - N object variable sets	~300 us
 - N accesses				~300 us
 - N vector pushes			173 us
+
+Partial sort times
+50 x 50 on 20				~14,000 us		Unrealistic case
+35 x 35 on 20				~7,000 us		Worst-case map + objects
+35 x 35 on 5				~2,000 us		Worst-case map, average case objects
+25 x 25 on 50				~10,000 us		Average-case map, Unrealistic objects
+25 x 25 on 20				~3,500 us		Average-case map, worst-case objects
 
 
 10000 inserts + set creation	~7,000 us

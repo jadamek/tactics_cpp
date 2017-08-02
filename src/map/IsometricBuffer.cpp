@@ -150,7 +150,7 @@ void IsometricBuffer::sort()
 // limiting re-attachment and bounding box computation to dirty nodes
 //----------------------------------------------------------------------------
 void IsometricBuffer::partialSort(const std::set<IsometricNode*>& dirty_nodes)
-{
+{    
     for(auto node : dirty_nodes)
     {
         // Remove any pre-existing outgoing edges

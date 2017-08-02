@@ -16,7 +16,7 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(50, 50, MAP_SCALE);
+    Map map(35, 35, MAP_SCALE);
 
     for(int x = 0; x < map.width(); x++)
     {
@@ -148,7 +148,7 @@ int main()
         // Timing updates
         elapsed = clock.restart().asSeconds();
         soul->update(elapsed);
-        //map.getDepthBuffer().update(elapsed);
+        map.getDepthBuffer().update(elapsed);
 
         window.clear(sf::Color::Black);
         window.draw(map);
