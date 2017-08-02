@@ -8,6 +8,7 @@
 #include "sprite/map/SpriteTile.h"
 #include "objects/Actor.h"
 #include "sprite/SpriteActor.h"
+#include "screen/ViewEx.h"
 
 int main()
 {
@@ -59,10 +60,12 @@ int main()
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
 
-    sf::View view(window.getDefaultView());
+    ViewEx view;
     view.setCenter(0, 0);
 
     window.setView(view);
+
+    view.fadeIn(3);
 
     // Clock and Animation
     sf::Clock clock;
@@ -133,14 +136,67 @@ int main()
                 soul->moveTo(soul->position() + sf::Vector3f(0, 1.0, 0));
             }
         }
+
+        // Keyboard Input handles : Q - Shake | CTRL + Q - Stop Shake
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+        {
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+            {
+                view.stopShaking();
+            }
+            else if(!view.shaking())
+            {
+                view.shake(16.0, 2);
+            }
+        }
+
+        // Keyboard Input handles : S - Spin | CTRL + S - Stop Spin
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        {
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+            {
+                view.stopSpinning();
+            }
+            else if(!view.spinning())
+            {
+                view.spin(0.5);
+            }
+        }
+
+        // Keyboard Input handles : (Numpad +) - Zoom in
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Add) && !view.zooming())
+        {
+            view.zoom(-0.25, 2);
+        }
+
+        // Keyboard Input handles : (Numpad -) - Zoom out
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Subtract) && !view.zooming())
+        {
+            view.zoom(0.25, 2);
+        }
+
+        /*        
+        // Keyboard Input handles : T - Cycle Next Tint
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+
+        }
+        */
+
+        // Keyboard Input handles : F - Flash
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::F) && !view.flashing())
+        {
+            view.flash(1, sf::Color(80, 80, 160));
+        }
         
         // Keyboard Input handles : ESC
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         {
+            view.fadeOut(1);
             closing = true;
         }
 
-        if(closing)
+        if(closing && !view.tinting())
         {
             window.close();
         }
@@ -149,9 +205,12 @@ int main()
         elapsed = clock.restart().asSeconds();
         soul->update(elapsed);
         map.getDepthBuffer().update(elapsed);
+        view.update(elapsed);
 
         window.clear(sf::Color::Black);
+        window.setView(view);
         window.draw(map);
+        view.drawOverlays(window);
         window.display();
     }
 
