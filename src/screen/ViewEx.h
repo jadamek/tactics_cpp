@@ -40,6 +40,11 @@ public:
     void                scrollTo(const sf::Vector2f& target, float duration);
     bool                scrolling() const;
     void                stopScrolling();
+    
+    // Enhanced functions - Focusing
+    void                focus(const sf::Transformable* object, float duration);
+    bool                focusing() const;
+    void                stopFocusing();
 
     // Enhanced functions - Shaking
     void                shake(float magnitude, float frequency, float duration = 0, SHAKE_DIRECTION direction = SHAKE_HORIZONTAL);
@@ -87,6 +92,9 @@ protected:
 
     sf::Vector2f        scrollTarget_;
     int                 scrollLength_;
+
+    const sf::Transformable* focusTarget_;
+    float               focusDur_;
 
     float               shakeAmp_;
     float               shakeFreq_;

@@ -45,13 +45,11 @@ sf::FloatRect Actor::getGlobalBounds() const
 }
 
 //----------------------------------------------------------------------------
-// - Set Sprite
+// - Get Sprite
 //----------------------------------------------------------------------------
-// * sprite : representative sprite for this actor
-//----------------------------------------------------------------------------
-void Actor::setSprite(const Sprite* sprite)
+const Sprite* Actor::getSprite() const
 {
-    sprite_ = sprite;
+    return sprite_;
 }
 
 //----------------------------------------------------------------------------

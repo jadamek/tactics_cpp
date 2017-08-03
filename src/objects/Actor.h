@@ -19,6 +19,7 @@ public:
     virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const;
     void                    setSprite(const Sprite* sprite);
+    const Sprite*           getSprite() const;
 
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;

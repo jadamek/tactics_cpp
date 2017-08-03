@@ -101,37 +101,65 @@ int main()
                 window.close();
         }
         
-        // Keyboard Input handles : LEFT
+        // Keyboard Input handles : Left - Move | SHIFT + Left - Scroll Left
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
-            if(!soul->moving())
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+            {
+                if(!view.scrolling() && !view.focusing())
+                {
+                    view.scroll(sf::Vector2f(-1 * MAP_SCALE.x, 0), 0.3);
+                }
+            }
+            else if(!soul->moving())
             {
                 soul->moveTo(soul->position() + sf::Vector3f(-1.0, 0, 0));
             }
         }
 
-        // Keyboard Input handles : RIGHT
+        // Keyboard Input handles : Right - Move | SHIFT + Right - Scroll Right
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
         {
-            if(!soul->moving())
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+            {
+                if(!view.scrolling() && !view.focusing())
+                {
+                    view.scroll(sf::Vector2f(MAP_SCALE.x, 0), 0.3);
+                }
+            }
+            else if(!soul->moving())
             {
                 soul->moveTo(soul->position() + sf::Vector3f(1.0, 0, 0));
             }
         }
 
-        // Keyboard Input handles : UP
+        // Keyboard Input handles : Up - Move | SHIFT + Up - Scroll Up
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            if(!soul->moving())
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+            {
+                if(!view.scrolling() && !view.focusing())
+                {
+                    view.scroll(sf::Vector2f(0, -1 * MAP_SCALE.y), 0.3);
+                }
+            }
+            else if(!soul->moving())
             {
                 soul->moveTo(soul->position() + sf::Vector3f(0, -1.0, 0));
             }
         }
 
-        // Keyboard Input handles : DOWN
+        // Keyboard Input handles : Down - Move | SHIFT + Down - Scroll down
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            if(!soul->moving())
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
+            {
+                if(!view.scrolling() && !view.focusing())
+                {
+                    view.scroll(sf::Vector2f(0, MAP_SCALE.y), 0.3);
+                }
+            }
+            else if(!soul->moving())
             {
                 soul->moveTo(soul->position() + sf::Vector3f(0, 1.0, 0));
             }
@@ -188,8 +216,14 @@ int main()
         {
             view.flash(1, sf::Color(80, 80, 160));
         }
+
+        // Keyboard Input handles : G - Goto Player (Focus)
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::G) && !view.focusing())
+        {
+            view.focus(soul->getSprite(), 0.5);
+        }
         
-        // Keyboard Input handles : ESC
+        // Keyboard Input handles : Escape
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         {
             view.fadeOut(1);

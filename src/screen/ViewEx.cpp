@@ -19,6 +19,7 @@ ViewEx::ViewEx(const sf::FloatRect& viewport) :
     scrollLength_(0),
     shakeLength_(0),
     shakeLoop_(false),
+    focusTarget_(0),
     zoom_(1),
     zoomLength_(0),
     spinLength_(0),
@@ -169,6 +170,7 @@ void ViewEx::reset(const sf::FloatRect& rectangle)
     setSize(sf::Vector2f(rectangle.width, rectangle.height));
     setRotation(getRotation());
     stopScrolling();
+    stopFocusing();
     stopShaking();
     stopSpinning();
     stopZooming();
@@ -177,7 +179,7 @@ void ViewEx::reset(const sf::FloatRect& rectangle)
 //----------------------------------------------------------------------------
 // - Scroll
 //----------------------------------------------------------------------------
-// * distance : the offset vector to scroll along
+// * offset : the offset vector to scroll along
 // * duration : time in seconds the scroll will be completed in    
 // Starts the scrolling process by setting and computing a frame-wise time
 // length from the duration in seconds.
@@ -218,6 +220,45 @@ bool ViewEx::scrolling() const
 void ViewEx::stopScrolling()
 {
     scrollLength_ = 0;
+}
+
+//----------------------------------------------------------------------------
+// - Focus
+//----------------------------------------------------------------------------
+// * object : object to continually scroll to
+// * duration : time in seconds every scroll will be completed in    
+// Causes the view to always scroll to a given target if ever it is not
+// currently centered on it
+//----------------------------------------------------------------------------
+void ViewEx::focus(const sf::Transformable* object, float duration)
+{
+    if(duration > 0)
+    {
+        focusTarget_ = object;
+        focusDur_ = duration;
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Is Focusing?
+//----------------------------------------------------------------------------
+// Returns whether the view is currently focusing on an object
+//----------------------------------------------------------------------------
+bool ViewEx::focusing() const
+{
+    return focusTarget_ != 0;
+}
+
+//----------------------------------------------------------------------------
+// - Stop Focusing
+//----------------------------------------------------------------------------
+// Ceases any focusing and scrolling motion by setting the target to null and
+// the scroll duration to 0.
+//----------------------------------------------------------------------------
+void ViewEx::stopFocusing()
+{
+    stopScrolling();
+    focusTarget_ = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -465,6 +506,12 @@ void ViewEx::drawOverlays(sf::RenderTarget& target) const
 //----------------------------------------------------------------------------
 void ViewEx::step()
 {
+    // Update Focusing
+    if((focusTarget_ && !scrolling()) && center_ != focusTarget_->getPosition())
+    {
+        scrollTo(focusTarget_->getPosition(), focusDur_);
+    }
+
     // Update Scrolling
     if(scrollLength_ > 0)
     {

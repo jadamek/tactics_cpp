@@ -8,7 +8,7 @@
 // * scale : (x,y,z) pixels per local unit scaling vector
 //----------------------------------------------------------------------------
 IsometricBuffer::IsometricBuffer(const sf::Vector3f& scale) :
-    AnimatedObject(1.f),
+    AnimatedObject(FPS),
     scale_(sf::Vector3f(std::max(1.f, scale.x), std::max(1.f, scale.y), std::max(1.f, scale.z))),
     dirty_(false)
 {}
