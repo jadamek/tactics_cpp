@@ -31,7 +31,7 @@ IsometricBuffer::~IsometricBuffer()
 void IsometricBuffer::add(const IsometricObject* obj)
 {
     IsometricNode* node = new IsometricNode(const_cast<IsometricObject*>(obj), this);
-    objects_.insert(node);
+    objects_.push_back(node);
     alert();
 }
 
@@ -54,19 +54,25 @@ void IsometricBuffer::remove(const IsometricObject* obj)
 void IsometricBuffer::remove(IsometricNode* node)
 {
     // Remove node's target object from sorted images
-    auto toRemove = std::find(sorted_.begin(), sorted_.end(), node->target());
-    if(toRemove != sorted_.end())
+    auto sortedTarget = std::find(sorted_.begin(), sorted_.end(), node->target());
+    if(sortedTarget != sorted_.end())
     {
-        sorted_.erase(toRemove);
+        sorted_.erase(sortedTarget);
     }
 
-    // Remove any incoming edges for the extinct node
-    for(auto neighbor : objects_)
+    for(auto node_it = objects_.begin(); node_it != objects_.end();)
     {
-        neighbor->removeChild(node);
-    }
-
-    objects_.erase(node);    
+        if(*node_it != node)
+        {
+            // Remove any incoming edges for the extinct node
+            (*node_it++)->removeChild(node);
+        }
+        else
+        {
+            // Remove the node itself
+            node_it = objects_.erase(node_it);
+        }
+    }  
 }
 
 //----------------------------------------------------------------------------
@@ -87,26 +93,25 @@ void IsometricBuffer::alert()
 void IsometricBuffer::sort()
 {    
     // Remove any pre-existing edges for all nodes
-    for(auto node : objects_)
+    for(int n = 0; n < objects_.size(); n++)
     {
-        node->detach();
+        objects_[n]->detach();
     }
     
     // Connect nodes with intersecting bounding boxes using directed edges
-    for(auto node_it = objects_.begin(); node_it != objects_.end(); node_it++)
-    {
-        auto neighbor_it = node_it;
+    for(int i = 0; i < objects_.size(); i++)
+    {        
 
-        for(++neighbor_it; neighbor_it != objects_.end(); neighbor_it++)
+        for(int j = i + 1; j < objects_.size(); j++)
         {
             // If bounding boxes intersect, establish a directed connection (parent-child)
-            if((*node_it)->getBounds().intersects((*neighbor_it)->getBounds())){
-                (*node_it)->attach(*neighbor_it);                
+            if(objects_[i]->getBounds().intersects(objects_[j]->getBounds())){
+                objects_[i]->attach(objects_[j]);                
             }
         }
 
         // Clears "dirty" flag for this node during next sort
-        (*node_it)->resolve();
+        objects_[i]->resolve();
     }
 
     // Clear any previous sorting
@@ -126,39 +131,39 @@ void IsometricBuffer::sort()
 // Re-sorts isometric nodes into drawing order using a topological sort,
 // limiting re-attachment and bounding box computation to dirty nodes
 //----------------------------------------------------------------------------
-void IsometricBuffer::partialSort(const std::set<IsometricNode*>& dirty_nodes)
-{    
-    for(auto node : dirty_nodes)
+void IsometricBuffer::partialSort(const std::vector<IsometricNode*>& dirty_nodes)
+{
+    for(int d = 0; d < dirty_nodes.size(); d++)
     {
         // Remove any pre-existing outgoing edges
-        node->detach();
+        dirty_nodes[d]->detach();
 
         // Remove any incoming edges
-        for(auto parent : objects_)
+        for(int parent = 0; parent < objects_.size(); parent++)
         {
-            parent->removeChild(node);
+            objects_[parent]->removeChild(dirty_nodes[d]);
         }
     }
 
     // Reconnect all edges to dirty nodes
-    for(auto node : dirty_nodes)
+    for(int d = 0; d < dirty_nodes.size(); d++)
     {
         // Check all possible other nodes for connection
-        for(auto neighbor : objects_)
+        for(int neighbor = 0; neighbor < objects_.size(); neighbor++)
         {
             // No edges to self
-            if(node != neighbor)
+            if(dirty_nodes[d] != objects_[neighbor])
             {
                 // If bounding boxes intersect, draw an edge
-                if(node->getBounds().intersects(neighbor->getBounds()))
+                if(dirty_nodes[d]->getBounds().intersects(objects_[neighbor]->getBounds()))
                 {
-                    node->attach(neighbor);
+                    dirty_nodes[d]->attach(objects_[neighbor]);
                 }
             }
         }
 
         // Clears "dirty" flag for this node during next sort        
-        node->resolve();
+        dirty_nodes[d]->resolve();
     }
 
     // Clear any previous sorting
@@ -180,17 +185,17 @@ void IsometricBuffer::partialSort(const std::set<IsometricNode*>& dirty_nodes)
 void IsometricBuffer::topologicalSort()
 {
     // Clear all visited flags
-    for(auto node : objects_)
+    for(int n = 0; n < objects_.size(); n++)
     {
-        node->setVisited(false);
+        objects_[n]->setVisited(false);
     }
 
     // Sort each non-visited node
-    for(auto node : objects_)
+    for(int n = 0; n < objects_.size(); n++)
     {
-        if(!node->visited())
+        if(!objects_[n]->visited())
         {
-            topologicalTraverse(node);            
+            topologicalTraverse(objects_[n]);            
         }
     }
 }
@@ -226,12 +231,12 @@ void IsometricBuffer::topologicalTraverse(IsometricNode* node)
 //----------------------------------------------------------------------------
 void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    for(auto obj : sorted_)
+    for(int n = 0; n < sorted_.size(); n++)
     {
         sf::RenderStates state = states;
-		state.transform.translate(obj->getGlobalPosition());
+		state.transform.translate(sorted_[n]->getGlobalPosition());
 
-		target.draw(*obj, state);
+		target.draw(*sorted_[n], state);
     }
 }
 #include <iostream>
@@ -243,13 +248,13 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 void IsometricBuffer::step()
 {
     if(dirty_){
-        std::set<IsometricNode*> dirty;
+        std::vector<IsometricNode*> dirty;
 
-        for(IsometricNode* node : objects_)
+        for(int n = 0; n < objects_.size(); n++)
         {
-            if(node->dirty())
+            if(objects_[n]->dirty())
             {
-                dirty.insert(node);
+                dirty.push_back(objects_[n]);
             }
         }
 

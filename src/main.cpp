@@ -31,6 +31,7 @@ int main()
             map.place(tile, x, y);
         }
     }
+    // map.remove(0, 1, 0);
 
     soul_texture.loadFromFile("resources/graphics/Soul.png");
     std::vector<Actor*> souls;

@@ -2,8 +2,7 @@
 #define TACTICS_ISOMETRIC_BUFFER_H
 
 #include <SFML/Graphics.hpp>
-#include <list>
-#include <set>
+#include <vector>
 #include "IsometricNode.h"
 #include "../objects/AnimatedObject.h"
 
@@ -26,15 +25,15 @@ public:
     void                sort();
 
 private:
-    void                partialSort(const std::set<IsometricNode*>& dirty_nodes);
+    void                partialSort(const std::vector<IsometricNode*>& dirty_nodes);
     void                topologicalSort();
     void                topologicalTraverse(IsometricNode* node);
     void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     void                step();
 
 // Members
-    std::set<IsometricNode*>            objects_;
-    std::list<const IsometricObject*>   sorted_;
+    std::vector<IsometricNode*>         objects_;
+    std::vector<const IsometricObject*> sorted_;
     bool                                dirty_;
 };
 
