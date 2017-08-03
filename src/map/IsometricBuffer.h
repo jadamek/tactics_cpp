@@ -16,11 +16,9 @@ class IsometricBuffer : public sf::Drawable, public AnimatedObject
 {
 // Methods
 public:
-    IsometricBuffer(const sf::Vector3f& scale = sf::Vector3f(1, 1, 1));    
+    IsometricBuffer();    
     ~IsometricBuffer();
 
-    const sf::Vector3f& getIsometricScale() const;
-    sf::Vector2f        localToIso(const sf::Vector3f& position) const;
     void                add(const IsometricObject* obj);
     void                remove(const IsometricObject* obj);
     void                remove(IsometricNode* node);
@@ -35,7 +33,6 @@ private:
     void                step();
 
 // Members
-    sf::Vector3f                        scale_;
     std::set<IsometricNode*>            objects_;
     std::list<const IsometricObject*>   sorted_;
     bool                                dirty_;

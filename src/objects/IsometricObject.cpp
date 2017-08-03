@@ -1,5 +1,6 @@
 #include "IsometricObject.h"
 #include "../map/IsometricNode.h"
+#include "../settings.h"
 
 //----------------------------------------------------------------------------
 // - Isometric Object Contructor
@@ -56,6 +57,20 @@ void IsometricObject::setPosition(const sf::Vector3f& position)
         // Alert handler of change
         handler_->alert(); 
     }
+}
+
+//----------------------------------------------------------------------------
+// - Get Global Position from Isometric
+//----------------------------------------------------------------------------
+// Returns this object's 2-Dimensional pixel coordinate position by converting
+// its 3-Dimensional isometric coordinate position
+//----------------------------------------------------------------------------
+sf::Vector2f IsometricObject::getGlobalPosition() const
+{
+    float x = 0.5 * MAP_SCALE.x * (position_.x - position_.y);
+    float y = 0.5 * MAP_SCALE.y * (position_.x + position_.y) - MAP_SCALE.z * position_.z;
+
+    return sf::Vector2f(x, y);
 }
 
 //----------------------------------------------------------------------------

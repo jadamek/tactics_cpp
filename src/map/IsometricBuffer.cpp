@@ -7,9 +7,8 @@
 //----------------------------------------------------------------------------
 // * scale : (x,y,z) pixels per local unit scaling vector
 //----------------------------------------------------------------------------
-IsometricBuffer::IsometricBuffer(const sf::Vector3f& scale) :
+IsometricBuffer::IsometricBuffer() :
     AnimatedObject(FPS),
-    scale_(sf::Vector3f(std::max(1.f, scale.x), std::max(1.f, scale.y), std::max(1.f, scale.z))),
     dirty_(false)
 {}
 
@@ -22,28 +21,6 @@ IsometricBuffer::~IsometricBuffer()
     {
         delete node;
     }
-}
-
-//----------------------------------------------------------------------------
-// - Get Isometric Scaling Vector
-//----------------------------------------------------------------------------
-const sf::Vector3f& IsometricBuffer::getIsometricScale() const
-{
-    return scale_;
-}
-
-//----------------------------------------------------------------------------
-// - Isometric Buffer Destructor
-//----------------------------------------------------------------------------
-// Converts a 3-Dimensional local coordinate position to a 2-Dimensional
-// isometric pixel coordinate position
-//----------------------------------------------------------------------------
-sf::Vector2f IsometricBuffer::localToIso(const sf::Vector3f& position) const
-{
-    float x = 0.5 * scale_.x * (position.x - position.y);
-    float y = 0.5 * scale_.y * (position.x + position.y) - scale_.z * position.z;
-
-    return sf::Vector2f(x, y);
 }
 
 //----------------------------------------------------------------------------
@@ -66,7 +43,7 @@ void IsometricBuffer::add(const IsometricObject* obj)
 void IsometricBuffer::remove(const IsometricObject* obj)
 {
     remove(obj->getHandler());
-    delete obj->getHandler();
+    delete obj->getHandler(); 
 }
 
 //----------------------------------------------------------------------------
@@ -252,7 +229,7 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
     for(auto obj : sorted_)
     {
         sf::RenderStates state = states;
-		state.transform.translate(localToIso(obj->position()));
+		state.transform.translate(obj->getGlobalPosition());
 
 		target.draw(*obj, state);
     }

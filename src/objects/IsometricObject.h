@@ -22,6 +22,7 @@ public:
     virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const = 0;
     void                    setPosition(const sf::Vector3f& position);
+    sf::Vector2f            getGlobalPosition() const;
 
     friend class            IsometricNode;
     friend class            IsometricBuffer;

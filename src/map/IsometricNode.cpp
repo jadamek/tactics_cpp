@@ -18,7 +18,7 @@ IsometricNode::IsometricNode(IsometricObject* target, IsometricBuffer* container
     {
         // Compute bounding box
         sf::FloatRect bounds = target_->getGlobalBounds();
-        sf::Vector2f isometric_position = container_->localToIso(target_->position());
+        sf::Vector2f isometric_position = target_->getGlobalPosition();
         bounds.left += isometric_position.x;
         bounds.top += isometric_position.y;
 
@@ -63,7 +63,7 @@ void IsometricNode::alert()
     {
         // Re-compute bounding box
         sf::FloatRect bounds = target_->getGlobalBounds();
-        sf::Vector2f isometric_position = container_->localToIso(target_->position());
+        sf::Vector2f isometric_position = target_->getGlobalPosition();
         bounds.left += isometric_position.x;
         bounds.top += isometric_position.y;
 
@@ -139,11 +139,11 @@ const std::set<IsometricNode*>& IsometricNode::children() const
 bool IsometricNode::compare(const IsometricObject* a, const IsometricObject* b) const
 {
     // First check if either object is over the other
-    if(a->position().z >= b->position().z + b->getHeight())
+    if(a->position().z >= b->position().z + b->getHeight(sf::Vector2f(a->position().x - b->position().x, a->position().y - b->position().y)))
     {
         return true;
     }
-    else if(b->position().z >= a->position().z + a->getHeight())
+    else if(b->position().z >= a->position().z + a->getHeight(sf::Vector2f(a->position().x - b->position().x, a->position().y - b->position().y)))
     {
         return false;
     }

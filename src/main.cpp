@@ -17,7 +17,7 @@ int main()
     grass_texture.loadFromFile("resources/graphics/GrassTile.png");
     dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
 
-    Map map(35, 35, MAP_SCALE);
+    Map map(35, 35);
 
     for(int x = 0; x < map.width(); x++)
     {
@@ -220,7 +220,7 @@ int main()
         // Keyboard Input handles : G - Goto Player (Focus)
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::G) && !view.focusing())
         {
-            view.focus(soul->getSprite(), 0.5);
+            view.focus(soul, 0.5);
         }
         
         // Keyboard Input handles : Escape

@@ -8,10 +8,9 @@
 // * width : width of the map (x-axis) in tiles
 // * length : length of the map (y-axis) in tiles
 //----------------------------------------------------------------------------
-Map::Map(int width, int length, const sf::Vector3f& scale) :
+Map::Map(int width, int length) :
     width_(std::max(1, width)),
-    length_(std::max(1, length)),
-    images_(scale)
+    length_(std::max(1, length))
 {
     tiles_.resize(width_, std::vector<std::vector<Tile*>>(length_));
 }
@@ -241,6 +240,26 @@ bool Map::remove(int x, int y, int layer)
     tiles_[x][y].erase(tiles_[x][y].begin() + layer);
 
     return true;
+}
+
+//----------------------------------------------------------------------------
+// Valid Tile?
+//----------------------------------------------------------------------------
+// * x : x-coordinate of position by which to query for valid tile presence
+// * y : y-coordinate of position by which to query for valid tile presence
+// Returns whether the (x, y) position contains a valid tile
+//----------------------------------------------------------------------------
+bool Map::valid(float x, float y) const
+{
+    int x_i = (int)round(x);
+    int y_i = (int)round(y);
+
+    if((x < 0 || x >= width_) || (y < 0 || y >= length_))
+    {
+        return false;
+    }
+    
+    return !tiles_[x][y].empty();
 }
 
 //----------------------------------------------------------------------------

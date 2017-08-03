@@ -17,7 +17,7 @@ class Map : public sf::Drawable
 {
 // Methods
 public:
-    Map(int width = 10, int length = 10, const sf::Vector3f& scale = sf::Vector3f(1, 1, 1));
+    Map(int width = 10, int length = 10);
     ~Map();
 
     const Tile*         at(int x, int y, float z = FLT_MAX) const;
@@ -26,6 +26,7 @@ public:
     bool                insert(Tile* tile, int x, int y, int layer);
     bool                replace(Tile* tile, int x, int y, int layer);
     bool                remove(int x, int y, int layer);
+    bool                valid(float x, float y) const;
     float               height(float x, float y) const;
     void                addObject(const IsometricObject* obj);
     int                 width() const;

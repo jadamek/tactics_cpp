@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../objects/AnimatedObject.h"
+#include "../objects/IsometricObject.h"
 #include "../settings.h"
 
 //================================================================================
@@ -42,7 +43,7 @@ public:
     void                stopScrolling();
     
     // Enhanced functions - Focusing
-    void                focus(const sf::Transformable* object, float duration);
+    void                focus(const IsometricObject* object, float duration);
     bool                focusing() const;
     void                stopFocusing();
 
@@ -93,7 +94,7 @@ protected:
     sf::Vector2f        scrollTarget_;
     int                 scrollLength_;
 
-    const sf::Transformable* focusTarget_;
+    const IsometricObject* focusTarget_;
     float               focusDur_;
 
     float               shakeAmp_;

@@ -15,15 +15,15 @@ int main()
     sf::Clock timer;
     float elapsed;
 
-    bool** adjMatrix = new bool*[10000];
+    std::vector<Obj*> objs;
+    for(int i = 0; i < 10000; i++)
+    {
+        objs.push_back(new Obj);
+    }    
     timer.restart();            
     for(int i = 0; i < 10000; i++)
     {
-        adjMatrix[i] = new bool[10000];
-        for(int j = 0; j < 10000; j++)
-        {
-            adjMatrix[i][j] = false;
-        }
+        objs[i];
     }
     elapsed = timer.restart().asMicroseconds();
 

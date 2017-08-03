@@ -230,7 +230,7 @@ void ViewEx::stopScrolling()
 // Causes the view to always scroll to a given target if ever it is not
 // currently centered on it
 //----------------------------------------------------------------------------
-void ViewEx::focus(const sf::Transformable* object, float duration)
+void ViewEx::focus(const IsometricObject* object, float duration)
 {
     if(duration > 0)
     {
@@ -507,9 +507,9 @@ void ViewEx::drawOverlays(sf::RenderTarget& target) const
 void ViewEx::step()
 {
     // Update Focusing
-    if((focusTarget_ && !scrolling()) && center_ != focusTarget_->getPosition())
+    if((focusTarget_ && !scrolling()) && center_ != focusTarget_->getGlobalPosition())
     {
-        scrollTo(focusTarget_->getPosition(), focusDur_);
+        scrollTo(focusTarget_->getGlobalPosition(), focusDur_);
     }
 
     // Update Scrolling
