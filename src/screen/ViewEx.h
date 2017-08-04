@@ -6,6 +6,16 @@
 #include "../objects/IsometricObject.h"
 #include "../settings.h"
 
+namespace Shake{
+    // Enumerables for enhanced functions
+    enum Direction {Horizontal = 0, Vertical = 1};
+}
+
+namespace Spin{
+    enum Direction {Clockwise = -1, CounterClockwise = 1};
+
+}
+
 //================================================================================
 // ** ViewEx
 //================================================================================
@@ -32,10 +42,6 @@ public:
     void                scale(float factor);
     void                reset(const sf::FloatRect& rectangle);
 
-    // Enumerables for enhanced functions
-    enum SHAKE_DIRECTION {SHAKE_HORIZONTAL = 0, SHAKE_VERTICAL = 1};
-    enum SPIN_DIRECTION {SPIN_CLOCKWISE = -1, SPIN_COUNTER_CLOCKWISE = 1};
-
     // Enhanced functions - Scrolling
     void                scroll(const sf::Vector2f& offset, float duration);
     void                scrollTo(const sf::Vector2f& target, float duration);
@@ -48,7 +54,7 @@ public:
     void                stopFocusing();
 
     // Enhanced functions - Shaking
-    void                shake(float magnitude, float frequency, float duration = 0, SHAKE_DIRECTION direction = SHAKE_HORIZONTAL);
+    void                shake(float magnitude, float frequency, float duration = 0, Shake::Direction direction = Shake::Horizontal);
     bool                shaking() const;
     void                stopShaking();
 
@@ -58,7 +64,7 @@ public:
     void                stopZooming();
 
     // Enhanced functions - Spinning
-    void                spin(float rps, float revolutions = 0, SPIN_DIRECTION direction = SPIN_CLOCKWISE);
+    void                spin(float rps, float revolutions = 0, Spin::Direction direction = Spin::Clockwise);
     bool                spinning() const;
     void                stopSpinning();
 
@@ -102,7 +108,7 @@ protected:
     int                 shakePeak_;
     int                 shakeLength_;
     bool                shakeLoop_;
-    SHAKE_DIRECTION     shakeDir_;
+    Shake::Direction    shakeDir_;
 
     float               zoom_;
     float               zoomRate_;

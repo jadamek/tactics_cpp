@@ -271,7 +271,7 @@ void ViewEx::stopFocusing()
 // * direction : direction of the vibration; may be horizontal (0) or vertical
 //       (1), and defaults to horizontal otherwise
 //----------------------------------------------------------------------------
-void ViewEx::shake(float magnitude, float frequency, float duration, SHAKE_DIRECTION direction)
+void ViewEx::shake(float magnitude, float frequency, float duration, Shake::Direction direction)
 {
     if(magnitude != 0 && frequency > 0)
     {
@@ -357,7 +357,7 @@ void ViewEx::stopZooming()
 // * direction : may be clockwise (-1) or counter-clockwise (1)
 // Causes the view so spin at a constant rate
 //----------------------------------------------------------------------------
-void ViewEx::spin(float rps, float revolutions, SPIN_DIRECTION direction)
+void ViewEx::spin(float rps, float revolutions, Spin::Direction direction)
 {
     if(rps > 0)
     {

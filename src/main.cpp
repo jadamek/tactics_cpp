@@ -9,6 +9,7 @@
 #include "objects/Actor.h"
 #include "sprite/SpriteActor.h"
 #include "screen/ViewEx.h"
+#include "screen/Panorama.h"
 
 int main()
 {
@@ -57,6 +58,13 @@ int main()
 
     Actor* soul = new Actor(soul_sprite, &map);
     map.addObject(soul);
+
+    // Background/Foreground panorama
+    sf::Texture sky_texture;
+    sky_texture.loadFromFile("resources/graphics/CloudySky.jpg");
+
+    Panorama background(sky_texture);
+    background.setPanningRate(0.2);
     
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
@@ -240,9 +248,11 @@ int main()
         elapsed = clock.restart().asSeconds();
         soul->update(elapsed);
         map.getDepthBuffer().update(elapsed);
+        background.update(elapsed);
         view.update(elapsed);
 
         window.clear(sf::Color::Black);
+        background.drawOverlays(window);
         window.setView(view);
         window.draw(map);
         view.drawOverlays(window);
