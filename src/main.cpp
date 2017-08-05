@@ -10,7 +10,7 @@
 #include "sprite/SpriteActor.h"
 #include "screen/ViewEx.h"
 #include "screen/Panorama.h"
-#include "sprite/SpriteIndexed.h"
+#include "sprite/SpriteDirected.h"
 
 int main()
 {
@@ -63,11 +63,14 @@ int main()
     // Sprite tests
     sf::Texture assassin_texture;
     assassin_texture.loadFromFile("resources/graphics/Assassin.png");
-    SpriteIndexed assassin(assassin_texture, 20, 32);
+    SpriteDirected assassin(assassin_texture, 20, 32);
     assassin.setIndex(1);
 
     assassin.move(0, -100);
     assassin.scale(sf::Vector2f(2, 2));
+
+    float sin_timer = 0;
+    float facing_timer = 0;
 
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -260,6 +263,21 @@ int main()
         map.getDepthBuffer().update(elapsed);
         background.update(elapsed);
         view.update(elapsed);
+
+        sin_timer += elapsed;
+        facing_timer += elapsed;
+
+        if(sin_timer > 1)
+        {
+            assassin.setIndex((assassin.getIndex() + 1) % assassin.getIndexLimit());
+            sin_timer -= 1;
+        }
+
+        if(facing_timer > 4)
+        {
+            assassin.setDirection((assassin.getDirection() + 1) % assassin.getDirections());
+            facing_timer -= 4;
+        }
 
         window.clear(sf::Color::Black);
         background.drawOverlays(window);
