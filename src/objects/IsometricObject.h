@@ -16,7 +16,7 @@ class IsometricObject : public sf::Drawable
 // Methods    
 public:
     IsometricObject();
-    ~IsometricObject();
+    virtual ~IsometricObject();
     
     const sf::Vector3f&     position() const;
     virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;

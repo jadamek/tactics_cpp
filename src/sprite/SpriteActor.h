@@ -14,7 +14,7 @@ class SpriteActor : public Sprite
 // Methods
 public:
     SpriteActor(const sf::Sprite* sprite = 0);
-    ~SpriteActor();
+    virtual ~SpriteActor();
 
     void                    setSprite(const sf::Sprite* sprite);
     virtual sf::FloatRect   getGlobalBounds() const;

@@ -18,7 +18,7 @@ class Map : public sf::Drawable
 // Methods
 public:
     Map(int width = 10, int length = 10);
-    ~Map();
+    virtual ~Map();
 
     const Tile*         at(int x, int y, float z = FLT_MAX) const;
     Tile*               at(int x, int y, float z = FLT_MAX);

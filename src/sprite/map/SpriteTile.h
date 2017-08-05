@@ -13,7 +13,7 @@ class SpriteTile : public Sprite{
 // Methods
 public:
     SpriteTile(const sf::Texture&, float width = 0, float length = 0, float height = 0, bool continuous = false);
-    ~SpriteTile();
+    virtual ~SpriteTile();
 
     sf::FloatRect   getGlobalBounds() const;
     void            resetHeight(float);

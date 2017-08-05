@@ -17,7 +17,7 @@ class MobileObject : public IsometricObject, public AnimatedObject
 public:
 
     MobileObject(const Map* ground = 0);
-    ~MobileObject();
+    virtual ~MobileObject();
 
     void            moveTo(const sf::Vector3f& position);
     void            moveAlong(const std::list<sf::Vector3f>& path);

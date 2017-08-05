@@ -14,7 +14,7 @@ class Actor : public MobileObject
 // Methods
 public:
     Actor(const Sprite* sprite = 0, const Map* ground = 0);
-    ~Actor();
+    virtual ~Actor();
 
     virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const;
