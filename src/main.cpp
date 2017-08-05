@@ -10,6 +10,7 @@
 #include "sprite/SpriteActor.h"
 #include "screen/ViewEx.h"
 #include "screen/Panorama.h"
+#include "sprite/SpriteIndexed.h"
 
 int main()
 {
@@ -58,6 +59,15 @@ int main()
 
     Actor* soul = new Actor(soul_sprite, &map);
     map.addObject(soul);
+
+    // Sprite tests
+    sf::Texture assassin_texture;
+    assassin_texture.loadFromFile("resources/graphics/Assassin.png");
+    SpriteIndexed assassin(assassin_texture, 20, 32);
+    std::cout << assassin.getWidth() << " x " << assassin.getHeight() << std::endl;
+
+    assassin.move(0, -100);
+    assassin.scale(sf::Vector2f(2, 2));
 
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -255,6 +265,7 @@ int main()
         background.drawOverlays(window);
         window.setView(view);
         window.draw(map);
+        window.draw(assassin);
         view.drawOverlays(window);
         window.display();
     }
