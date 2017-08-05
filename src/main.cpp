@@ -64,7 +64,7 @@ int main()
     sf::Texture assassin_texture;
     assassin_texture.loadFromFile("resources/graphics/Assassin.png");
     SpriteIndexed assassin(assassin_texture, 20, 32);
-    std::cout << assassin.getWidth() << " x " << assassin.getHeight() << std::endl;
+    assassin.setIndex(1);
 
     assassin.move(0, -100);
     assassin.scale(sf::Vector2f(2, 2));

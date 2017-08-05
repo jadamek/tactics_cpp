@@ -8,12 +8,12 @@
 // * height : height in pixels of a single frame in the sheet
 //----------------------------------------------------------------------------
 SpriteIndexed::SpriteIndexed(const sf::Texture &texture, int width, int height) :
-    sprite_(texture),
-	index_(0)
+	sf::Sprite(texture),
+	index_(0),
+	width_((0 < width  && width < widthLimit())  ? width  : texture.getSize().x),
+	height_((0 < height && height < heightLimit()) ? height : texture.getSize().y)
 {
-    width_ = (0 < width  && width < widthLimit())  ? width  : texture.getSize().x;
-	height_ = (0 < height && height < heightLimit()) ? height : texture.getSize().y;
-	sprite_.setTextureRect(sf::IntRect(0, 0, width_, height_));
+	sf::Sprite::setTextureRect(sf::IntRect(0, 0, width_, height_));
 }
 
 //----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ int SpriteIndexed::getIndex() const
 //----------------------------------------------------------------------------
 void SpriteIndexed::setIndex(int index)
 {
-	if (index >= 0 && index < indexLimit())
+	if (index >= 0 && index < getIndexLimit())
     {
         index_ = index;
         updateFrame();
@@ -95,22 +95,14 @@ void SpriteIndexed::setHeight(int height)
 }
 
 //----------------------------------------------------------------------------
-// - Get Texture
-//----------------------------------------------------------------------------
-const sf::Texture* SpriteIndexed::getTexture() const
-{
-    return sprite_.getTexture();
-}
-
-//----------------------------------------------------------------------------
-// - Set Texture
+// - Set Texture (Override)
 //----------------------------------------------------------------------------
 // * texture : bitmap sprite sheet this sprite derives from
-// Sets the sprite texture and handles any indexing discrepancies
+// Overrides set texture to handle any indexing discrepancies
 //----------------------------------------------------------------------------
 void SpriteIndexed::setTexture(const sf::Texture & texture)
 {
-	sprite_.setTexture(texture);
+	sf::Sprite::setTexture(texture);
 
 	if (width_ < 1 || width_ > widthLimit())
     {
@@ -122,26 +114,10 @@ void SpriteIndexed::setTexture(const sf::Texture & texture)
 		height_ = heightLimit();
     }
 
-	if (index_ > indexLimit())
+	if (index_ > getIndexLimit())
     {
-		index_ = indexLimit();
+		index_ = getIndexLimit();
     }
-}
-
-//----------------------------------------------------------------------------
-// - Get Global Bounding Rectangle (Override)
-//----------------------------------------------------------------------------
-// Returns the rectangle this sprite inscribes
-//----------------------------------------------------------------------------
-sf::FloatRect SpriteIndexed::getGlobalBounds() const
-{
-    sf::FloatRect bounds;
-
-    bounds = sprite_.getGlobalBounds();
-    bounds.left += getPosition().x;
-    bounds.top += getPosition().y;
-    
-    return bounds;
 }
 
 //----------------------------------------------------------------------------
@@ -152,20 +128,10 @@ sf::FloatRect SpriteIndexed::getGlobalBounds() const
 //----------------------------------------------------------------------------
 int SpriteIndexed::getIndexLimit() const
 {
-	if (!sprite_.getTexture())
+	if (!getTexture())
 		return 0;
 
-	return (sprite_.getTexture()->getSize().x / width_) * (sprite_.getTexture()->getSize().y / height_);
-}
-
-//----------------------------------------------------------------------------
-// - Draw (Override)
-//----------------------------------------------------------------------------
-void SpriteIndexed::draw(sf::RenderTarget& target, sf::RenderStates states) const
-{
-    states.transform *= getTransform();
-
-    target.draw(sprite_, states);
+	return (getTexture()->getSize().x / width_) * (getTexture()->getSize().y / height_);
 }
 
 //----------------------------------------------------------------------------
@@ -175,12 +141,10 @@ void SpriteIndexed::draw(sf::RenderTarget& target, sf::RenderStates states) cons
 //----------------------------------------------------------------------------
 int SpriteIndexed::widthLimit() const
 {
-	if (!sprite_.getTexture())
-    {
+	if (!getTexture())
 		return 0;
-    }
 
-	return sprite_.getTexture()->getSize().x;
+	return getTexture()->getSize().x;
 }
 
 //----------------------------------------------------------------------------
@@ -190,12 +154,10 @@ int SpriteIndexed::widthLimit() const
 //----------------------------------------------------------------------------
 int SpriteIndexed::heightLimit() const
 {
-	if (!sprite_.getTexture())
-    {
+	if (!getTexture())
 		return 0;
-    }
 
-	return sprite_.getTexture()->getSize().y;
+	return getTexture()->getSize().y;
 }
 
 //----------------------------------------------------------------------------
@@ -206,6 +168,6 @@ int SpriteIndexed::heightLimit() const
 //----------------------------------------------------------------------------
 void SpriteIndexed::updateFrame()
 {
-	int xTiles = sprite_.getTexture()->getSize().x / width_;
-	sprite_.setTextureRect(sf::IntRect(width_ * (index_ % xTiles), height_ * (index_ / xTiles), width_, height_));
+	int xTiles = getTexture()->getSize().x / width_;
+	sf::Sprite::setTextureRect(sf::IntRect(width_ * (index_ % xTiles), height_ * (index_ / xTiles), width_, height_));
 }
