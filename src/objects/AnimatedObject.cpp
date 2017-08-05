@@ -7,32 +7,9 @@
 //----------------------------------------------------------------------------
 AnimatedObject::AnimatedObject(float fps) :
     fps_(fps > 0 ? fps : FPS),
-    speed_(1),
     clock_(0),
     frozen_(false)
 {}
-
-//----------------------------------------------------------------------------
-// - Get Speed
-//----------------------------------------------------------------------------
-float AnimatedObject::getSpeed() const
-{
-    return speed_;
-}
-
-//----------------------------------------------------------------------------
-// - Set Speed
-//----------------------------------------------------------------------------
-// * speed : relative multiplier of time that passes for this object
-//----------------------------------------------------------------------------
-void AnimatedObject::setSpeed(float speed)
-{
-    // A speed of zero or less is undefined
-    if(speed > 0)
-    {
-        speed_ = speed;
-    }
-}
 
 //----------------------------------------------------------------------------
 // - Get Local Frames/Second
@@ -99,7 +76,7 @@ void AnimatedObject::update(float elapsed)
 {
     if(!frozen_)
     {
-        clock_ += speed_ * elapsed * fps_;
+        clock_ += elapsed * fps_;
         while(clock_ >= 1)
         {
             step();

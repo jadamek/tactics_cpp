@@ -16,8 +16,6 @@ class AnimatedObject
 public:
     AnimatedObject(float fps = FPS);
 
-    float           getSpeed() const;
-    void            setSpeed(float speed);
     float           getFPS() const;
     void            setFPS(float fps);
     bool            frozen() const;
@@ -31,7 +29,6 @@ protected:
 
 // Members
     float           fps_;
-    float           speed_;
     float           clock_;
     bool            frozen_;
 };
