@@ -32,16 +32,12 @@ void SpriteActor::setSprite(const sf::Sprite* sprite)
 //----------------------------------------------------------------------------
 sf::FloatRect SpriteActor::getGlobalBounds() const
 {
-    sf::FloatRect bounds;
-
     if(sprite_)
     {
-        bounds = sprite_->getGlobalBounds();
-        bounds.left += getPosition().x;
-        bounds.top += getPosition().y;
+        return getTransform().transformRect(sprite_->getGlobalBounds());
     }
     
-    return bounds;
+    return sf::FloatRect();
 }
 
 //----------------------------------------------------------------------------

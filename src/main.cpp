@@ -11,6 +11,7 @@
 #include "screen/ViewEx.h"
 #include "screen/Panorama.h"
 #include "sprite/SpriteDirected.h"
+#include "sprite/SpriteAnimated.h"
 
 int main()
 {
@@ -63,13 +64,14 @@ int main()
     // Sprite tests
     sf::Texture assassin_texture;
     assassin_texture.loadFromFile("resources/graphics/Assassin.png");
-    SpriteDirected assassin(assassin_texture, 20, 32);
-    assassin.setIndex(1);
+    SpriteDirected* assassin_sprite = new SpriteDirected(assassin_texture, 20, 32);
+    std::cout << "assassin sprite " << assassin_sprite << std::endl;
 
+    SpriteAnimated assassin(assassin_sprite);
     assassin.move(0, -100);
     assassin.scale(sf::Vector2f(2, 2));
+    assassin.play("default", true);
 
-    float sin_timer = 0;
     float facing_timer = 0;
 
     // Background/Foreground panorama
@@ -261,21 +263,15 @@ int main()
         elapsed = clock.restart().asSeconds();
         soul->update(elapsed);
         map.getDepthBuffer().update(elapsed);
+        assassin.update(elapsed);
         background.update(elapsed);
         view.update(elapsed);
 
-        sin_timer += elapsed;
         facing_timer += elapsed;
-
-        if(sin_timer > 1)
-        {
-            assassin.setIndex((assassin.getIndex() + 1) % assassin.getIndexLimit());
-            sin_timer -= 1;
-        }
 
         if(facing_timer > 4)
         {
-            assassin.setDirection((assassin.getDirection() + 1) % assassin.getDirections());
+            assassin_sprite->setDirection((assassin_sprite->getDirection() + 1) % assassin_sprite->getDirections());
             facing_timer -= 4;
         }
 
