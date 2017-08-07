@@ -54,25 +54,19 @@ int main()
         map.addObject(soul);
     }
 
-    sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
-    SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
-    soul_sprite->move(-12, -40);
-
-    Actor* soul = new Actor(soul_sprite, &map);
-    map.addObject(soul);
-
     // Sprite tests
     sf::Texture assassin_texture;
     assassin_texture.loadFromFile("resources/graphics/Assassin.png");
-    SpriteDirected* assassin_sprite = new SpriteDirected(assassin_texture, 20, 32);
-    std::cout << "assassin sprite " << assassin_sprite << std::endl;
+    SpriteDirected* assassin_base_sprite = new SpriteDirected(assassin_texture, 20, 32);
+    assassin_base_sprite->setOrigin(10, 28);
+    assassin_base_sprite->setPosition(0, 0);
+    assassin_base_sprite->scale(1, 1);
 
-    SpriteAnimated assassin(assassin_sprite);
-    assassin.move(0, -100);
-    assassin.scale(sf::Vector2f(2, 2));
-    assassin.play("default", true);
+    SpriteAnimated* assassin_sprite = new SpriteAnimated(assassin_base_sprite);
+    assassin_sprite->play("default", true);
 
-    float facing_timer = 0;
+    Actor* assassin = new Actor(assassin_sprite, &map);
+    map.addObject(assassin);    
 
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -135,9 +129,10 @@ int main()
                     view.scroll(sf::Vector2f(-1 * MAP_SCALE.x, 0), 0.3);
                 }
             }
-            else if(!soul->moving())
+            else if(!assassin->moving())
             {
-                soul->moveTo(soul->position() + sf::Vector3f(-1.0, 0, 0));
+                assassin_base_sprite->setDirection(1);
+                assassin->moveTo(assassin->position() + sf::Vector3f(-1.0, 0, 0));
             }
         }
 
@@ -151,9 +146,10 @@ int main()
                     view.scroll(sf::Vector2f(MAP_SCALE.x, 0), 0.3);
                 }
             }
-            else if(!soul->moving())
+            else if(!assassin->moving())
             {
-                soul->moveTo(soul->position() + sf::Vector3f(1.0, 0, 0));
+                assassin_base_sprite->setDirection(3);
+                assassin->moveTo(assassin->position() + sf::Vector3f(1.0, 0, 0));
             }
         }
 
@@ -167,9 +163,10 @@ int main()
                     view.scroll(sf::Vector2f(0, -1 * MAP_SCALE.y), 0.3);
                 }
             }
-            else if(!soul->moving())
+            else if(!assassin->moving())
             {
-                soul->moveTo(soul->position() + sf::Vector3f(0, -1.0, 0));
+                assassin_base_sprite->setDirection(2);
+                assassin->moveTo(assassin->position() + sf::Vector3f(0, -1.0, 0));
             }
         }
 
@@ -183,9 +180,10 @@ int main()
                     view.scroll(sf::Vector2f(0, MAP_SCALE.y), 0.3);
                 }
             }
-            else if(!soul->moving())
+            else if(!assassin->moving())
             {
-                soul->moveTo(soul->position() + sf::Vector3f(0, 1.0, 0));
+                assassin_base_sprite->setDirection(0);
+                assassin->moveTo(assassin->position() + sf::Vector3f(0, 1.0, 0));
             }
         }
 
@@ -244,7 +242,7 @@ int main()
         // Keyboard Input handles : G - Goto Player (Focus)
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::G) && !view.focusing())
         {
-            view.focus(soul, 0.5);
+            view.focus(assassin, 0.5);
         }
         
         // Keyboard Input handles : Escape
@@ -261,25 +259,16 @@ int main()
 
         // Timing updates
         elapsed = clock.restart().asSeconds();
-        soul->update(elapsed);
+        assassin->update(elapsed);
+        assassin_sprite->update(elapsed);
         map.getDepthBuffer().update(elapsed);
-        assassin.update(elapsed);
         background.update(elapsed);
-        view.update(elapsed);
-
-        facing_timer += elapsed;
-
-        if(facing_timer > 4)
-        {
-            assassin_sprite->setDirection((assassin_sprite->getDirection() + 1) % assassin_sprite->getDirections());
-            facing_timer -= 4;
-        }
+        view.update(elapsed);        
 
         window.clear(sf::Color::Black);
         background.drawOverlays(window);
         window.setView(view);
         window.draw(map);
-        window.draw(assassin);
         view.drawOverlays(window);
         window.display();
     }

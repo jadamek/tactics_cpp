@@ -1,4 +1,5 @@
 #include "SpriteAnimated.h"
+#include <math.h>
 
 //----------------------------------------------------------------------------
 // - Animated Sprite Constructor
@@ -6,9 +7,10 @@
 // * sprite : indexed sprite on which all animations are played
 //----------------------------------------------------------------------------
 SpriteAnimated::SpriteAnimated(SpriteIndexed* sprite) :
-    AnimatedObject(1),
+    AnimatedObject(2),
     current_(0),
     playing_(""),
+    length_(-1),
     sprite_(sprite)
 {    
     if(sprite_){
@@ -86,9 +88,31 @@ void SpriteAnimated::remove(const std::string& name)
 //----------------------------------------------------------------------------
 void SpriteAnimated::play(const std::string& name, bool looping)
 {
-    current_ = 0;
-    playing_ = name;
-    loop_ = looping;
+    if(name != ""){
+        current_ = 0;
+        playing_ = name;
+        length_ = -1;
+        loop_ = looping;
+    }
+    
+}
+
+//----------------------------------------------------------------------------
+// - Play Animation
+//----------------------------------------------------------------------------
+// * name : name of the sequence to begin playing
+// * duration : animation will continue playing from for the entire duration
+//      in seconds, looping until the time expires
+//----------------------------------------------------------------------------
+void SpriteAnimated::playFor(const std::string& name, float duration)
+{
+    if(name != "" && duration > 0)
+    {
+        current_ = 0;
+        playing_ = name;
+        length_ = floor(duration * getFPS());
+        loop_ = false;
+    }    
 }
 
 //----------------------------------------------------------------------------
@@ -166,18 +190,33 @@ void SpriteAnimated::draw(sf::RenderTarget& target, sf::RenderStates states) con
 //----------------------------------------------------------------------------
 void SpriteAnimated::step()
 {
+    if(length_ == 0)
+    {
+        stop();
+    }
+    
     if(playing_ != "")
     {
         if(current_ < animations_[playing_].size())
         {
             sprite_->setIndex(animations_[playing_][current_++]);
+            
+            if(length_ > 0)
+            {
+                length_--;
+            }
         }
 
         if(current_ == animations_[playing_].size())
         {
-            if(loop_)
+            if(loop_ || length_ > 0)
             {
                 current_ = 0;
+
+                if(length_ > 0)
+                {
+                    length_--;
+                }
             }
             else
             {

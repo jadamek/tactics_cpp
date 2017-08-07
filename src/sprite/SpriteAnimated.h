@@ -24,6 +24,7 @@ public:
     bool                        has(const std::string& name) const;
     void                        remove(const std::string& name);
     void                        play(const std::string& name = "default", bool looping = false);
+    void                        playFor(const std::string& name = "default", float duration = -1);
     bool                        playing() const;
     void                        stop();
     SpriteIndexed*              getSprite();
@@ -39,6 +40,7 @@ protected:
     int                         current_;
     std::string                 playing_;
     SpriteIndexed*              sprite_;
+    int                         length_;
     bool                        loop_;
     std::map<std::string, std::vector<int>> animations_;
 };
