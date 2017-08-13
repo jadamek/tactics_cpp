@@ -14,16 +14,6 @@
 #include "sprite/SpriteAnimated.h"
 #include "game/ActionScheduler.h"
 
-void shout()
-{
-    std::cout << "Hey." << std::endl;
-}
-
-void greet()
-{
-    std::cout << "Hi." << std::endl;
-}
-
 int main()
 {
     sf::Texture soul_texture, grass_texture, dirt_texture;
@@ -66,8 +56,8 @@ int main()
     }
 
     // Test action scheduler
-    ActionScheduler::instance().schedule(shout, 2 * FPS);
-    ActionScheduler::instance().schedule(greet, 4 * FPS);
+    ActionScheduler::instance().schedule([](){std::cout << "Hey." << std::endl;}, 2 * FPS);
+    ActionScheduler::instance().schedule([](){std::cout << "Hi." << std::endl;}, 4 * FPS);
 
     // Sprite tests
     sf::Texture assassin_texture;

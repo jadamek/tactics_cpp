@@ -31,6 +31,7 @@ public:
     const SpriteIndexed*        getSprite() const;
     void                        setSprite(SpriteIndexed* sprite);
     virtual sf::FloatRect       getGlobalBounds() const;
+    int                         getFramesRemaining() const;
 
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;

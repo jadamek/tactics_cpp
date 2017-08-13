@@ -174,6 +174,17 @@ sf::FloatRect SpriteAnimated::getGlobalBounds() const
 }
 
 //----------------------------------------------------------------------------
+// - Get Remaining Animation Frames
+//----------------------------------------------------------------------------
+// Returns the number of animations frames left to play, or -1 if the
+// animation is currently looping
+//----------------------------------------------------------------------------
+int SpriteAnimated::getFramesRemaining() const
+{
+    return (loop_ ? -1 : length_);
+}
+
+//----------------------------------------------------------------------------
 // - Draw (Override)
 //----------------------------------------------------------------------------
 void SpriteAnimated::draw(sf::RenderTarget& target, sf::RenderStates states) const

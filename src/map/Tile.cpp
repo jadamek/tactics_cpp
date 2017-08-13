@@ -5,10 +5,10 @@
 // - Tile Constructor
 //----------------------------------------------------------------------------
 Tile::Tile(const Sprite* sprite, float height) :
-    IsometricObject(),
+    MapObject(height),
     sprite_(sprite),
-    occupant_(0),
-    height_(std::max(0.f, height)){}
+    occupant_(0)
+{}
 
 //----------------------------------------------------------------------------
 // - Tile Destructor
@@ -16,16 +16,6 @@ Tile::Tile(const Sprite* sprite, float height) :
 Tile::~Tile()
 {
     delete sprite_;
-}
-
-//----------------------------------------------------------------------------
-// - Get Height
-//----------------------------------------------------------------------------
-// * position : (x,y) position relative to the center of the object
-//----------------------------------------------------------------------------
-float Tile::getHeight(const sf::Vector2f& position) const
-{
-    return height_;
 }
 
 //----------------------------------------------------------------------------
@@ -41,7 +31,7 @@ sf::FloatRect Tile::getGlobalBounds() const
 //----------------------------------------------------------------------------
 // Get Occupant Tile
 //----------------------------------------------------------------------------
-const Tile* Tile::getOccupant() const
+const MapObject* Tile::getOccupant() const
 {
     return occupant_;
 }
@@ -49,7 +39,7 @@ const Tile* Tile::getOccupant() const
 //----------------------------------------------------------------------------
 // Get Occupant Tile (Mutable)
 //----------------------------------------------------------------------------
-Tile* Tile::getOccupant()
+MapObject* Tile::getOccupant()
 {
     return occupant_;
 }
@@ -69,33 +59,13 @@ void Tile::setSprite(const Sprite* sprite)
 //----------------------------------------------------------------------------
 // * occupant : set the map object lying on top of this one
 //----------------------------------------------------------------------------
-void Tile::setOccupant(Tile* occupant)
+void Tile::setOccupant(MapObject* occupant)
 {
     occupant_ = occupant;
 }
 
 //----------------------------------------------------------------------------
-// - Set Height
-//----------------------------------------------------------------------------
-// * height : new height of the tile
-// Raises or lowers the object appropriately
-//----------------------------------------------------------------------------
-void Tile::setHeight(float height)
-{
-    float heightChange = height - height_;
-
-    if(heightChange > 0)
-    {
-        rise(heightChange);
-    }
-    else
-    {
-        lower(-1 * heightChange);
-    }
-}
-
-//----------------------------------------------------------------------------
-// - Rise
+// - Rise (Override)
 //----------------------------------------------------------------------------
 // * z : relative height to raise this tile by.
 // Raises a tile increasing its z-position and that of any object above it.
@@ -109,9 +79,8 @@ void Tile::rise(float z)
     }
 }
 
-
 //----------------------------------------------------------------------------
-// - Lower 
+// - Lower (Override)
 //----------------------------------------------------------------------------
 // * z : relative height to lower this tile by.
 // Lowers a tile decreasing its z-position and that of any object above it.
