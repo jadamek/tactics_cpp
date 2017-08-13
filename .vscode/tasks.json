@@ -8,6 +8,7 @@
             "command": "g++",
             "args":["src/main.cpp",
                 "src/map/*.cpp",
+                "src/game/*.cpp",
                 "src/objects/*.cpp",
                 "src/sprite/*.cpp",
                 "src/sprite/map/*.cpp",

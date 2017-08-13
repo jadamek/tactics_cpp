@@ -12,6 +12,17 @@
 #include "screen/Panorama.h"
 #include "sprite/SpriteDirected.h"
 #include "sprite/SpriteAnimated.h"
+#include "game/ActionScheduler.h"
+
+void shout()
+{
+    std::cout << "Hey." << std::endl;
+}
+
+void greet()
+{
+    std::cout << "Hi." << std::endl;
+}
 
 int main()
 {
@@ -53,6 +64,10 @@ int main()
         souls.push_back(soul);
         map.addObject(soul);
     }
+
+    // Test action scheduler
+    ActionScheduler::instance().schedule(shout, 2 * FPS);
+    ActionScheduler::instance().schedule(greet, 4 * FPS);
 
     // Sprite tests
     sf::Texture assassin_texture;
@@ -259,11 +274,12 @@ int main()
 
         // Timing updates
         elapsed = clock.restart().asSeconds();
+        ActionScheduler::instance().update(elapsed);
         assassin->update(elapsed);
         assassin_sprite->update(elapsed);
         map.getDepthBuffer().update(elapsed);
         background.update(elapsed);
-        view.update(elapsed);        
+        view.update(elapsed);
 
         window.clear(sf::Color::Black);
         background.drawOverlays(window);
