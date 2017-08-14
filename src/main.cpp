@@ -18,16 +18,16 @@ int main()
 {
     sf::Texture soul_texture, grass_texture, dirt_texture;
 
-    grass_texture.loadFromFile("resources/graphics/GrassTile.png");
-    dirt_texture.loadFromFile("resources/graphics/DirtTile.png");
+    grass_texture.loadFromFile("resources/graphics/GrassTile_32x16.png");
+    dirt_texture.loadFromFile("resources/graphics/DirtTile_32x16.png");
 
-    Map map(35, 35);
+    Map map(15, 15);
 
     for(int x = 0; x < map.width(); x++)
     {
         for(int y = 0; y < map.length(); y++)
         {
-            float height = 1 + (rand() % 4);
+            float height = 3;
 
             SpriteTile* tile_sprite = new SpriteTile(grass_texture, MAP_SCALE.x, MAP_SCALE.y, MAP_SCALE.z * height);
             Tile* tile = new Tile(tile_sprite, height);
@@ -35,43 +35,22 @@ int main()
             map.place(tile, x, y);
         }
     }
-    // map.remove(0, 1, 0);
 
-    soul_texture.loadFromFile("resources/graphics/Soul.png");
-    std::vector<Actor*> souls;
-
-    // Create test objects
-    for(int i = 0; i < 20; i++)
-    {
-        sf::Sprite* soul_basic_sprite = new sf::Sprite(soul_texture);
-        SpriteActor* soul_sprite = new SpriteActor(soul_basic_sprite);
-        soul_sprite->move(-12, -40);
-
-        float x = 3 * (i % 10) + 2;
-        float y = 3 * (i / 10) + 2;
-
-        Actor* soul = new Actor(soul_sprite, &map);
-        souls.push_back(soul);
-        map.addObject(soul);
-    }
-
-    // Test action scheduler
-    ActionScheduler::instance().schedule([](){std::cout << "Hey." << std::endl;}, 2 * FPS);
-    ActionScheduler::instance().schedule([](){std::cout << "Hi." << std::endl;}, 4 * FPS);
-
-    // Sprite tests
+    // Setup Assassin player
     sf::Texture assassin_texture;
     assassin_texture.loadFromFile("resources/graphics/Assassin.png");
-    SpriteDirected* assassin_base_sprite = new SpriteDirected(assassin_texture, 20, 32);
-    assassin_base_sprite->setOrigin(10, 28);
-    assassin_base_sprite->setPosition(0, 0);
-    assassin_base_sprite->scale(1, 1);
 
-    SpriteAnimated* assassin_sprite = new SpriteAnimated(assassin_base_sprite);
-    assassin_sprite->play("default", true);
+    Actor* assassin = new Actor(assassin_texture, &map);
+    map.addObject(assassin);
 
-    Actor* assassin = new Actor(assassin_sprite, &map);
-    map.addObject(assassin);    
+    // Setup Paladin player
+    sf::Texture paladin_texture;
+    paladin_texture.loadFromFile("resources/graphics/Paladin.png");
+
+    Actor* paladin = new Actor(paladin_texture, &map);
+    map.addObject(paladin);
+
+    paladin->setPosition(sf::Vector3f(5, 5, map.height(5, 5)));
 
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -96,22 +75,6 @@ int main()
 
     clock.restart();
     map.getDepthBuffer().sort();
-    sort_time = clock.restart().asMicroseconds();
-
-    std::cout << "Full sort in : " << sort_time << " us " << std::endl;
-
-    for(int i = 0; i < souls.size (); i++)
-    {
-        float x = 3 * (i % 10) + 1;
-        float y = 3 * (i / 10) + 1;
-        souls[i]->setPosition(sf::Vector3f(x, y, map.height(x, y)));
-    }
-
-    clock.restart();
-    map.getDepthBuffer().update(1);
-    sort_time = clock.restart().asMicroseconds();
-
-    std::cout << "Partial sort in : " << sort_time << " us " << std::endl;
 
     bool closing = false;
 
@@ -134,10 +97,9 @@ int main()
                     view.scroll(sf::Vector2f(-1 * MAP_SCALE.x, 0), 0.3);
                 }
             }
-            else if(!assassin->moving())
+            else if(!assassin->walking())
             {
-                assassin_base_sprite->setDirection(1);
-                assassin->moveTo(assassin->position() + sf::Vector3f(-1.0, 0, 0));
+                assassin->walk(sf::Vector2f(-1.0, 0));
             }
         }
 
@@ -151,10 +113,9 @@ int main()
                     view.scroll(sf::Vector2f(MAP_SCALE.x, 0), 0.3);
                 }
             }
-            else if(!assassin->moving())
+            else if(!assassin->walking())
             {
-                assassin_base_sprite->setDirection(3);
-                assassin->moveTo(assassin->position() + sf::Vector3f(1.0, 0, 0));
+                assassin->walk(sf::Vector2f(1.0, 0));
             }
         }
 
@@ -168,10 +129,9 @@ int main()
                     view.scroll(sf::Vector2f(0, -1 * MAP_SCALE.y), 0.3);
                 }
             }
-            else if(!assassin->moving())
+            else if(!assassin->walking())
             {
-                assassin_base_sprite->setDirection(2);
-                assassin->moveTo(assassin->position() + sf::Vector3f(0, -1.0, 0));
+                assassin->walk(sf::Vector2f(0, -1.0));
             }
         }
 
@@ -185,10 +145,9 @@ int main()
                     view.scroll(sf::Vector2f(0, MAP_SCALE.y), 0.3);
                 }
             }
-            else if(!assassin->moving())
+            else if(!assassin->walking())
             {
-                assassin_base_sprite->setDirection(0);
-                assassin->moveTo(assassin->position() + sf::Vector3f(0, 1.0, 0));
+                assassin->walk(sf::Vector2f(0, 1.0));
             }
         }
 
@@ -266,7 +225,7 @@ int main()
         elapsed = clock.restart().asSeconds();
         ActionScheduler::instance().update(elapsed);
         assassin->update(elapsed);
-        assassin_sprite->update(elapsed);
+        paladin->update(elapsed);
         map.getDepthBuffer().update(elapsed);
         background.update(elapsed);
         view.update(elapsed);

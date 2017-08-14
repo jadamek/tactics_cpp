@@ -239,7 +239,7 @@ void IsometricBuffer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 		target.draw(*sorted_[n], state);
     }
 }
-#include <iostream>
+
 //----------------------------------------------------------------------------
 // - Increment Frame
 //----------------------------------------------------------------------------
@@ -267,7 +267,6 @@ void IsometricBuffer::step()
         // Otherwise, execute a partial sort only on the dirty nodes
         else
         {
-            std::cout << "partially sorting " << dirty.size() << " objects ... " << std::endl;
             partialSort(dirty);
         }
     }       

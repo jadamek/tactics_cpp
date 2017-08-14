@@ -36,21 +36,8 @@ MobileObject::~MobileObject()
 //----------------------------------------------------------------------------
 void MobileObject::moveTo(const sf::Vector3f& position)
 {
-    destination_.clear();
-    destination_.push_back(position);
+    destination_ = position;
     arrival_ = computeArrival(position);
-}
-
-//----------------------------------------------------------------------------
-// - Move Along a Path
-//----------------------------------------------------------------------------
-// * path : a list of consecutive destinations
-// Sets the object's destination as a path, or list of consecutive locations
-//----------------------------------------------------------------------------
-void MobileObject::moveAlong(const std::list<sf::Vector3f>& path)
-{
-    destination_ = path;
-    arrival_ = (path.empty() ? 0 : computeArrival(path.front()));
 }
 
 //----------------------------------------------------------------------------
@@ -58,7 +45,7 @@ void MobileObject::moveAlong(const std::list<sf::Vector3f>& path)
 //----------------------------------------------------------------------------
 bool MobileObject::moving() const
 {
-    destination_.size() > 0;
+    return arrival_ > 0;
 }
 
 //----------------------------------------------------------------------------
@@ -68,7 +55,6 @@ bool MobileObject::moving() const
 //----------------------------------------------------------------------------
 void MobileObject::stopMoving()
 {
-    destination_.clear();
     arrival_ = 0;
 }
 
@@ -79,32 +65,19 @@ void MobileObject::stopMoving()
 //----------------------------------------------------------------------------
 void MobileObject::step()
 {
-    if(destination_.size())
+    if(arrival_ > 0)
     {
-        if(arrival_ > 0)
+        float x = position().x + (destination_.x - position().x) / float(arrival_);
+        float y = position().y + (destination_.y - position().y) / float(arrival_);
+        float z = (ground_ ? ground_->height(x, y) : position().z);
+
+        if(z < 0)
         {
-            float x = position().x + (destination_.front().x - position().x) / float(arrival_);
-            float y = position().y + (destination_.front().y - position().y) / float(arrival_);
-            float z = (ground_ ? ground_->height(x, y) : position().z);
-
-            if(z < 0)
-            {
-                z = position().z;
-            }
-
-            setPosition(sf::Vector3f(x, y, z));
-            arrival_--;
+            z = position().z;
         }
 
-        if(arrival_ == 0)
-        {
-            destination_.pop_front();
-
-            if(destination_.size() > 0)
-            {
-                arrival_ = computeArrival(destination_.front());
-            }
-        }
+        setPosition(sf::Vector3f(x, y, z));
+        arrival_--;
     }
 }
 

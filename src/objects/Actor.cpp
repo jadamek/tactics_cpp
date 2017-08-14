@@ -1,14 +1,23 @@
 #include "Actor.h"
+#include <math.h>
+
+# define M_PI 3.14159265358979323846
 
 //----------------------------------------------------------------------------
 // - Actor Constructor
 //----------------------------------------------------------------------------
-// * sprite : representative sprite for this actor
+// * texture : bitmap for this actor's directed sprite animations
 //----------------------------------------------------------------------------
-Actor::Actor(const Sprite* sprite, const Map* ground) :
+Actor::Actor(const sf::Texture& texture, const Map* ground) :
     MobileObject(ground),
-    sprite_(sprite)
-{}
+    sprite_(0),
+    baseSprite_(new SpriteDirected(texture, 20, 32))
+{
+    baseSprite_->setOrigin(10, 28);
+    baseSprite_->setPosition(0, 0);
+    sprite_ = new SpriteAnimated(baseSprite_);
+    sprite_->play("default", true);        
+}
 
 //----------------------------------------------------------------------------
 // - Actor Destructor
@@ -16,6 +25,64 @@ Actor::Actor(const Sprite* sprite, const Map* ground) :
 Actor::~Actor()
 {
     delete sprite_;
+    delete baseSprite_;
+}
+
+//----------------------------------------------------------------------------
+// - Walk A Relative Distance
+//----------------------------------------------------------------------------
+// * distance : relative position the actor will eventually arrive at to their
+//          current one
+// Sets the actor walking toward a single relative location
+//----------------------------------------------------------------------------
+void Actor::walk(const sf::Vector2f& distance)
+{
+    walkTo(sf::Vector2f(position().x + distance.x, position().y + distance.y));
+}
+
+//----------------------------------------------------------------------------
+// - Walk To Single Position
+//----------------------------------------------------------------------------
+// * position : position the actor will eventually arrive at
+// Sets the actor walking toward a single location
+//----------------------------------------------------------------------------
+void Actor::walkTo(const sf::Vector2f& position)
+{
+    face(position);
+    moveTo(sf::Vector3f(position.x, position.y, 0));
+}
+
+//----------------------------------------------------------------------------
+// - Move Along a Path
+//----------------------------------------------------------------------------
+// * path : a list of consecutive destinations
+// Sets the actor's destination as a path, or list of consecutive locations to
+// walk to
+//----------------------------------------------------------------------------
+void Actor::walkAlong(const std::list<sf::Vector2f>& path)
+{
+    path_ = path;
+    walkTo(path_.front());    
+    path_.pop_front();
+}
+
+//----------------------------------------------------------------------------
+// - Is Actor Walking?
+//----------------------------------------------------------------------------
+bool Actor::walking() const
+{
+    return moving() || !path_.empty();
+}
+
+//----------------------------------------------------------------------------
+// - Stop Walking
+//----------------------------------------------------------------------------
+// Cancels current destination and motion
+//----------------------------------------------------------------------------
+void Actor::stopWalking()
+{
+    stopMoving();
+    path_.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -35,13 +102,25 @@ float Actor::getHeight(const sf::Vector2f& position) const
 //----------------------------------------------------------------------------
 sf::FloatRect Actor::getGlobalBounds() const
 {
-    if(sprite_)
-    {
-        return sprite_->getGlobalBounds();
-    }
-    else{
-        return sf::FloatRect(position_.x, position_.y, 0, 0);
-    }
+    return sprite_->getGlobalBounds();        
+}
+
+//----------------------------------------------------------------------------
+// - Set Texture
+//----------------------------------------------------------------------------
+// * texture : bitmap for this actor's directed sprite animations
+//----------------------------------------------------------------------------
+void Actor::setTexture(const sf::Texture& texture)
+{
+    baseSprite_->setTexture(texture);
+}
+
+//----------------------------------------------------------------------------
+// - Get Sprite (Mutable)
+//----------------------------------------------------------------------------
+Sprite* Actor::getSprite()
+{
+    return sprite_;
 }
 
 //----------------------------------------------------------------------------
@@ -53,12 +132,76 @@ const Sprite* Actor::getSprite() const
 }
 
 //----------------------------------------------------------------------------
+// - Set Facing
+//----------------------------------------------------------------------------
+// * direction : relative direction, counting 0 as east and rotating clockwise
+//----------------------------------------------------------------------------
+void Actor::face(int direction)
+{
+    baseSprite_->setDirection(direction);
+}
+
+//----------------------------------------------------------------------------
+// - Face Toward Position
+//----------------------------------------------------------------------------
+// * target : x-y position to face toward by setting direction to the
+//      closest angularly
+//----------------------------------------------------------------------------
+void Actor::face(const sf::Vector2f& target)
+{
+    double angle = atan2(target.y - position().y, target.x - position().x);
+
+    if(angle < 0)
+    {
+        angle = 2 * M_PI + angle;
+    }
+
+    int direction = round(angle / 2 / M_PI * baseSprite_->getDirections());
+
+    baseSprite_->setDirection(direction % baseSprite_->getDirections());
+}
+
+//----------------------------------------------------------------------------
+// - Get Current Facing
+//----------------------------------------------------------------------------
+int Actor::facing() const
+{
+    return baseSprite_->getDirection();
+}
+
+//----------------------------------------------------------------------------
+// - Update Actor (Override)
+//----------------------------------------------------------------------------
+// Temporary solution to updating animated members until AnimationManager is
+// implemented
+//----------------------------------------------------------------------------
+void Actor::update(float elapsed)
+{
+    MobileObject::update(elapsed);
+    sprite_->update(elapsed);
+}
+
+//----------------------------------------------------------------------------
 // - Draw (Override)
 //----------------------------------------------------------------------------
 void Actor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if(sprite_)
+    target.draw(*sprite_, states);
+}
+
+//----------------------------------------------------------------------------
+// - Increment Frame
+//----------------------------------------------------------------------------
+// Update all motions, status checks and other frame-based operations
+//----------------------------------------------------------------------------
+void Actor::step()
+{
+    // Update path-based movement
+    MobileObject::step();
+
+    if(arrival_ == 0 && !path_.empty())
     {
-        target.draw(*sprite_, states);
-    }
+        walkTo(path_.front());
+        path_.pop_front();
+    }    
 }

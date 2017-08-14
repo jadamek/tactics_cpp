@@ -20,7 +20,6 @@ public:
     virtual ~MobileObject();
 
     void            moveTo(const sf::Vector3f& position);
-    void            moveAlong(const std::list<sf::Vector3f>& path);
     bool            moving() const;
     void            stopMoving();
 
@@ -29,9 +28,9 @@ protected:
     int             computeArrival(const sf::Vector3f& position);
 
 // Members
-    const Map*              ground_;
-    int                     arrival_;
-    std::list<sf::Vector3f> destination_;
+    const Map*      ground_;
+    int             arrival_;
+    sf::Vector3f    destination_;
 };
 
 #endif
