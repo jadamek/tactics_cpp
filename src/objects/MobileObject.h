@@ -20,8 +20,11 @@ public:
     virtual ~MobileObject();
 
     void            moveTo(const sf::Vector3f& position);
+    void            moveTo(const sf::Vector3f& position, float duration);
     bool            moving() const;
     void            stopMoving();
+    float           getSpeed() const;
+    void            setSpeed(float speed);
 
 protected:
     virtual void    step();
@@ -31,6 +34,7 @@ protected:
     const Map*      ground_;
     int             arrival_;
     sf::Vector3f    destination_;
+    float           speed_;
 };
 
 #endif

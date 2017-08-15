@@ -31,7 +31,6 @@ public:
     void                    face(int direction);
     void                    face(const sf::Vector2f& target);
     int                     facing() const;
-    virtual void            update(float elapsed);
     
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;

@@ -12,6 +12,7 @@ MobileObject::MobileObject(const Map* ground) :
     IsometricObject(),
     AnimatedObject(),
     ground_(ground),
+    speed_(1),
     arrival_(0)
 {
     if(ground)
@@ -32,12 +33,30 @@ MobileObject::~MobileObject()
 // - Move Linearly To Position
 //----------------------------------------------------------------------------
 // * destination : position the object will eventually arrive at
-// Sets the object's target destination to a single location
+// Sets the object's target destination to a single location with a travel
+// time dependant on the distance
 //----------------------------------------------------------------------------
 void MobileObject::moveTo(const sf::Vector3f& position)
 {
     destination_ = position;
     arrival_ = computeArrival(position);
+}
+
+//----------------------------------------------------------------------------
+// - Move Linearly To Position
+//----------------------------------------------------------------------------
+// * destination : position the object will eventually arrive at
+// * duration : number of seconds until the object reaches the destination
+// Sets the object's target destination to a single location with a fixed
+// travel time
+//----------------------------------------------------------------------------
+void MobileObject::moveTo(const sf::Vector3f& position, float duration)
+{
+    if(duration > 0)
+    {        
+        destination_ = position;
+        arrival_ = int(duration * getFPS() / speed_);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +75,28 @@ bool MobileObject::moving() const
 void MobileObject::stopMoving()
 {
     arrival_ = 0;
+}
+
+//----------------------------------------------------------------------------
+// - Get Speed
+//----------------------------------------------------------------------------
+float MobileObject::getSpeed() const
+{
+    return speed_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Speed
+//----------------------------------------------------------------------------
+// * speed : relative speed, which multiplies the rate at which an object
+//      moves (1 tile/s for constant motion)
+//----------------------------------------------------------------------------
+void MobileObject::setSpeed(float speed)
+{
+    if(speed > 0)
+    {
+        speed_ = speed;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -89,5 +130,5 @@ void MobileObject::step()
 int MobileObject::computeArrival(const sf::Vector3f& position)
 {
     double distance = sqrt(pow((position.x - position_.x), 2) + pow((position.y - position_.y), 2));
-    return (int)(ceil(distance * getFPS()));
+    return (int)(ceil(distance * getFPS() / speed_));
 }

@@ -170,18 +170,6 @@ int Actor::facing() const
 }
 
 //----------------------------------------------------------------------------
-// - Update Actor (Override)
-//----------------------------------------------------------------------------
-// Temporary solution to updating animated members until AnimationManager is
-// implemented
-//----------------------------------------------------------------------------
-void Actor::update(float elapsed)
-{
-    MobileObject::update(elapsed);
-    sprite_->update(elapsed);
-}
-
-//----------------------------------------------------------------------------
 // - Draw (Override)
 //----------------------------------------------------------------------------
 void Actor::draw(sf::RenderTarget& target, sf::RenderStates states) const

@@ -1,100 +1,106 @@
-#include "AnimatedObject.h"
+#include "Animations.h"
+#include "../objects/AnimatedObject.h"
 
 //----------------------------------------------------------------------------
-// - Animated Object Constructor
+// - Animations Manager Constructor (private)
 //----------------------------------------------------------------------------
-// * fps : number of times step() will be called per second of elapsed time
-//----------------------------------------------------------------------------
-AnimatedObject::AnimatedObject(float fps) :
-    fps_(fps > 0 ? fps : FPS),
-    clock_(0),
-    frozen_(false),
-    animHandler_(0)
-{
-    Animations::instance().add(this);
-}
+Animations::Animations() :
+    front_(0),
+    frozen_(false)
+{}
 
 //----------------------------------------------------------------------------
-// - Animated Object Destructor
+// - Animations Manager Copy Constructor (private, empty)
 //----------------------------------------------------------------------------
-AnimatedObject::~AnimatedObject()
+Animations::Animations(const Animations& copy)
+{}
+
+//----------------------------------------------------------------------------
+// - Animations Manager Destructor
+//----------------------------------------------------------------------------
+Animations::~Animations()
 {
-    if(animHandler_)
+    Node* next, *current(front_);
+
+    while(current)
     {
-        delete animHandler_;
+        next = current->next();
+        delete current;
+        current = next;
     }
 }
 
 //----------------------------------------------------------------------------
-// - Get Local Frames/Second
+// - Get Animations Manager Single Instance
 //----------------------------------------------------------------------------
-float AnimatedObject::getFPS() const
+Animations& Animations::instance()
 {
-    return fps_;
+    static Animations instance;
+    return instance;
 }
 
 //----------------------------------------------------------------------------
-// - Set Local Frames/Second
+// - Register Object to Manager
 //----------------------------------------------------------------------------
-// * fps : calls to step() per second of elapsed time
+// * obj : Animated object this manager will now handle
+// Pushes a new animated object to the front of the list composed into a node
 //----------------------------------------------------------------------------
-void AnimatedObject::setFPS(float fps)
+void Animations::add(AnimatedObject* obj)
 {
-    // An fps of zero or less is undefined
-    if(fps > 0)
+    if(obj)
     {
-        fps_ = fps;
+        Node* addition = new Node(obj, this, 0, front_);
+        if(front_)
+        {
+            front_->setPrevious(addition);
+        }
+        
+        front_ = addition;
     }
 }
 
 //----------------------------------------------------------------------------
-// - Is Object Frozen?
+// - Freeze Animations
 //----------------------------------------------------------------------------
-bool AnimatedObject::frozen() const
-{
-    return frozen_;
-}
-
-//----------------------------------------------------------------------------
-// - Set Frozen Status
-//----------------------------------------------------------------------------
-// * frozen : sets a flag indicating time is frozen for this object
-//----------------------------------------------------------------------------
-void AnimatedObject::setFrozen(bool frozen)
-{
-    frozen_ = frozen;
-}
-
-//----------------------------------------------------------------------------
-// - Set Frozen to True
-//----------------------------------------------------------------------------
-void AnimatedObject::freeze()
+void Animations::freeze()
 {
     frozen_ = true;
 }
 
 //----------------------------------------------------------------------------
-// - Set Frozen to False
+// - Unfreeze Animations
 //----------------------------------------------------------------------------
-void AnimatedObject::unfreeze()
+void Animations::unfreeze()
 {
     frozen_ = false;
 }
 
 //----------------------------------------------------------------------------
-// - Update
+// - Set Frozen Status
 //----------------------------------------------------------------------------
-// * elapsed : relative time passed since last update
-//----------------------------------------------------------------------------
-void AnimatedObject::update(float elapsed)
+void Animations::setFrozen(bool frozen)
 {
-    if(!frozen_)
+    frozen_ = frozen;
+}
+
+//----------------------------------------------------------------------------
+// - Animations Frozen?
+//----------------------------------------------------------------------------
+bool Animations::frozen() const
+{
+    frozen_;
+}
+
+//----------------------------------------------------------------------------
+// - Update Animations
+//----------------------------------------------------------------------------
+void Animations::update(float elapsed)
+{
+    Node* node = front_;
+
+    while(node && !frozen_)
     {
-        clock_ += elapsed * fps_;
-        while(clock_ >= 1)
-        {
-            step();
-            clock_ -= 1;
-        }
+        node->getObject()->update(elapsed);
+        node = node->next();
     }
 }

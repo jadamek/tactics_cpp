@@ -52,6 +52,17 @@ int main()
 
     paladin->setPosition(sf::Vector3f(5, 5, map.height(5, 5)));
 
+    std::list<sf::Vector2f> patrol;
+    for(int i = 0; i < 10; i++)
+    {
+        patrol.push_back(sf::Vector2f(10, 5));
+        patrol.push_back(sf::Vector2f(10, 10));
+        patrol.push_back(sf::Vector2f(5, 10));
+        patrol.push_back(sf::Vector2f(5, 5));
+    }
+
+    paladin->walkAlong(patrol);
+
     // Background/Foreground panorama
     sf::Texture sky_texture;
     sky_texture.loadFromFile("resources/graphics/CloudySky.jpg");
@@ -223,12 +234,7 @@ int main()
 
         // Timing updates
         elapsed = clock.restart().asSeconds();
-        ActionScheduler::instance().update(elapsed);
-        assassin->update(elapsed);
-        paladin->update(elapsed);
-        map.getDepthBuffer().update(elapsed);
-        background.update(elapsed);
-        view.update(elapsed);
+        Animations::instance().update(elapsed);
 
         window.clear(sf::Color::Black);
         background.drawOverlays(window);
