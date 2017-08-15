@@ -7,13 +7,14 @@
 //----------------------------------------------------------------------------
 IsometricObject::IsometricObject() :
     sf::Drawable(),
-    handler_(0){}
-
+    handler_(0)
+{}
+    
 //----------------------------------------------------------------------------
 // - Isometric Object Destructor
 //----------------------------------------------------------------------------
 IsometricObject::~IsometricObject()
-{
+{    
     if(handler_)
     {
         handler_->deactivate();

@@ -25,7 +25,6 @@ Actor::Actor(const sf::Texture& texture, const Map* ground) :
 Actor::~Actor()
 {
     delete sprite_;
-    delete baseSprite_;
 }
 
 //----------------------------------------------------------------------------
