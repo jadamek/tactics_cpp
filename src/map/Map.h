@@ -7,6 +7,8 @@
 #include "Tile.h"
 #include "IsometricBuffer.h"
 
+class Actor;
+
 //================================================================================
 // ** Map
 //================================================================================
@@ -32,6 +34,9 @@ public:
     int                 width() const;
     int                 length() const;
     IsometricBuffer&    getDepthBuffer();
+    Actor*              playerAt(int x, int y);
+    void                enter(Actor* actor, int x, int y);
+    void                exit(int x, int y);
     
 protected:
     virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -42,6 +47,7 @@ protected:
     int                 length_;
     IsometricBuffer     images_;
     std::vector<std::vector<std::vector<Tile*>>> tiles_;
+    Actor***            players_;
 };
 
 #endif

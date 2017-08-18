@@ -13,6 +13,18 @@ Map::Map(int width, int length) :
     length_(std::max(1, length))
 {
     tiles_.resize(width_, std::vector<std::vector<Tile*>>(length_));
+
+    // 2-D player array
+    players_ = new Actor**[width_];
+    for(int x = 0; x < width_; x++)
+    {
+        players_[x] = new Actor*[length_];
+
+        for(int y = 0; y < length_; y++)
+        {
+            players_[x][y] = 0;
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -319,6 +331,49 @@ int Map::length() const
 IsometricBuffer& Map::getDepthBuffer()
 {
     return images_;
+}
+
+//----------------------------------------------------------------------------
+// - Get Player At Position
+//----------------------------------------------------------------------------
+Actor* Map::playerAt(int x, int y)
+{
+    if((x >= 0 && x < width_) || (y >= 0 || y < length_))    
+    {
+        return players_[x][y];
+    }
+    else{
+        return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Enter Player
+//----------------------------------------------------------------------------
+// * actor : player entering the map square
+// * x : x-coordinate of the map square
+// * y : y-coordinate of the map square
+//----------------------------------------------------------------------------
+void Map::enter(Actor* actor, int x, int y)
+{
+    if((x >= 0 && x < width_) || (y >= 0 || y < length_))
+    {
+        players_[x][y] = actor;        
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Exit Player
+//----------------------------------------------------------------------------
+// * x : x-coordinate of the map square the player is exiting
+// * y : y-coordinate of the map square the player is exiting
+//----------------------------------------------------------------------------
+void Map::exit(int x, int y)
+{
+    if((x >= 0 && x < width_) || (y >= 0 || y < length_))
+    {
+        players_[x][y] = 0;        
+    }
 }
 
 //----------------------------------------------------------------------------

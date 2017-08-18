@@ -13,6 +13,7 @@
 #include "sprite/SpriteDirected.h"
 #include "sprite/SpriteAnimated.h"
 #include "game/ActionScheduler.h"
+#include "objects/Cursor.h"
 
 int main()
 {
@@ -63,13 +64,23 @@ int main()
 
     paladin->walkAlong(patrol);
 
+    // Cursor setup
+    sf::Texture cursor_texture;
+    cursor_texture.loadFromFile("resources/graphics/Cursor_32x16.png");
+
+    Cursor* cursor = new Cursor(cursor_texture, &map);
+    map.addObject(cursor);
+
     // Background/Foreground panorama
     sf::Texture sky_texture;
     sky_texture.loadFromFile("resources/graphics/CloudySky.jpg");
 
     Panorama background(sky_texture);
     background.setPanningRate(0.2);
-    
+
+    sf::Color tints[4] = {sf::Color(0, 0, 0, 0), sf::Color(255, 0, 0, 60), sf::Color(0, 255, 0, 60), sf::Color(0, 0, 255, 60)};
+    int tintIndex = 0;
+
     // Window and view
     sf::RenderWindow window(sf::VideoMode(640, 480), "Tactics");
 
@@ -199,14 +210,15 @@ int main()
         {
             view.zoom(0.25, 2);
         }
-
-        /*        
+  
         // Keyboard Input handles : T - Cycle Next Tint
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::T))
         {
-
-        }
-        */
+            if(!view.tinting())
+            {
+                view.tint(tints[++tintIndex % 4], 1);
+            }
+        }        
 
         // Keyboard Input handles : F - Flash
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::F) && !view.flashing())
@@ -235,7 +247,6 @@ int main()
         // Timing updates
         elapsed = clock.restart().asSeconds();
         Animations::instance().update(elapsed);
-
         window.clear(sf::Color::Black);
         background.drawOverlays(window);
         window.setView(view);
