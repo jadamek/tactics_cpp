@@ -3,10 +3,8 @@
 //----------------------------------------------------------------------------
 // - InputHandler Constructor
 //----------------------------------------------------------------------------
-// * parent : handler designated as input controller above this
-//----------------------------------------------------------------------------
-InputHandler::InputHandler(InputHandler* parent) :
-    parent_(parent)
+InputHandler::InputHandler() :
+    busy_(false)
 {}
 
 //----------------------------------------------------------------------------
@@ -14,3 +12,22 @@ InputHandler::InputHandler(InputHandler* parent) :
 //----------------------------------------------------------------------------
 InputHandler::~InputHandler()
 {}
+
+//----------------------------------------------------------------------------
+// - Is Handler Busy?
+//----------------------------------------------------------------------------
+bool InputHandler::busy() const
+{
+    return busy_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Busy Flag
+//----------------------------------------------------------------------------    
+// * busy : flag indicating the handler is currently busy and will not be
+// polling for input
+//----------------------------------------------------------------------------
+void InputHandler::setBusy(bool busy)
+{
+    busy_ = busy;
+}

@@ -1,0 +1,20 @@
+cursor
+	[select] menu
+		[move] selector
+	^--- (-move) --	[select]
+	^--------------	[esc]
+		[action] menu
+			[attack] selector
+				[select]
+        ^---------- (-action) ---------	[confirm]
+			^--------------	[esc]
+		^--------------	[esc]
+			[skill] X
+	^--------------	[esc]
+		[status] X
+^--- (next) --- [wait] selector
+	^-(+mv)-[esc w/ -move]
+^--------------	[esc]
+	[esc] menu
+		[exit]
+^--------------	[esc]

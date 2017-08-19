@@ -13,7 +13,8 @@
 #include "sprite/SpriteDirected.h"
 #include "sprite/SpriteAnimated.h"
 #include "game/ActionScheduler.h"
-#include "objects/Cursor.h"
+#include "control/Cursor.h"
+#include "game/InputManager.h"
 
 int main()
 {
@@ -70,6 +71,8 @@ int main()
 
     Cursor* cursor = new Cursor(cursor_texture, &map);
     map.addObject(cursor);
+
+    InputManager::instance().push(cursor);
 
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -245,6 +248,7 @@ int main()
         }
 
         // Timing updates
+        InputManager::instance().poll();
         elapsed = clock.restart().asSeconds();
         Animations::instance().update(elapsed);
         window.clear(sf::Color::Black);

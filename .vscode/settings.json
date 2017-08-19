@@ -49,6 +49,8 @@
         "set": "cpp",
         "list": "cpp",
         "functional": "cpp",
-        "xfunctional": "cpp"
+        "xfunctional": "cpp",
+        "stack": "cpp",
+        "deque": "cpp"
     }
 }

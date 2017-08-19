@@ -1,5 +1,5 @@
-#ifndef TACTICS_INPUT_HANDLER
-#define TACTICS_INPUT_HANDLER
+#ifndef TACTICS_INPUT_HANDLER_H
+#define TACTICS_INPUT_HANDLER_H
 
 #include <SFML/Graphics.hpp>
 
@@ -13,14 +13,18 @@ class InputHandler
 {
 // Methods
 public:
-    InputHandler(InputHandler* parent);
+    InputHandler();
     virtual ~InputHandler();
 
-    virtual void    pollInput() = 0;
+    virtual void    poll() = 0;
+    virtual void    hide() = 0;
+    virtual void    show() = 0;
+    virtual bool    busy() const;
+    void            setBusy(bool busy);
     
 // Members
 protected:
-    InputHandler*   parent_;
+    bool            busy_;
 };
 
 #endif

@@ -8,9 +8,9 @@
 // * parent : handler designated as input controller above this
 //----------------------------------------------------------------------------
 Cursor::Cursor(const sf::Texture& texture, Map* map, InputHandler* parent) :
-    InputHandler(parent),
     map_(map),
-    sprite_(texture)
+    sprite_(texture),
+    hidden_(false)
 {
     sprite_.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 
@@ -110,12 +110,38 @@ sf::FloatRect Cursor::getGlobalBounds() const
 //----------------------------------------------------------------------------
 // Poll Input Event (Override)
 //----------------------------------------------------------------------------
-void Cursor::pollInput()
+void Cursor::poll()
 {
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-    {
-        std::cout << "Hey." << std::endl;
-    }
+    if(!busy_ && !hidden_){
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            std::cout << "Hey." << std::endl;
+        }
+    }    
+}
+
+//----------------------------------------------------------------------------
+// Show Cursor (Override)
+//----------------------------------------------------------------------------
+void Cursor::show()
+{
+    hidden_ = false;
+}
+
+//----------------------------------------------------------------------------
+// Hide Cursor (Override)
+//----------------------------------------------------------------------------
+void Cursor::hide()
+{
+    hidden_ = true;
+}
+
+//----------------------------------------------------------------------------
+// Cursor Busy? (Override)
+//----------------------------------------------------------------------------
+bool Cursor::busy() const
+{
+    return busy_ || moving();
 }
 
 //----------------------------------------------------------------------------
@@ -123,5 +149,7 @@ void Cursor::pollInput()
 //----------------------------------------------------------------------------
 void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(sprite_, states);
+    if(!hidden_){
+        target.draw(sprite_, states);        
+    }
 }
