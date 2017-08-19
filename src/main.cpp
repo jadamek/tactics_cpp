@@ -15,6 +15,7 @@
 #include "game/ActionScheduler.h"
 #include "control/Cursor.h"
 #include "game/InputManager.h"
+#include "sprite/SpriteMenuFrame.h"
 
 int main()
 {
@@ -73,6 +74,11 @@ int main()
     map.addObject(cursor);
 
     InputManager::instance().push(cursor);
+
+    // Test Menu setup
+    sf::Texture menu_frame_texture;
+    menu_frame_texture.loadFromFile("resources/graphics/MenuFrame.png");
+    SpriteMenuFrame menu(menu_frame_texture, sf::Vector2u(48, 120));
 
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -255,6 +261,7 @@ int main()
         background.drawOverlays(window);
         window.setView(view);
         window.draw(map);
+        window.draw(menu);
         view.drawOverlays(window);
         window.display();
     }
