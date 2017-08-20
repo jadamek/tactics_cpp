@@ -16,7 +16,9 @@ Cursor::Cursor(const sf::Texture& texture, Map* map, InputHandler* parent) :
     if(map_)
     {
         setPosition(sf::Vector3f(0, 0, std::max(0.f, map_->height(0, 0))));
-    }    
+    }
+
+    setSpeed(10);
 }
 
 //----------------------------------------------------------------------------

@@ -35,16 +35,18 @@ void Menu::addOption(const std::string& label, std::function<void()> action)
 {
     sf::Text labelSprite(label, font_, 16);
     labelSprite.setPosition(4, 20 * options_.size() + 4);
+    labelSprite.setStyle(sf::Text::Bold);\
 
-    if(options_.empty())
-    {
-        labelSprite.setStyle(sf::Text::Bold);
-    }
-
+    // Increase the width of the menu to hold a bolded label
     unsigned int textWidth = ceil(labelSprite.getGlobalBounds().width);
     if(textWidth > width_)
     {
         width_ = textWidth;
+    }
+    
+    if(!options_.empty())
+    {
+        labelSprite.setStyle(sf::Text::Regular);
     }
 
     options_.push_back(std::pair<sf::Text, std::function<void()>>(labelSprite, action));

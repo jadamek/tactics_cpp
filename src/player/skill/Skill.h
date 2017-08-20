@@ -1,9 +1,11 @@
 #ifndef TACTICS_PLAYER_SKILL_H
 #define TACTICS_PLAYER_SKILL_H
 
+#include<SFML/Graphics.hpp>
 #include<vector>
 
 class Actor;
+class Map;
 
 //================================================================================
 // ** Skill
@@ -15,6 +17,8 @@ class Skill
 // Methods
 public:
     virtual void use(Actor* caster, const std::vector<Actor*>& targets) = 0;
+    virtual std::vector<sf::Vector2i> range(Actor* caster, Map* map) const = 0;
+    virtual std::vector<sf::Vector2i> area(const sf::Vector2i source, Map* map) const = 0;
 };
 
 #endif

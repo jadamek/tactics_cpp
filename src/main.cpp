@@ -16,6 +16,7 @@
 #include "control/Cursor.h"
 #include "game/InputManager.h"
 #include "control/Menu.h"
+#include "sprite/SpriteArea.h"
 
 int main()
 {    
@@ -80,6 +81,14 @@ int main()
     Menu menu(menu_frame_texture);
 
     InputManager::instance().push(&menu);
+
+    // sprites
+    sf::Texture area_texture;
+    area_texture.loadFromFile("resources/graphics/AreaSquare.png");
+    SpriteArea area(area_texture, sf::Color(80,80,255));
+    area.setPosition(sf::Vector3f(2, 7, map.height(2, 7)));
+
+    map.addObject(&area);
     
     // Background/Foreground panorama
     sf::Texture sky_texture;
