@@ -64,11 +64,11 @@ bool ActionScheduler::empty() const
 //----------------------------------------------------------------------------
 // - 
 //----------------------------------------------------------------------------
-void ActionScheduler::schedule(void(*action)(), int delay)
+void ActionScheduler::schedule(std::function<void()> action, int delay)
 {
     if(delay >= 0)
     {
-        schedule_.push_back(std::pair<void(*&)(), int>(action, delay));
+        schedule_.push_back(std::pair<std::function<void()>, int>(action, delay));
     }
 }
 

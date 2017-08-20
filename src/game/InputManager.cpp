@@ -36,7 +36,7 @@ void InputManager::poll()
 {
     if(!handlerStack_.empty())
     {
-        if(!handlerStack_.top()->busy())
+        if(!handlerStack_.top()->busy() && handlerStack_.top()->active())
         {
             handlerStack_.top()->poll();
         }
@@ -52,10 +52,10 @@ void InputManager::push(InputHandler* handler)
 {
     if(!handlerStack_.empty())
     {
-        handlerStack_.top()->hide();           
+        handlerStack_.top()->setActive(false);           
     }
     handlerStack_.push(handler);
-    handlerStack_.top()->show(); 
+    handlerStack_.top()->setActive(true); 
 }
 
 //----------------------------------------------------------------------------
@@ -65,9 +65,9 @@ void InputManager::pop()
 {
     if(!handlerStack_.empty())
     {
-        handlerStack_.top()->hide();
+        handlerStack_.top()->setActive(false);
         handlerStack_.pop();
-        handlerStack_.top()->show();    
+        handlerStack_.top()->setActive(true);    
     }
 }
 
@@ -78,10 +78,10 @@ void InputManager::popToLast()
 {
     while(handlerStack_.size() > 1)
     {
-        handlerStack_.top()->hide();
+        handlerStack_.top()->setActive(false);
         handlerStack_.pop();
     }
-    handlerStack_.top()->show();
+    handlerStack_.top()->setActive(true);
 }
 
 //----------------------------------------------------------------------------

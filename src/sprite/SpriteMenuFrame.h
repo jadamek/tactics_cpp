@@ -16,6 +16,7 @@ public:
     SpriteMenuFrame(const sf::Texture& texture, sf::Vector2u size = sf::Vector2u(32, 32));
     ~SpriteMenuFrame();
 
+    void                    setSize(const sf::Vector2u& size);
     virtual sf::FloatRect   getGlobalBounds() const;    
     
 protected:
@@ -25,6 +26,7 @@ protected:
     sf::Sprite*             frame_;
     int                     width_x;
     int                     width_y;
+    sf::Vector2u            size_;
 };
 
 #endif

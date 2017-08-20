@@ -26,10 +26,7 @@ public:
     virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect   getGlobalBounds() const;
     virtual void            poll();
-    virtual void            show();
-    virtual void            hide();
-    virtual bool            busy() const;
-    
+    virtual bool            busy() const;    
     
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -37,7 +34,6 @@ protected:
 // Members
     sf::Sprite              sprite_;
     Map*                    map_;
-    bool                    hidden_;
 };
 
 #endif

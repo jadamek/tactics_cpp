@@ -4,7 +4,8 @@
 // - InputHandler Constructor
 //----------------------------------------------------------------------------
 InputHandler::InputHandler() :
-    busy_(false)
+    busy_(false),
+    active_(true)
 {}
 
 //----------------------------------------------------------------------------
@@ -30,4 +31,22 @@ bool InputHandler::busy() const
 void InputHandler::setBusy(bool busy)
 {
     busy_ = busy;
+}
+
+//----------------------------------------------------------------------------
+// - Is Handler Active (Visible)?
+//----------------------------------------------------------------------------
+bool InputHandler::active() const
+{
+    return active_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Active Flag
+//----------------------------------------------------------------------------    
+// * active : flag indicating the handler is currently active
+//----------------------------------------------------------------------------
+void InputHandler::setActive(bool active)
+{
+    active_ = active;
 }

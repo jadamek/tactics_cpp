@@ -4,6 +4,7 @@
 #include "../objects/AnimatedObject.h"
 #include "../settings.h"
 #include <list>
+#include <functional>
 
 //================================================================================
 // ** ActionScheduler
@@ -23,12 +24,12 @@ private:
 public:
     static ActionScheduler& instance();
     bool                    empty() const;
-    void                    schedule(void(*action)(), int delay);
+    void                    schedule(std::function<void()>, int delay);
     void                    clear();
 
 // Members
 private:
-    std::list<std::pair<void(*)(), int>> schedule_;
+    std::list<std::pair<std::function<void()>, int>> schedule_;
 };
 
 #endif

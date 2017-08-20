@@ -15,10 +15,10 @@
 #include "game/ActionScheduler.h"
 #include "control/Cursor.h"
 #include "game/InputManager.h"
-#include "sprite/SpriteMenuFrame.h"
+#include "control/Menu.h"
 
 int main()
-{
+{    
     sf::Texture soul_texture, grass_texture, dirt_texture;
 
     grass_texture.loadFromFile("resources/graphics/GrassTile_32x16.png");
@@ -72,14 +72,15 @@ int main()
 
     Cursor* cursor = new Cursor(cursor_texture, &map);
     map.addObject(cursor);
-
     InputManager::instance().push(cursor);
-
+    
     // Test Menu setup
     sf::Texture menu_frame_texture;
     menu_frame_texture.loadFromFile("resources/graphics/MenuFrame.png");
-    SpriteMenuFrame menu(menu_frame_texture, sf::Vector2u(48, 120));
+    Menu menu(menu_frame_texture);
 
+    InputManager::instance().push(&menu);
+    
     // Background/Foreground panorama
     sf::Texture sky_texture;
     sky_texture.loadFromFile("resources/graphics/CloudySky.jpg");
@@ -109,6 +110,9 @@ int main()
 
     bool closing = false;
 
+    menu.addOption("Greetings", [](){std::cout << "Hey." << std::endl;});    
+    menu.addOption("Exit Game", [&closing, &view](){view.fadeOut(1); closing = true;});    
+    
     while(window.isOpen())
     {
         sf::Event event;
@@ -116,71 +120,7 @@ int main()
         {
             if(event.type == sf::Event::Closed)
                 window.close();
-        }
-        
-        // Keyboard Input handles : Left - Move | SHIFT + Left - Scroll Left
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-            {
-                if(!view.scrolling() && !view.focusing())
-                {
-                    view.scroll(sf::Vector2f(-1 * MAP_SCALE.x, 0), 0.3);
-                }
-            }
-            else if(!assassin->walking())
-            {
-                assassin->walk(sf::Vector2f(-1.0, 0));
-            }
-        }
-
-        // Keyboard Input handles : Right - Move | SHIFT + Right - Scroll Right
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-            {
-                if(!view.scrolling() && !view.focusing())
-                {
-                    view.scroll(sf::Vector2f(MAP_SCALE.x, 0), 0.3);
-                }
-            }
-            else if(!assassin->walking())
-            {
-                assassin->walk(sf::Vector2f(1.0, 0));
-            }
-        }
-
-        // Keyboard Input handles : Up - Move | SHIFT + Up - Scroll Up
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-            {
-                if(!view.scrolling() && !view.focusing())
-                {
-                    view.scroll(sf::Vector2f(0, -1 * MAP_SCALE.y), 0.3);
-                }
-            }
-            else if(!assassin->walking())
-            {
-                assassin->walk(sf::Vector2f(0, -1.0));
-            }
-        }
-
-        // Keyboard Input handles : Down - Move | SHIFT + Down - Scroll down
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
-            {
-                if(!view.scrolling() && !view.focusing())
-                {
-                    view.scroll(sf::Vector2f(0, MAP_SCALE.y), 0.3);
-                }
-            }
-            else if(!assassin->walking())
-            {
-                assassin->walk(sf::Vector2f(0, 1.0));
-            }
-        }
+        }        
 
         // Keyboard Input handles : Q - Shake | CTRL + Q - Stop Shake
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
@@ -227,7 +167,7 @@ int main()
             {
                 view.tint(tints[++tintIndex % 4], 1);
             }
-        }        
+        }
 
         // Keyboard Input handles : F - Flash
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::F) && !view.flashing())
@@ -264,6 +204,7 @@ int main()
         window.draw(menu);
         view.drawOverlays(window);
         window.display();
+        
     }
 
     std::cout << "ok" << std::endl;

@@ -9,8 +9,7 @@
 //----------------------------------------------------------------------------
 Cursor::Cursor(const sf::Texture& texture, Map* map, InputHandler* parent) :
     map_(map),
-    sprite_(texture),
-    hidden_(false)
+    sprite_(texture)
 {
     sprite_.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 
@@ -112,28 +111,10 @@ sf::FloatRect Cursor::getGlobalBounds() const
 //----------------------------------------------------------------------------
 void Cursor::poll()
 {
-    if(!busy_ && !hidden_){
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-        {
-            std::cout << "Hey." << std::endl;
-        }
-    }    
-}
-
-//----------------------------------------------------------------------------
-// Show Cursor (Override)
-//----------------------------------------------------------------------------
-void Cursor::show()
-{
-    hidden_ = false;
-}
-
-//----------------------------------------------------------------------------
-// Hide Cursor (Override)
-//----------------------------------------------------------------------------
-void Cursor::hide()
-{
-    hidden_ = true;
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+        std::cout << "Hey." << std::endl;
+    }     
 }
 
 //----------------------------------------------------------------------------
@@ -149,7 +130,7 @@ bool Cursor::busy() const
 //----------------------------------------------------------------------------
 void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if(!hidden_){
+    if(active()){
         target.draw(sprite_, states);        
     }
 }
