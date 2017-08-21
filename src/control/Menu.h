@@ -18,7 +18,7 @@ class Menu : public InputHandler, public sf::Drawable, public sf::Transformable,
 // Methods
 public:
     Menu(const sf::Texture& frameTexture);
-    ~Menu();
+    virtual ~Menu();
 
     void                addOption(const std::string& label, std::function<void()> action);
     virtual void        poll();

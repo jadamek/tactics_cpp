@@ -17,6 +17,7 @@
 #include "game/InputManager.h"
 #include "control/Menu.h"
 #include "sprite/SpriteArea.h"
+#include "control/TargetSelector.h"
 
 int main()
 {    
@@ -71,25 +72,33 @@ int main()
     sf::Texture cursor_texture;
     cursor_texture.loadFromFile("resources/graphics/Cursor_32x16.png");
 
-    Cursor* cursor = new Cursor(cursor_texture, &map);
+    Cursor* cursor = new Cursor(cursor_texture, &map, [](){std::cout << "Hey." << std::endl;});
     map.addObject(cursor);
     InputManager::instance().push(cursor);
     
-    // Test Menu setup
-    sf::Texture menu_frame_texture;
-    menu_frame_texture.loadFromFile("resources/graphics/MenuFrame.png");
-    Menu menu(menu_frame_texture);
-
-    InputManager::instance().push(&menu);
-
-    // sprites
+    // Test Selector setup
     sf::Texture area_texture;
     area_texture.loadFromFile("resources/graphics/AreaSquare.png");
-    SpriteArea area(area_texture, sf::Color(80,80,255));
-    area.setPosition(sf::Vector3f(2, 7, map.height(2, 7)));
 
-    map.addObject(&area);
+    std::vector<sf::Vector2i> area;
+    for(int x = -2; x <= 2; x++)
+    {
+        for(int y = -2; y <= 2; y++)
+        {
+            if(abs(x) + abs(y) <= 2)
+            {
+                area.push_back(sf::Vector2i(2 + x, 7 + y));
+            }
+        }        
+    }
     
+    TargetSelector selector(area, area_texture, sf::Color(80,80,255), cursor_texture, &map, [](){std::cout << "Hey." << std::endl;});
+    selector.setPosition(sf::Vector3f(2, 7, map.height(2, 7)));
+
+    map.addObject(&selector);
+
+    InputManager::instance().push(&selector);
+        
     // Background/Foreground panorama
     sf::Texture sky_texture;
     sky_texture.loadFromFile("resources/graphics/CloudySky.jpg");
@@ -118,9 +127,6 @@ int main()
     map.getDepthBuffer().sort();
 
     bool closing = false;
-
-    menu.addOption("Greetings", [](){std::cout << "Hey." << std::endl;});    
-    menu.addOption("Exit Game", [&closing, &view](){view.fadeOut(1); closing = true;});    
     
     while(window.isOpen())
     {
@@ -210,7 +216,6 @@ int main()
         background.drawOverlays(window);
         window.setView(view);
         window.draw(map);
-        window.draw(menu);
         view.drawOverlays(window);
         window.display();
         

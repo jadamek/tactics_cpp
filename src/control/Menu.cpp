@@ -63,6 +63,9 @@ void Menu::addOption(const std::string& label, std::function<void()> action)
 //----------------------------------------------------------------------------
 void Menu::poll()
 {
+    // Consecutive keyboard input for menus is throttled by 10 frames
+    static int throttle = 15;
+
     // Consecutive keyboard input is throttled by 20 frames
     if(throttle_ <= 0)
     {
@@ -70,7 +73,7 @@ void Menu::poll()
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
             highlight((current_ + 1) % options_.size());            
-            throttle_ = 20;
+            throttle_ = throttle;
         }
 
         // Keyboard Input handle : Up - highlight previous option
@@ -84,7 +87,7 @@ void Menu::poll()
 
             highlight(previous);
 
-            throttle_ = 20;            
+            throttle_ = throttle;            
         }
 
         // Keyboard Input handle : Enter - select current option
@@ -94,7 +97,7 @@ void Menu::poll()
             {
                 options_[current_].second();
             }
-            throttle_ = 20;            
+            throttle_ = throttle;            
         }
     }
 }

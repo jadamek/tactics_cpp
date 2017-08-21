@@ -5,11 +5,13 @@
 //----------------------------------------------------------------------------
 // * texture : bitmap the cursor uses as its sprite display
 // * map : map this cursor belongs to and moves within
-// * parent : handler designated as input controller above this
+// * action, callable to execute when the cursor is "clicked"
 //----------------------------------------------------------------------------
-Cursor::Cursor(const sf::Texture& texture, Map* map, InputHandler* parent) :
+Cursor::Cursor(const sf::Texture& texture, Map* map, std::function<void()> action) :
     map_(map),
-    sprite_(texture)
+    sprite_(texture),
+    throttle_(0),
+    action_(action)
 {
     sprite_.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
 
@@ -44,49 +46,6 @@ void Cursor::goTo(const sf::Vector2f& position)
 }
 
 //----------------------------------------------------------------------------
-// - Select Player
-//----------------------------------------------------------------------------
-// Returns the player located at the current position, if one is present
-//----------------------------------------------------------------------------
-Actor* Cursor::select() const
-{
-    if(map_)
-    {
-        return map_->playerAt(position().x, position().y);
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-//----------------------------------------------------------------------------
-// - Get Map Environment
-//----------------------------------------------------------------------------
-// Returns the tile located at the current position, or the map object located
-// at the tile if one is present
-//----------------------------------------------------------------------------
-MapObject* Cursor::getEnvironment() const
-{
-    if(map_)
-    {
-        Tile* tile = 0;
-        if((tile = map_->at(position().x, position().y)))
-        {
-            if(tile->getOccupant()){
-                return tile->getOccupant();
-            }
-            else
-            {
-                return tile;
-            }
-        }
-    }
-
-    return 0;
-}
-
-//----------------------------------------------------------------------------
 // - Get Height (Override)
 //----------------------------------------------------------------------------
 // * position : (x,y) position relative to the center of the object
@@ -113,10 +72,90 @@ sf::FloatRect Cursor::getGlobalBounds() const
 //----------------------------------------------------------------------------
 void Cursor::poll()
 {
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    // Consecutive keyboard input for cursors is throttled by 5 frames
+    static int throttle = 10;
+    
+    if(map_)
     {
-        std::cout << "Hey." << std::endl;
-    }     
+        
+        if(throttle_ <= 0)
+        {
+            // Keyboard Input handle : Down - move cursor downward
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {           
+                // Move to the next valid position downward of this
+                int y = position().y + 1;
+                while(!map_->at(position().x, y) && y < map_->length())
+                {
+                    y++;
+                }
+
+                if(y < map_->length())
+                {
+                    goTo(sf::Vector2f(position().x, y));
+                    throttle_ = throttle;                
+                }
+            }
+
+            // Keyboard Input handle : Up - move cursor upward
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            {           
+                // Move to the next valid position upward of this
+                int y = position().y - 1;
+                while(!map_->at(position().x, y) && y >= 0)
+                {
+                    y--;
+                }
+
+                if(y >= 0)
+                {
+                    goTo(sf::Vector2f(position().x, y));
+                    throttle_ = throttle;                
+                }
+            }
+
+            // Keyboard Input handle : Left - move cursor left
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+            {
+                // Move to the next valid position left of this
+                int x = position().x - 1;
+                while(!map_->at(x, position().y) && x >= 0)
+                {
+                    x--;
+                }
+
+                if(x >= 0)
+                {
+                    goTo(sf::Vector2f(x, position().y));
+                    throttle_ = throttle;                
+                }
+            }
+
+            // Keyboard Input handle : Right - move cursor right
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                // Move to the next valid position right of this
+                int x = position().x + 1;
+                while(!map_->at(x, position().y) && x < map_->width())
+                {
+                    x++;
+                }
+
+                if(x < map_->width())
+                {
+                    goTo(sf::Vector2f(x, position().y));
+                    throttle_ = throttle;                
+                }
+            }
+
+            // Keyboard Input handle : Enter - select current position
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+            {
+                action_();
+                throttle_ = throttle;            
+            }
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -134,5 +173,18 @@ void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(active()){
         target.draw(sprite_, states);        
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Increment Frame (Override)
+//----------------------------------------------------------------------------
+void Cursor::step()
+{
+    MobileObject::step();
+
+    if(throttle_ > 0)
+    {
+        throttle_--;
     }
 }
