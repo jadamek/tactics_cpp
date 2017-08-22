@@ -1,5 +1,6 @@
 #include "IsometricObject.h"
 #include "../map/IsometricNode.h"
+#include "../map/IsometricBuffer.h"
 #include "../settings.h"
 
 //----------------------------------------------------------------------------
@@ -72,6 +73,17 @@ sf::Vector2f IsometricObject::getGlobalPosition() const
     float y = 0.5 * MAP_SCALE.y * (position_.x + position_.y) - MAP_SCALE.z * position_.z;
 
     return sf::Vector2f(x, y);
+}
+
+//----------------------------------------------------------------------------
+// - Join Buffer
+//----------------------------------------------------------------------------
+// * buffer : isometric container to join
+// Overridable join method to allow composite joins
+//----------------------------------------------------------------------------
+void IsometricObject::join(IsometricBuffer* buffer) const
+{
+    buffer->insert(this);
 }
 
 //----------------------------------------------------------------------------

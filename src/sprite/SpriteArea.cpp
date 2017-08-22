@@ -1,23 +1,34 @@
 #include "SpriteArea.h"
+#include <math.h>
 
 //----------------------------------------------------------------------------
 // - Sprite Area Constructor
 //----------------------------------------------------------------------------
-// * texture : bitmap of a single area square
-// * color : coloring of the affected area, e.g blue for a move square
+// * texture : bitmap to use for the sprites to be drawn at position of
+//      interest
+// * area : set of positions that describe the area of interest
+// * map : height map used to determine each positions height
+// * color : color of the area of interest
 //----------------------------------------------------------------------------
-SpriteArea::SpriteArea(const sf::Texture& texture, const sf::Color& color) :
-    sprite_(texture)
+SpriteArea::SpriteArea(const sf::Texture& texture, const std::vector<sf::Vector2i>& area, Map* map, const sf::Color& color) :
+    area_(area.size(), SpriteAreaSquare(texture, color))
 {
-    sprite_.setColor(color);
-    sprite_.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
+    if(map)
+    {
+        for(int i = 0; i < area_.size(); i++)
+        {
+            area_[i].setPosition(sf::Vector3f(area[i].x, area[i].y, map->height(area[i].x, area[i].y)));
+        }
+    }    
 }
 
 //----------------------------------------------------------------------------
 // - Sprite Area Destructor
 //----------------------------------------------------------------------------
 SpriteArea::~SpriteArea()
-{}
+{
+
+}
 
 //----------------------------------------------------------------------------
 // - Get Global Bounding Rectangle (Override)
@@ -26,17 +37,42 @@ SpriteArea::~SpriteArea()
 //----------------------------------------------------------------------------
 sf::FloatRect SpriteArea::getGlobalBounds() const
 {
-    return sprite_.getGlobalBounds();
+    return sf::FloatRect();
 }
 
 //----------------------------------------------------------------------------
-// - Get Height (Override)
+// - Join Buffer (Override)
 //----------------------------------------------------------------------------
-// * position : (x,y) position relative to the center of the object
+// * buffer : isometric container to add all area squares
 //----------------------------------------------------------------------------
-float SpriteArea::getHeight(const sf::Vector2f& position) const
+void SpriteArea::join(IsometricBuffer* buffer) const
 {
-    return 0;
+    for(int i = 0; i < area_.size(); i++)
+    {
+        buffer->insert(&area_[i]);
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Area Contains Point?
+//----------------------------------------------------------------------------
+// * position : X-Y coordinate which is being compared to all positions in the
+//      area of interest
+//----------------------------------------------------------------------------
+bool SpriteArea::contains(const sf::Vector2f& position) const
+{
+    int x = round(position.x);
+    int y = round(position.y);
+    
+    for(int i = 0; i < area_.size(); i++)
+    {
+        if(area_[i].position().x == x && area_[i].position().y == y)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 //----------------------------------------------------------------------------
@@ -44,5 +80,8 @@ float SpriteArea::getHeight(const sf::Vector2f& position) const
 //----------------------------------------------------------------------------
 void SpriteArea::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(sprite_, states);
+    for(int i = 0; i < area_.size(); area_)
+    {
+        target.draw(area_[i], states);        
+    }
 }

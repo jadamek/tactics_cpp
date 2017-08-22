@@ -30,9 +30,7 @@ IsometricBuffer::~IsometricBuffer()
 //----------------------------------------------------------------------------  
 void IsometricBuffer::add(const IsometricObject* obj)
 {
-    IsometricNode* node = new IsometricNode(const_cast<IsometricObject*>(obj), this);
-    objects_.push_back(node);
-    alert();
+    obj->join(this);
 }
 
 //----------------------------------------------------------------------------
@@ -122,6 +120,18 @@ void IsometricBuffer::sort()
 
     // Clear buffer-wide dirty flag
     dirty_ = false;
+}
+
+//----------------------------------------------------------------------------
+// - Insert Object
+//----------------------------------------------------------------------------
+// * obj : isometric object to insert into the buffer
+//----------------------------------------------------------------------------
+void IsometricBuffer::insert(const IsometricObject* obj)
+{
+    IsometricNode* node = new IsometricNode(const_cast<IsometricObject*>(obj), this);
+    objects_.push_back(node);
+    alert();
 }
 
 //----------------------------------------------------------------------------

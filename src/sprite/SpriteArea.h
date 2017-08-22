@@ -2,28 +2,32 @@
 #define TACTICS_SPRITE_AREA_H
 
 #include <SFML/Graphics.hpp>
-#include "../player/skill/Skill.h"
-#include "../objects/Actor.h"
+#include <vector>
+#include "SpriteAreaSquare.h"
+#include "../map/Map.h"
 
 //================================================================================
-// * Sprite Area
+// * Sprite Area Square
 //================================================================================
-// Sprite of a single isometric area square
+// Compound sprite of an area of interest
 //================================================================================
 class SpriteArea : public IsometricObject
 {
 // Methods
 public:
-    SpriteArea(const sf::Texture& texture, const sf::Color& color);
+    SpriteArea(const sf::Texture& texture, const std::vector<sf::Vector2i>& area, Map* map, const sf::Color& color);
     virtual ~SpriteArea();
 
     virtual sf::FloatRect   getGlobalBounds() const;
-    virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
+    virtual void            join(IsometricBuffer* buffer) const;
+    bool                    contains(const sf::Vector2f& position) const;
     
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
-    sf::Sprite              sprite_;
+// Members
+    std::vector<SpriteAreaSquare> area_;    
 };
 
 #endif
+

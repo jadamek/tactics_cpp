@@ -1,6 +1,6 @@
 #include "TargetSelector.h"
 #include <math.h>
-
+/*
 //----------------------------------------------------------------------------
 // - Target Selector Constructor
 //----------------------------------------------------------------------------
@@ -54,3 +54,4 @@ bool TargetSelector::contains(const sf::Vector2f& position) const
 
     return false;
 }
+*/

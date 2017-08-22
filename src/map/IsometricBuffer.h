@@ -19,6 +19,7 @@ public:
     ~IsometricBuffer();
 
     void                add(const IsometricObject* obj);
+    void                insert(const IsometricObject* obj);    
     void                remove(const IsometricObject* obj);
     void                remove(IsometricNode* node);
     void                alert();

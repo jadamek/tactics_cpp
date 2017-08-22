@@ -23,7 +23,8 @@ public:
     virtual sf::FloatRect   getGlobalBounds() const = 0;
     void                    setPosition(const sf::Vector3f& position);
     sf::Vector2f            getGlobalPosition() const;
-
+    virtual void            join(IsometricBuffer* buffer) const;
+    
     friend class            IsometricNode;
     friend class            IsometricBuffer;
 

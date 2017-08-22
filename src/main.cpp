@@ -17,7 +17,6 @@
 #include "game/InputManager.h"
 #include "control/Menu.h"
 #include "sprite/SpriteArea.h"
-#include "control/TargetSelector.h"
 
 int main()
 {    
@@ -92,12 +91,10 @@ int main()
         }        
     }
     
-    TargetSelector selector(area, area_texture, sf::Color(80,80,255), cursor_texture, &map, [](){std::cout << "Hey." << std::endl;});
-    selector.setPosition(sf::Vector3f(2, 7, map.height(2, 7)));
+    SpriteArea* area_sprite = new SpriteArea(area_texture, area, &map, sf::Color(140,140,255));
 
-    map.addObject(&selector);
+    map.addObject(area_sprite);
 
-    InputManager::instance().push(&selector);
         
     // Background/Foreground panorama
     sf::Texture sky_texture;
