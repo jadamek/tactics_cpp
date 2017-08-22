@@ -79,22 +79,11 @@ int main()
     sf::Texture area_texture;
     area_texture.loadFromFile("resources/graphics/AreaSquare.png");
 
-    std::vector<sf::Vector2i> area;
-    for(int x = -2; x <= 2; x++)
-    {
-        for(int y = -2; y <= 2; y++)
-        {
-            if(abs(x) + abs(y) <= 2)
-            {
-                area.push_back(sf::Vector2i(2 + x, 7 + y));
-            }
-        }        
-    }
+    std::vector<sf::Vector2f> area = assassin->reach();    
     
     SpriteArea* area_sprite = new SpriteArea(area_texture, area, &map, sf::Color(140,140,255));
 
     map.addObject(area_sprite);
-
         
     // Background/Foreground panorama
     sf::Texture sky_texture;

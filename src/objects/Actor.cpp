@@ -1,5 +1,6 @@
 #include "Actor.h"
 #include <math.h>
+#include "../game/ManhattanArea.h"
 
 # define M_PI 3.14159265358979323846
 
@@ -82,6 +83,29 @@ void Actor::stopWalking()
 {
     stopMoving();
     path_.clear();
+}
+
+//----------------------------------------------------------------------------
+// - Compute Reach
+//----------------------------------------------------------------------------
+// Returns a vector of all reachable positions by this unit's movement
+//----------------------------------------------------------------------------
+std::vector<sf::Vector2f> Actor::reach() const
+{
+    // Replace later (MovementStyle?)
+    int move = 4;
+    const Map* ground = ground_;
+    
+    return ManhattanArea::compute(move, sf::Vector2f(position().x, position().y),
+        [ground](const sf::Vector2f& initial, const sf::Vector2f& target)
+        {
+            if(ground)
+            {
+                return ground->valid(target.x, target.y);
+            }
+        
+            return false;
+        });
 }
 
 //----------------------------------------------------------------------------
@@ -192,3 +216,4 @@ void Actor::step()
         path_.pop_front();
     }    
 }
+

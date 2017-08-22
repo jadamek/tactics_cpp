@@ -15,7 +15,7 @@ class SpriteArea : public IsometricObject
 {
 // Methods
 public:
-    SpriteArea(const sf::Texture& texture, const std::vector<sf::Vector2i>& area, Map* map, const sf::Color& color);
+    SpriteArea(const sf::Texture& texture, const std::vector<sf::Vector2f>& area, Map* map, const sf::Color& color);
     virtual ~SpriteArea();
 
     virtual sf::FloatRect   getGlobalBounds() const;

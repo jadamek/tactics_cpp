@@ -38,7 +38,7 @@ void Cursor::goTo(const sf::Vector2f& position)
 {
     if(map_)
     {
-        if(map_->at(position.x, position.y))
+        if(map_->valid(position.x, position.y))
         {
             moveTo(sf::Vector3f(position.x, position.y, map_->height(position.x, position.y)));
         }
@@ -85,7 +85,7 @@ void Cursor::poll()
             {           
                 // Move to the next valid position downward of this
                 int y = position().y + 1;
-                while(!map_->at(position().x, y) && y < map_->length())
+                while(!map_->valid(position().x, y) && y < map_->length())
                 {
                     y++;
                 }
@@ -102,7 +102,7 @@ void Cursor::poll()
             {           
                 // Move to the next valid position upward of this
                 int y = position().y - 1;
-                while(!map_->at(position().x, y) && y >= 0)
+                while(!map_->valid(position().x, y) && y >= 0)
                 {
                     y--;
                 }
@@ -119,7 +119,7 @@ void Cursor::poll()
             {
                 // Move to the next valid position left of this
                 int x = position().x - 1;
-                while(!map_->at(x, position().y) && x >= 0)
+                while(!map_->valid(x, position().y) && x >= 0)
                 {
                     x--;
                 }
@@ -136,7 +136,7 @@ void Cursor::poll()
             {
                 // Move to the next valid position right of this
                 int x = position().x + 1;
-                while(!map_->at(x, position().y) && x < map_->width())
+                while(!map_->valid(x, position().y) && x < map_->width())
                 {
                     x++;
                 }

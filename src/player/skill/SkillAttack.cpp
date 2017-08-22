@@ -23,7 +23,6 @@ void SkillAttack::use(Actor* caster, const std::vector<Actor*>& targets)
 //----------------------------------------------------------------------------
 std::vector<sf::Vector2i> SkillAttack::range(Actor* caster, Map* map) const
 {
-    int move = 4; // Change to get from player later
     std::vector<sf::Vector2i> result;
 
     if(map && caster)
@@ -60,6 +59,5 @@ std::vector<sf::Vector2i> SkillAttack::range(Actor* caster, Map* map) const
 //----------------------------------------------------------------------------
 std::vector<sf::Vector2i> SkillAttack::area(const sf::Vector2i source, Map* map) const
 {
-    std::vector<sf::Vector2i> result;
-    result.push_back(sf::Vector2i(source));
+    std::vector<sf::Vector2i>(1, sf::Vector2i(source));
 }

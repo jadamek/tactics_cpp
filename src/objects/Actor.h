@@ -18,28 +18,29 @@ public:
     Actor(const sf::Texture& texture, const Map* ground = 0);
     virtual ~Actor();
 
-    void                    walk(const sf::Vector2f& distance);
-    void                    walkTo(const sf::Vector2f& position);
-    void                    walkAlong(const std::list<sf::Vector2f>& path);
-    bool                    walking() const;
-    void                    stopWalking();
-    virtual float           getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
-    virtual sf::FloatRect   getGlobalBounds() const;
-    void                    setTexture(const sf::Texture& sprite);
-    Sprite*                 getSprite();
-    const Sprite*           getSprite() const;
-    void                    face(int direction);
-    void                    face(const sf::Vector2f& target);
-    int                     facing() const;
+    void                        walk(const sf::Vector2f& distance);
+    void                        walkTo(const sf::Vector2f& position);
+    void                        walkAlong(const std::list<sf::Vector2f>& path);
+    bool                        walking() const;
+    void                        stopWalking();
+    std::vector<sf::Vector2f>   reach() const;
+    virtual float               getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
+    virtual sf::FloatRect       getGlobalBounds() const;
+    void                        setTexture(const sf::Texture& sprite);
+    Sprite*                     getSprite();
+    const Sprite*               getSprite() const;
+    void                        face(int direction);
+    void                        face(const sf::Vector2f& target);
+    int                         facing() const;
     
 protected:
-    virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    virtual void            step();
-
+    virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
+    virtual void                step();
+    
 // Members
-    SpriteAnimated*         sprite_;
-    SpriteDirected*         baseSprite_;
-    std::list<sf::Vector2f> path_;
+    SpriteAnimated*             sprite_;
+    SpriteDirected*             baseSprite_;
+    std::list<sf::Vector2f>     path_;
 };
 
 #endif

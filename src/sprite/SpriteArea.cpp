@@ -10,7 +10,7 @@
 // * map : height map used to determine each positions height
 // * color : color of the area of interest
 //----------------------------------------------------------------------------
-SpriteArea::SpriteArea(const sf::Texture& texture, const std::vector<sf::Vector2i>& area, Map* map, const sf::Color& color) :
+SpriteArea::SpriteArea(const sf::Texture& texture, const std::vector<sf::Vector2f>& area, Map* map, const sf::Color& color) :
     area_(area.size(), SpriteAreaSquare(texture, color))
 {
     if(map)
