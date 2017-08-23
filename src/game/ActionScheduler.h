@@ -1,16 +1,15 @@
 #ifndef TACTICS_ACTION_SCHEDULER_H
 #define TACTICS_ACTION_SCHEDULER_H
 
+#include "Action.h"
 #include "../objects/AnimatedObject.h"
 #include "../settings.h"
 #include <list>
-#include <functional>
 
 //================================================================================
 // ** ActionScheduler
 //================================================================================
-// Singleton scheduler for executing scheduled callback functions in relative game
-// time
+// Singleton scheduler for executing scheduled actions in relative game time
 //================================================================================
 class ActionScheduler : public AnimatedObject
 {
@@ -24,12 +23,12 @@ private:
 public:
     static ActionScheduler& instance();
     bool                    empty() const;
-    void                    schedule(std::function<void()>, int delay);
+    void                    schedule(const Action& action);
     void                    clear();
 
 // Members
 private:
-    std::list<std::pair<std::function<void()>, int>> schedule_;
+    std::list<Action>       schedule_;
 };
 
 #endif

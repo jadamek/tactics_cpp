@@ -22,22 +22,22 @@ ActionScheduler::~ActionScheduler()
 //----------------------------------------------------------------------------
 // - Increment Frame
 //----------------------------------------------------------------------------
-// Decrements each scheduled task's remaining frame delay. If any action
-// reaches zero remaining frames, it is executed and then removed from the
-// schedule
+// Decrements each scheduled action's remaining frame delay. If any action
+// reaches zero remaining frames or the action has a special trigger which is
+// activated, it is executed and then removed from the schedule
 //----------------------------------------------------------------------------
 void ActionScheduler::step()
 {
-    for(auto task = schedule_.begin(); task != schedule_.end();)
+    for(auto action = schedule_.begin(); action != schedule_.end();)
     {
-        if(task->second-- < 1)
+        if(action->countdown() < 1 || action->triggered())
         {
-            task->first();
-            task = schedule_.erase(task);
+            action->execute();
+            action = schedule_.erase(action);
         }
         else
         {
-            task++;
+            action++;
         }
     }
 }
@@ -62,14 +62,11 @@ bool ActionScheduler::empty() const
 }
 
 //----------------------------------------------------------------------------
-// - 
+// - Schedule Action
 //----------------------------------------------------------------------------
-void ActionScheduler::schedule(std::function<void()> action, int delay)
+void ActionScheduler::schedule(const Action& action)
 {
-    if(delay >= 0)
-    {
-        schedule_.push_back(std::pair<std::function<void()>, int>(action, delay));
-    }
+    schedule_.push_back(action);
 }
 
 //----------------------------------------------------------------------------

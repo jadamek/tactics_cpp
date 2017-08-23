@@ -32,6 +32,7 @@ public:
     void                        face(int direction);
     void                        face(const sf::Vector2f& target);
     int                         facing() const;
+    const Map*                  getEnvironment() const;
     
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;

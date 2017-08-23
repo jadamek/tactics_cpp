@@ -51,6 +51,8 @@
         "functional": "cpp",
         "xfunctional": "cpp",
         "stack": "cpp",
-        "deque": "cpp"
+        "deque": "cpp",
+        "unordered_set": "cpp",
+        "xhash": "cpp"
     }
 }

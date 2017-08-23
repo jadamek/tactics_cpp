@@ -3,34 +3,23 @@
 #include <vector>
 #include <set>
 #include <list>
-
-
-class Obj
-{
-public:
-    bool whatever;
-    int id;
-};
+#include "game/ManhattanArea.h"
+#include "control/TargetConfirmer.h"
 
 int main()
 {
     sf::Clock timer;
     float elapsed;
     
-    std::vector<Obj*> objs;
-    for(int i = 0; i < 10000; i++)
-    {
-        objs.push_back(new Obj);
-    }    
-    std::vector<Obj*> other;
+    
     timer.restart();
-    for(int i = 0; i < 10000; i++)
+    for(int i = 0; i < 1; i++)
     {
-        other.push_back(objs[i]);
+        ManhattanArea::compute(10, sf::Vector2f(), [](const sf::Vector2f&, const sf::Vector2f&){return true;});
     }
     elapsed = timer.restart().asMicroseconds();
 
-    std::cout << "Execution time: " << elapsed << " us " << std::endl;
+    std::cout << "Execution time (lamb): " << elapsed << " us " << std::endl;
 
     return 0;
 }

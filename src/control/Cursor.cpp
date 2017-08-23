@@ -65,8 +65,6 @@ sf::FloatRect Cursor::getGlobalBounds() const
     return sprite_.getGlobalBounds();
 }
 
-#include <iostream>
-
 //----------------------------------------------------------------------------
 // Poll Input Event (Override)
 //----------------------------------------------------------------------------

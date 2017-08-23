@@ -1,10 +1,11 @@
+/*
+
 #ifndef TACTICS_TARGET_SELECTOR_H
 #define TACTICS_TARGET_SELECTOR_H
 
 #include "Cursor.h"
 #include "../sprite/SpriteArea.h"
 #include <vector>
-/*
 //================================================================================
 // ** TargetSelector
 //================================================================================
@@ -22,5 +23,5 @@ public:
 
 protected:
 };
-*/
 #endif
+*/

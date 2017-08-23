@@ -18,31 +18,30 @@ void SkillAttack::use(Actor* caster, const std::vector<Actor*>& targets)
 // - Calculate Basic Attack Range
 //----------------------------------------------------------------------------
 // * caster : player making the attack
-// * map : environment where the range of the skill is being computed for
 // Returns a vector of possible positions the skill may be cast at
 //----------------------------------------------------------------------------
-std::vector<sf::Vector2i> SkillAttack::range(Actor* caster, Map* map) const
+std::vector<sf::Vector2i> SkillAttack::range(Actor* caster) const
 {
     std::vector<sf::Vector2i> result;
 
-    if(map && caster)
+    if(caster)
     {
-        if(map->at(caster->position().x + 1, caster->position().y))
+        if(caster->getEnvironment()->valid(caster->position().x + 1, caster->position().y))
         {
             result.push_back(sf::Vector2i(caster->position().x + 1, caster->position().y));
         }
 
-        if(map->at(caster->position().x - 1, caster->position().y))
+        if(caster->getEnvironment()->valid(caster->position().x - 1, caster->position().y))
         {
             result.push_back(sf::Vector2i(caster->position().x - 1, caster->position().y));
         }
 
-        if(map->at(caster->position().x, caster->position().y + 1))
+        if(caster->getEnvironment()->valid(caster->position().x, caster->position().y + 1))
         {
             result.push_back(sf::Vector2i(caster->position().x, caster->position().y + 1));
         }
 
-        if(map->at(caster->position().x, caster->position().y - 1))
+        if(caster->getEnvironment()->valid(caster->position().x, caster->position().y - 1))
         {
             result.push_back(sf::Vector2i(caster->position().x, caster->position().y - 1));
         }

@@ -193,6 +193,14 @@ int Actor::facing() const
 }
 
 //----------------------------------------------------------------------------
+// - Get Environment
+//----------------------------------------------------------------------------
+const Map* Actor::getEnvironment() const
+{
+    return ground_;
+}
+
+//----------------------------------------------------------------------------
 // - Draw (Override)
 //----------------------------------------------------------------------------
 void Actor::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -216,4 +224,3 @@ void Actor::step()
         path_.pop_front();
     }    
 }
-
