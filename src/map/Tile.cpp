@@ -15,7 +15,9 @@ Tile::Tile(const Sprite* sprite, float height) :
 //----------------------------------------------------------------------------
 Tile::~Tile()
 {
-    delete sprite_;
+    if(sprite_){
+        delete sprite_;        
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -25,7 +27,14 @@ Tile::~Tile()
 //----------------------------------------------------------------------------
 sf::FloatRect Tile::getGlobalBounds() const
 {
-    return sprite_->getGlobalBounds();
+    if(sprite_)
+    {
+        return sprite_->getGlobalBounds();        
+    }
+    else
+    {
+        return sf::FloatRect();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -99,5 +108,8 @@ void Tile::lower(float z)
 //----------------------------------------------------------------------------
 void Tile::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    target.draw(*sprite_, states);
+    if(sprite_)
+    {
+        target.draw(*sprite_, states);        
+    }
 }

@@ -9,7 +9,7 @@
 // * caster : player making the attack
 // * targets : set of intended targets for the attack
 //----------------------------------------------------------------------------
-void SkillAttack::use(Actor* caster, const std::vector<Actor*>& targets)
+void SkillAttack::use(Actor& caster, const std::vector<Actor*>& targets)
 {
     std::cout << "ATTACK!!!" << std::endl;
 }
@@ -20,31 +20,28 @@ void SkillAttack::use(Actor* caster, const std::vector<Actor*>& targets)
 // * caster : player making the attack
 // Returns a vector of possible positions the skill may be cast at
 //----------------------------------------------------------------------------
-std::vector<sf::Vector2i> SkillAttack::range(Actor* caster) const
+std::vector<sf::Vector2i> SkillAttack::range(Actor& caster) const
 {
     std::vector<sf::Vector2i> result;
 
-    if(caster)
+    if(caster.getEnvironment()->valid(caster.position().x + 1, caster.position().y))
     {
-        if(caster->getEnvironment()->valid(caster->position().x + 1, caster->position().y))
-        {
-            result.push_back(sf::Vector2i(caster->position().x + 1, caster->position().y));
-        }
+        result.push_back(sf::Vector2i(caster.position().x + 1, caster.position().y));
+    }
 
-        if(caster->getEnvironment()->valid(caster->position().x - 1, caster->position().y))
-        {
-            result.push_back(sf::Vector2i(caster->position().x - 1, caster->position().y));
-        }
+    if(caster.getEnvironment()->valid(caster.position().x - 1, caster.position().y))
+    {
+        result.push_back(sf::Vector2i(caster.position().x - 1, caster.position().y));
+    }
 
-        if(caster->getEnvironment()->valid(caster->position().x, caster->position().y + 1))
-        {
-            result.push_back(sf::Vector2i(caster->position().x, caster->position().y + 1));
-        }
+    if(caster.getEnvironment()->valid(caster.position().x, caster.position().y + 1))
+    {
+        result.push_back(sf::Vector2i(caster.position().x, caster.position().y + 1));
+    }
 
-        if(caster->getEnvironment()->valid(caster->position().x, caster->position().y - 1))
-        {
-            result.push_back(sf::Vector2i(caster->position().x, caster->position().y - 1));
-        }
+    if(caster.getEnvironment()->valid(caster.position().x, caster.position().y - 1))
+    {
+        result.push_back(sf::Vector2i(caster.position().x, caster.position().y - 1));
     }
 }
 
@@ -56,7 +53,7 @@ std::vector<sf::Vector2i> SkillAttack::range(Actor* caster) const
 // Returns a vector of all positions that will be affected by a cast of the
 // skill
 //----------------------------------------------------------------------------
-std::vector<sf::Vector2i> SkillAttack::area(const sf::Vector2i source, Map* map) const
+std::vector<sf::Vector2i> SkillAttack::area(const sf::Vector2i& source, Map& map) const
 {
     std::vector<sf::Vector2i>(1, sf::Vector2i(source));
 }

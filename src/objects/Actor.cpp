@@ -12,7 +12,9 @@
 Actor::Actor(const sf::Texture& texture, const Map* ground) :
     MobileObject(ground),
     sprite_(0),
-    baseSprite_(new SpriteDirected(texture, 20, 32))
+    baseSprite_(new SpriteDirected(texture, 20, 32)),
+    portrait_(0),
+    name_("Combatant")
 {
     baseSprite_->setOrigin(10, 28);
     baseSprite_->setPosition(0, 0);
@@ -26,6 +28,10 @@ Actor::Actor(const sf::Texture& texture, const Map* ground) :
 Actor::~Actor()
 {
     delete sprite_;
+    if(portrait_)
+    {
+        delete portrait_;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -198,6 +204,48 @@ int Actor::facing() const
 const Map* Actor::getEnvironment() const
 {
     return ground_;
+}
+
+//----------------------------------------------------------------------------
+// - Get Portrait Sprite
+//----------------------------------------------------------------------------
+sf::Sprite* Actor::getPortrait() const
+{
+    return portrait_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Portrait Image
+//----------------------------------------------------------------------------
+// * portrait : bitmap to use for the portrait sprite
+//----------------------------------------------------------------------------
+void Actor::setPortrait(const sf::Texture& portrait)
+{
+    if(portrait_ == 0)
+    {
+        portrait_ = new sf::Sprite;
+    }
+
+    portrait_->setTexture(portrait);
+    portrait_->setScale(64.f / portrait.getSize().x, 104.f / portrait.getSize().y);
+}
+
+//----------------------------------------------------------------------------
+// - Get Actor's Name
+//----------------------------------------------------------------------------
+const std::string& Actor::getName() const
+{
+    return name_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Actor Name
+//----------------------------------------------------------------------------
+// * name : name of the actor
+//----------------------------------------------------------------------------
+void Actor::setName(const std::string& name)
+{
+    name_ = name;
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@ private:
 public:
     ~Animations();
 
-    static Animations&    instance();
+    static Animations&          instance();
     void                        add(AnimatedObject* obj);
     void                        freeze();
     void                        unfreeze();

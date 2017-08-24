@@ -4,29 +4,25 @@
 //----------------------------------------------------------------------------
 // - Target Confirmer Constructor
 //----------------------------------------------------------------------------
-// * texture : bitmap of the cursor to use for this selector
+// * cursor : sprite of the cursor to use for this selector
 // * skill : skill being confirmed for casting
 // * caster : actor casting the skill in question
 // * targets : chosen targets to confirm
 //----------------------------------------------------------------------------
-TargetConfirmer::TargetConfirmer(const sf::Texture& texture, Skill* skill, Actor* caster, const std::vector<Actor*>& targets) :
-sprite_(texture),
+TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const std::vector<Actor*>& targets) :
+sprite_(cursor),
 throttle_(0),
-skill_(skill),
-caster_(caster),
+skill_(&skill),
+caster_(&caster),
 targets_(targets),
 current_(0)
 {    
-    sprite_.setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
-
     if(!targets_.empty())
     {
         setPosition(targets_[0]->position());    
     }
-    else if(caster_){
-        setPosition(caster_->position());
-    }
 
+    setPosition(caster_->position());
     setSpeed(10);
 }
 
@@ -64,48 +60,46 @@ void TargetConfirmer::poll()
     // Consecutive keyboard input for cursors is throttled by 5 frames
     static int throttle = 10;   
     
-    if(skill_ != 0 && caster_ != 0){
-        if(throttle_ <= 0)
-        {
-            // Cannot cycle through an empty target list
-            if(!targets_.empty()){
-                // Keyboard Input handle : Down - move cursor to previous target
-                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-                {           
-                    moveTo(targets_[(current_ - 1) % targets_.size()]->position());
-                    throttle_ = throttle;                
-                }
-
-                // Keyboard Input handle : Up - move cursor to next target
-                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-                {           
-                    moveTo(targets_[(current_ + 1) % targets_.size()]->position());
-                    throttle_ = throttle;                
-                }
-
-                // Keyboard Input handle : Left - move cursor to previous target
-                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                {
-                    moveTo(targets_[(current_ - 1) % targets_.size()]->position());
-                    throttle_ = throttle;                
-                }
-
-                // Keyboard Input handle : Right - move cursor  to next target
-                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                {
-                    moveTo(targets_[(current_ + 1) % targets_.size()]->position());
-                    throttle_ = throttle;                
-                }
+    if(throttle_ <= 0)
+    {
+        // Cannot cycle through an empty target list
+        if(!targets_.empty()){
+            // Keyboard Input handle : Down - move cursor to previous target
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+            {           
+                moveTo(targets_[(current_ - 1) % targets_.size()]->position());
+                throttle_ = throttle;                
             }
 
-            // Keyboard Input handle : Enter - confirm cast
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+            // Keyboard Input handle : Up - move cursor to next target
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+            {           
+                moveTo(targets_[(current_ + 1) % targets_.size()]->position());
+                throttle_ = throttle;                
+            }
+
+            // Keyboard Input handle : Left - move cursor to previous target
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
-                skill_->use(caster_, targets_);
-                //setBusy(true);
+                moveTo(targets_[(current_ - 1) % targets_.size()]->position());
+                throttle_ = throttle;                
+            }
+
+            // Keyboard Input handle : Right - move cursor  to next target
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+            {
+                moveTo(targets_[(current_ + 1) % targets_.size()]->position());
+                throttle_ = throttle;                
             }
         }
-    }
+
+        // Keyboard Input handle : Enter - confirm cast
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+        {
+            skill_->use(*caster_, targets_);
+            //setBusy(true);
+        }
+    }    
 }
 
 //----------------------------------------------------------------------------

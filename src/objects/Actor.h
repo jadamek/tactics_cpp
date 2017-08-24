@@ -33,7 +33,11 @@ public:
     void                        face(const sf::Vector2f& target);
     int                         facing() const;
     const Map*                  getEnvironment() const;
-    
+    sf::Sprite*                 getPortrait() const;
+    void                        setPortrait(const sf::Texture& portrait);
+    const std::string&          getName() const; 
+    void                        setName(const std::string& name);
+
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void                step();
@@ -42,6 +46,8 @@ protected:
     SpriteAnimated*             sprite_;
     SpriteDirected*             baseSprite_;
     std::list<sf::Vector2f>     path_;
+    sf::Sprite*                 portrait_;
+    std::string                 name_;
 };
 
 #endif

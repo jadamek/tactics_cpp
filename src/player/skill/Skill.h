@@ -19,9 +19,9 @@ public:
     Skill();
     virtual ~Skill();
 
-    virtual void use(Actor* caster, const std::vector<Actor*>& targets) = 0;
-    virtual std::vector<sf::Vector2i> range(Actor* caster) const = 0;
-    virtual std::vector<sf::Vector2i> area(const sf::Vector2i source, Map* map) const = 0;
+    virtual void use(Actor& caster, const std::vector<Actor*>& targets) = 0;
+    virtual std::vector<sf::Vector2i> range(Actor& caster) const = 0;
+    virtual std::vector<sf::Vector2i> area(const sf::Vector2i& source, Map& map) const = 0;
 
     bool    casting() const;
 

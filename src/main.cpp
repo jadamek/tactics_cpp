@@ -17,6 +17,7 @@
 #include "game/InputManager.h"
 #include "control/Menu.h"
 #include "sprite/SpriteArea.h"
+#include "sprite/SpriteActorHUD.h"
 
 int main()
 {    
@@ -41,11 +42,17 @@ int main()
     }
 
     // Setup Assassin player
-    sf::Texture assassin_texture;
+    sf::Texture assassin_texture, assassin_portrait;
     assassin_texture.loadFromFile("resources/graphics/Assassin.png");
-
+    assassin_portrait.loadFromFile("resources/graphics/AssassinPortrait_64x104.png");
+    
     Actor* assassin = new Actor(assassin_texture, &map);
     map.addObject(assassin);
+
+    assassin->setName("Assassin");
+    assassin->setPortrait(assassin_portrait);
+    
+    SpriteActorHUD hud(*assassin);
 
     // Setup Paladin player
     sf::Texture paladin_texture;
@@ -70,8 +77,11 @@ int main()
     // Cursor setup
     sf::Texture cursor_texture;
     cursor_texture.loadFromFile("resources/graphics/Cursor_32x16.png");
+    sf::Sprite cursor_sprite(cursor_texture);
+    cursor_sprite.setOrigin(cursor_texture.getSize().x / 2, cursor_texture.getSize().y / 2);
+    
 
-    Cursor* cursor = new Cursor(cursor_texture, &map, [](){std::cout << "Hey." << std::endl;});
+    Cursor* cursor = new Cursor(cursor_sprite, map, [](){std::cout << "Hey." << std::endl;});
     map.addObject(cursor);
     InputManager::instance().push(cursor);
     
@@ -81,7 +91,7 @@ int main()
 
     std::vector<sf::Vector2f> area = assassin->reach();    
     
-    SpriteArea* area_sprite = new SpriteArea(area_texture, area, &map, sf::Color(140,140,255));
+    SpriteArea* area_sprite = new SpriteArea(area_texture, area, map, sf::Color(140,140,255));
 
     map.addObject(area_sprite);
         
@@ -201,10 +211,10 @@ int main()
         window.clear(sf::Color::Black);
         background.drawOverlays(window);
         window.setView(view);
-        window.draw(map);
+        window.draw(map);        
+        window.draw(hud);
         view.drawOverlays(window);
-        window.display();
-        
+        window.display();        
     }
 
     std::cout << "ok" << std::endl;

@@ -16,7 +16,7 @@ class Cursor : public MobileObject, public InputHandler
 {
 // Methods
 public:
-    Cursor(const sf::Texture& texture, Map* map, std::function<void()> action);
+    Cursor(const sf::Sprite& cursor, Map& map, std::function<void()> action);
     virtual ~Cursor();
 
     virtual void            goTo(const sf::Vector2f& position);

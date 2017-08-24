@@ -17,7 +17,7 @@ class TargetConfirmer : public MobileObject, public InputHandler
 {
 // Methods
 public:
-    TargetConfirmer(const sf::Texture& texture, Skill* skill, Actor* caster, const std::vector<Actor*>& targets);
+    TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const std::vector<Actor*>& targets);
     virtual ~TargetConfirmer();
 
     virtual float               getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
