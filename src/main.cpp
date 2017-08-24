@@ -47,6 +47,7 @@ int main()
     assassin_portrait.loadFromFile("resources/graphics/AssassinPortrait_64x104.png");
     
     Actor* assassin = new Actor(assassin_texture, &map);
+    assassin->setPosition(sf::Vector3f(13, 13, map.height(13, 13)));
     map.addObject(assassin);
 
     assassin->setName("Assassin");

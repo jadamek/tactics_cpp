@@ -15,11 +15,14 @@ class ManhattanArea
 // Methods
 public:
     static std::vector<sf::Vector2f> compute(int distance, const sf::Vector2f& source,
-                std::function<bool(const sf::Vector2f&, const sf::Vector2f&)> predicate);
+                std::function<bool(const sf::Vector2f&, const sf::Vector2f&)> passable,
+                std::function<bool(const sf::Vector2f&)> exclude);
 
 private:
-    static void adjacentReach(const sf::Vector2f& position, int distance, const sf::Vector2f& previous,
-                std::function<bool(const sf::Vector2f&, const sf::Vector2f&)> predicate, std::vector<sf::Vector2f>& reachable);
+    static void adjacentReach(const sf::Vector2f& position, int distance,
+        std::function<bool(const sf::Vector2f&, const sf::Vector2f&)> passable,
+        std::function<bool(const sf::Vector2f&)> exclude, std::vector<sf::Vector2f>& area,
+        const sf::Vector2f& origin, int width, std::vector<bool>& visited);
 
     ManhattanArea(){}
     ManhattanArea(const ManhattanArea&){}

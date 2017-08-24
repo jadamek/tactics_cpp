@@ -34,7 +34,7 @@ public:
     int                 width() const;
     int                 length() const;
     IsometricBuffer&    getDepthBuffer();
-    Actor*              playerAt(int x, int y);
+    Actor*              playerAt(int x, int y) const;
     void                enter(Actor* actor, int x, int y);
     void                exit(int x, int y);
     

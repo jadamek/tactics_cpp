@@ -11,11 +11,11 @@ int main()
     sf::Clock timer;
     float elapsed;
     
-    
+    std::vector<sf::Vector2f> area;
     timer.restart();
     for(int i = 0; i < 1; i++)
     {
-        ManhattanArea::compute(10, sf::Vector2f(), [](const sf::Vector2f&, const sf::Vector2f&){return true;});
+        ManhattanArea::compute(6, sf::Vector2f(11, 11), [](const sf::Vector2f&, const sf::Vector2f&){return true;},[](const sf::Vector2f&){return false;});
     }
     elapsed = timer.restart().asMicroseconds();
 

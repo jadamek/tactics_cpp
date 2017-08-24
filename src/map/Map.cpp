@@ -336,7 +336,7 @@ IsometricBuffer& Map::getDepthBuffer()
 //----------------------------------------------------------------------------
 // - Get Player At Position
 //----------------------------------------------------------------------------
-Actor* Map::playerAt(int x, int y)
+Actor* Map::playerAt(int x, int y) const
 {
     if((x >= 0 && x < width_) || (y >= 0 || y < length_))    
     {

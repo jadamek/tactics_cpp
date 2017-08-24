@@ -111,6 +111,10 @@ std::vector<sf::Vector2f> Actor::reach() const
             }
         
             return false;
+        },
+        [ground](const sf::Vector2f& position)
+        {
+            return ground->playerAt(position.x, position.y);
         });
 }
 
