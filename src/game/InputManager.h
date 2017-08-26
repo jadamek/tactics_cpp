@@ -24,7 +24,7 @@ public:
     void                    poll();
     void                    push(InputHandler* handler);
     void                    pop();
-    void                    popToLast();
+    void                    popTo(InputHandler* handler);
     InputHandler*           getHandler() const;
 
 // Members

@@ -92,6 +92,14 @@ void Actor::stopWalking()
 }
 
 //----------------------------------------------------------------------------
+// - Structure for BFS Search during shortest path and reach computation
+//----------------------------------------------------------------------------
+struct BFSToken{
+    sf::Vector2f position;
+    int distance;
+};
+
+//----------------------------------------------------------------------------
 // - Compute Reach
 //----------------------------------------------------------------------------
 // Returns a vector of all reachable positions by this unit's movement using
@@ -106,72 +114,72 @@ std::vector<sf::Vector2f> Actor::reach() const
     sf::Vector2f origin = sf::Vector2f(position().x, position().y) - sf::Vector2f(move, move);
     int width = 2 * move + 1;
     std::vector<bool> visited(width * width, false);
-    std::queue<std::pair<sf::Vector2f, int>> queue;
+    std::queue<BFSToken> queue;
 
-    queue.push(std::pair<sf::Vector2f, int>(sf::Vector2f(position().x, position().y), move));
+    queue.push(BFSToken{sf::Vector2f(position().x, position().y), move});
     visited[move * (1 +  width)] = true;
 
     // Loop variables    
-    std::pair<sf::Vector2f, int> pos_d;
+    BFSToken token;
     sf::Vector2f adjacent;
     int v_i;
 
     while(!queue.empty())
     {
-        pos_d = queue.front();
+        token = queue.front();
         queue.pop();
 
-        if(occupiable(pos_d.first))
+        if(occupiable(token.position))
         {
-            area.push_back(pos_d.first);
+            area.push_back(token.position);
         }
 
-        if(pos_d.second > 0)
+        if(token.distance > 0)
         {
             // Check Rightward Position
-            adjacent = sf::Vector2f(pos_d.first.x + 1, pos_d.first.y);
+            adjacent = sf::Vector2f(token.position.x + 1, token.position.y);
             v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                if(!visited[v_i] && passable(token.position, adjacent)){
                     visited[v_i] = true;
-                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                    queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
             
             // Check Leftward Position
-            adjacent = sf::Vector2f(pos_d.first.x - 1, pos_d.first.y);
+            adjacent = sf::Vector2f(token.position.x - 1, token.position.y);
             v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                if(!visited[v_i] && passable(token.position, adjacent)){
                     visited[v_i] = true;
-                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                    queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
     
             // Check Downward Position
-            adjacent = sf::Vector2f(pos_d.first.x, pos_d.first.y + 1);
+            adjacent = sf::Vector2f(token.position.x, token.position.y + 1);
             v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                if(!visited[v_i] && passable(token.position, adjacent)){
                     visited[v_i] = true;
-                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                    queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
     
             // Check Upward Position
-            adjacent = sf::Vector2f(pos_d.first.x, pos_d.first.y - 1);
+            adjacent = sf::Vector2f(token.position.x, token.position.y - 1);
             v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                if(!visited[v_i] && passable(token.position, adjacent)){
                     visited[v_i] = true;
-                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                    queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
-        }
+        }        
     }
 
     return area;

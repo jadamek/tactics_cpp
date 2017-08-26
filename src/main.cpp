@@ -96,18 +96,6 @@ int main()
 
     map.addObject(area_sprite);
 
-    sf::Clock timer;
-    float timing;
-    
-    timer.restart();
-    for(int i = 0; i < 1; i++)
-    {
-        assassin->reach();
-    }
-    timing = timer.restart().asMicroseconds();
-
-    std::cout << "Execution time: " << timing << " us " << std::endl;
-        
     // Background/Foreground panorama
     sf::Texture sky_texture;
     sky_texture.loadFromFile("resources/graphics/CloudySky.jpg");
