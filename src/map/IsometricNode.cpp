@@ -1,4 +1,5 @@
 #include "IsometricBuffer.h"
+#include <algorithm>
 
 //----------------------------------------------------------------------------
 // - Isometric Node Contructor
@@ -94,10 +95,10 @@ void IsometricNode::attach(IsometricNode* node)
 {
     if(compare(target_, node->target()))
     {
-        children_.insert(node);
+        children_.push_back(node);
     }
     else{
-        node->children_.insert(this);
+        node->children_.push_back(this);
     }
 }
 
@@ -118,13 +119,17 @@ void IsometricNode::detach()
 //----------------------------------------------------------------------------
 void IsometricNode::removeChild(IsometricNode* child)
 {
-    children_.erase(child);
+    auto child_it = std::find(children_.begin(), children_.end(), child);
+    if(child_it != children_.end())
+    {
+        children_.erase(child_it);        
+    }
 }
 
 //----------------------------------------------------------------------------
 // - Get Child Set
 //----------------------------------------------------------------------------
-const std::set<IsometricNode*>& IsometricNode::children() const
+const std::deque<IsometricNode*>& IsometricNode::children() const
 {
     return children_;
 }

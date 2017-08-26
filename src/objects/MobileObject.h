@@ -4,7 +4,6 @@
 #include "IsometricObject.h"
 #include "AnimatedObject.h"
 #include "../map/Map.h"
-#include <list>
  
 //================================================================================
 // ** MobileObject

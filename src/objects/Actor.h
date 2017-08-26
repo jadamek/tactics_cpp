@@ -4,7 +4,7 @@
 #include "MobileObject.h"
 #include "../sprite/SpriteAnimated.h"
 #include "../sprite/SpriteDirected.h"
-#include <list>
+#include <deque>
 
 //================================================================================
 // ** Actor
@@ -20,7 +20,7 @@ public:
 
     void                        walk(const sf::Vector2f& distance);
     void                        walkTo(const sf::Vector2f& position);
-    void                        walkAlong(const std::list<sf::Vector2f>& path);
+    void                        walkAlong(const std::deque<sf::Vector2f>& path);
     bool                        walking() const;
     void                        stopWalking();
     std::vector<sf::Vector2f>   reach() const;
@@ -47,7 +47,7 @@ protected:
 // Members
     SpriteAnimated*             sprite_;
     SpriteDirected*             baseSprite_;
-    std::list<sf::Vector2f>     path_;
+    std::deque<sf::Vector2f>    path_;
     sf::Sprite*                 portrait_;
     std::string                 name_;
 };

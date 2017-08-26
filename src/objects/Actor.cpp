@@ -65,7 +65,7 @@ void Actor::walkTo(const sf::Vector2f& position)
 // Sets the actor's destination as a path, or list of consecutive locations to
 // walk to
 //----------------------------------------------------------------------------
-void Actor::walkAlong(const std::list<sf::Vector2f>& path)
+void Actor::walkAlong(const std::deque<sf::Vector2f>& path)
 {
     path_ = path;
     walkTo(path_.front());    
@@ -136,46 +136,47 @@ std::vector<sf::Vector2f> Actor::reach() const
 
         if(token.distance > 0)
         {
+            v_i = int(token.position.x - origin.x) + int(token.position.y - origin.y) * width;
+
             // Check Rightward Position
-            adjacent = sf::Vector2f(token.position.x + 1, token.position.y);
-            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            adjacent.x = token.position.x + 1;
+            adjacent.y = token.position.y;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(token.position, adjacent)){
-                    visited[v_i] = true;
+                if(!visited[v_i + 1] && passable(token.position, adjacent)){
+                    visited[v_i + 1] = true;
                     queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
             
             // Check Leftward Position
-            adjacent = sf::Vector2f(token.position.x - 1, token.position.y);
-            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            adjacent.x = token.position.x - 1;
+            adjacent.y = token.position.y;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(token.position, adjacent)){
-                    visited[v_i] = true;
+                if(!visited[v_i - 1] && passable(token.position, adjacent)){
+                    visited[v_i - 1] = true;
                     queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
     
             // Check Downward Position
-            adjacent = sf::Vector2f(token.position.x, token.position.y + 1);
-            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
-            if((adjacent.x >= 0 && adjacent.y >= 0))
+            adjacent.x = token.position.x;
+            adjacent.y = token.position.y + 1;
             {
-                if(!visited[v_i] && passable(token.position, adjacent)){
-                    visited[v_i] = true;
+                if(!visited[v_i + width] && passable(token.position, adjacent)){
+                    visited[v_i + width] = true;
                     queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }
     
             // Check Upward Position
-            adjacent = sf::Vector2f(token.position.x, token.position.y - 1);
-            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            adjacent.x = token.position.x;
+            adjacent.y = token.position.y - 1;
             if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                if(!visited[v_i] && passable(token.position, adjacent)){
-                    visited[v_i] = true;
+                if(!visited[v_i - width] && passable(token.position, adjacent)){
+                    visited[v_i - width] = true;
                     queue.push(BFSToken{adjacent, token.distance - 1});
                 }
             }

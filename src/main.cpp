@@ -64,7 +64,7 @@ int main()
 
     paladin->setPosition(sf::Vector3f(5, 5, map.height(5, 5)));
 
-    std::list<sf::Vector2f> patrol;
+    std::deque<sf::Vector2f> patrol;
     for(int i = 0; i < 10; i++)
     {
         patrol.push_back(sf::Vector2f(10, 5));
@@ -73,7 +73,7 @@ int main()
         patrol.push_back(sf::Vector2f(5, 5));
     }
 
-    paladin->walkAlong(patrol);
+    paladin->walkAlong(patrol);   
 
     // Cursor setup
     sf::Texture cursor_texture;

@@ -4,7 +4,7 @@
 #include "Action.h"
 #include "../objects/AnimatedObject.h"
 #include "../settings.h"
-#include <list>
+#include <deque>
 
 //================================================================================
 // ** ActionScheduler
@@ -28,7 +28,7 @@ public:
 
 // Members
 private:
-    std::list<Action>       schedule_;
+    std::deque<Action>     schedule_;
 };
 
 #endif

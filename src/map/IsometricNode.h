@@ -2,7 +2,7 @@
 #define TACTICS_ISOMETRIC_NODE_H
 
 #include "../objects/IsometricObject.h"
-#include <set>
+#include <deque>
 
 //================================================================================
 // ** IsometricNode
@@ -23,7 +23,7 @@ public:
     void                            attach(IsometricNode* node);
     void                            detach();
     void                            removeChild(IsometricNode* child);
-    const std::set<IsometricNode*>& children() const;
+    const std::deque<IsometricNode*>& children() const;
     bool                            dirty() const;
     const sf::FloatRect&            getBounds() const;
     void                            setBounds(const sf::FloatRect& bounds);
@@ -38,7 +38,7 @@ private:
     IsometricObject*                target_;
     IsometricBuffer*                container_;
     bool                            dirty_;
-    std::set<IsometricNode*>        children_;
+    std::deque<IsometricNode*>      children_;
     sf::FloatRect                   bounds_;
     bool                            visited_;
 };
