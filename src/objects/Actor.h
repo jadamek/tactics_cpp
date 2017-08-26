@@ -41,6 +41,8 @@ public:
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void                step();
+    virtual bool                occupiable(const sf::Vector2f& position) const;
+    virtual bool                passable(const sf::Vector2f& from, const sf::Vector2f& to) const;    
     
 // Members
     SpriteAnimated*             sprite_;

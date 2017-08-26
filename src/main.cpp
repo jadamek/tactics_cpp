@@ -47,7 +47,7 @@ int main()
     assassin_portrait.loadFromFile("resources/graphics/AssassinPortrait_64x104.png");
     
     Actor* assassin = new Actor(assassin_texture, &map);
-    assassin->setPosition(sf::Vector3f(13, 13, map.height(13, 13)));
+    assassin->setPosition(sf::Vector3f(12, 12, map.height(12, 12)));
     map.addObject(assassin);
 
     assassin->setName("Assassin");
@@ -95,6 +95,18 @@ int main()
     SpriteArea* area_sprite = new SpriteArea(area_texture, area, map, sf::Color(140,140,255));
 
     map.addObject(area_sprite);
+
+    sf::Clock timer;
+    float timing;
+    
+    timer.restart();
+    for(int i = 0; i < 1; i++)
+    {
+        assassin->reach();
+    }
+    timing = timer.restart().asMicroseconds();
+
+    std::cout << "Execution time: " << timing << " us " << std::endl;
         
     // Background/Foreground panorama
     sf::Texture sky_texture;
@@ -217,7 +229,7 @@ int main()
         view.drawOverlays(window);
         window.display();        
     }
-
+    
     std::cout << "ok" << std::endl;
 
     return 0;

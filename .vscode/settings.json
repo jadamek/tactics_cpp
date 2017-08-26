@@ -53,6 +53,7 @@
         "stack": "cpp",
         "deque": "cpp",
         "unordered_set": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "queue": "cpp"
     }
 }

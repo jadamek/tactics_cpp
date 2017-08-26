@@ -1,6 +1,6 @@
 #include "Actor.h"
 #include <math.h>
-#include "../game/ManhattanArea.h"
+#include <queue>
 
 # define M_PI 3.14159265358979323846
 
@@ -94,28 +94,87 @@ void Actor::stopWalking()
 //----------------------------------------------------------------------------
 // - Compute Reach
 //----------------------------------------------------------------------------
-// Returns a vector of all reachable positions by this unit's movement
+// Returns a vector of all reachable positions by this unit's movement using
+// breadth-first search guided by passability laws
 //----------------------------------------------------------------------------
 std::vector<sf::Vector2f> Actor::reach() const
 {
     // Replace later (MovementStyle?)
-    int move = 4;
-    const Map* ground = ground_;
+    int move = 6;
     
-    return ManhattanArea::compute(move, sf::Vector2f(position().x, position().y),
-        [ground](const sf::Vector2f& initial, const sf::Vector2f& target)
+    std::vector<sf::Vector2f> area;
+    sf::Vector2f origin = sf::Vector2f(position().x, position().y) - sf::Vector2f(move, move);
+    int width = 2 * move + 1;
+    std::vector<bool> visited(width * width, false);
+    std::queue<std::pair<sf::Vector2f, int>> queue;
+
+    queue.push(std::pair<sf::Vector2f, int>(sf::Vector2f(position().x, position().y), move));
+    visited[move * (1 +  width)] = true;
+
+    // Loop variables    
+    std::pair<sf::Vector2f, int> pos_d;
+    sf::Vector2f adjacent;
+    int v_i;
+
+    while(!queue.empty())
+    {
+        pos_d = queue.front();
+        queue.pop();
+
+        if(occupiable(pos_d.first))
         {
-            if(ground)
+            area.push_back(pos_d.first);
+        }
+
+        if(pos_d.second > 0)
+        {
+            // Check Rightward Position
+            adjacent = sf::Vector2f(pos_d.first.x + 1, pos_d.first.y);
+            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            if((adjacent.x >= 0 && adjacent.y >= 0))
             {
-                return ground->valid(target.x, target.y);
+                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                    visited[v_i] = true;
+                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                }
             }
-        
-            return false;
-        },
-        [ground](const sf::Vector2f& position)
-        {
-            return ground->playerAt(position.x, position.y);
-        });
+            
+            // Check Leftward Position
+            adjacent = sf::Vector2f(pos_d.first.x - 1, pos_d.first.y);
+            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            if((adjacent.x >= 0 && adjacent.y >= 0))
+            {
+                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                    visited[v_i] = true;
+                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                }
+            }
+    
+            // Check Downward Position
+            adjacent = sf::Vector2f(pos_d.first.x, pos_d.first.y + 1);
+            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            if((adjacent.x >= 0 && adjacent.y >= 0))
+            {
+                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                    visited[v_i] = true;
+                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                }
+            }
+    
+            // Check Upward Position
+            adjacent = sf::Vector2f(pos_d.first.x, pos_d.first.y - 1);
+            v_i = int(adjacent.x - origin.x) + int(adjacent.y - origin.y) * width;
+            if((adjacent.x >= 0 && adjacent.y >= 0))
+            {
+                if(!visited[v_i] && passable(pos_d.first, adjacent)){
+                    visited[v_i] = true;
+                    queue.push(std::pair<sf::Vector2f, int>(adjacent, pos_d.second - 1));
+                }
+            }
+        }
+    }
+
+    return area;
 }
 
 //----------------------------------------------------------------------------
@@ -275,4 +334,36 @@ void Actor::step()
         walkTo(path_.front());
         path_.pop_front();
     }    
+}
+
+//----------------------------------------------------------------------------
+// - Position Occupiable
+//----------------------------------------------------------------------------
+// * position : position  actor is considering moving to
+//----------------------------------------------------------------------------
+bool Actor::occupiable(const sf::Vector2f& position) const
+{
+    if(ground_)
+    {
+        return !ground_->playerAt(position.x, position.y);
+    }
+
+    return true;
+}
+
+//----------------------------------------------------------------------------
+// - Terrain Passable
+//----------------------------------------------------------------------------
+// * initial : position being traveled from
+// * target : position being traveled to
+// Returns True if the actor is able to move from one position to the other
+//----------------------------------------------------------------------------
+bool Actor::passable(const sf::Vector2f& initial, const sf::Vector2f& target) const
+{
+    if(ground_)
+    {
+        return ground_->valid(target.x, target.y);
+    }
+
+    return true;
 }
