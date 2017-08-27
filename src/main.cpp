@@ -90,11 +90,22 @@ int main()
     sf::Texture area_texture;
     area_texture.loadFromFile("resources/graphics/AreaSquare.png");
 
+    assassin->setMove(7);
     std::vector<sf::Vector2f> area = assassin->reach();    
     
     SpriteArea* area_sprite = new SpriteArea(area_texture, area, map, sf::Color(140,140,255));
 
     map.addObject(area_sprite);
+    sf::Vector2f dest(rand() % 7 + 7, rand() % 7 + 7);
+    cursor->goTo(dest);
+
+    std::deque<sf::Vector2f> path = assassin->shortestPath(dest);
+    std::cout << "shortest path to (" << dest.x << ", " << dest.y << "): { ";
+    for(auto position : path)
+    {
+        std::cout << "(" << position.x << ", " << position.y << ") ";
+    }
+    std::cout << "}" << std::endl;
 
     // Background/Foreground panorama
     sf::Texture sky_texture;

@@ -24,6 +24,7 @@ public:
     bool                        walking() const;
     void                        stopWalking();
     std::vector<sf::Vector2f>   reach() const;
+    std::deque<sf::Vector2f>    shortestPath(const sf::Vector2f& destination) const;
     virtual float               getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect       getGlobalBounds() const;
     void                        setTexture(const sf::Texture& sprite);
@@ -37,7 +38,9 @@ public:
     void                        setPortrait(const sf::Texture& portrait);
     const std::string&          getName() const; 
     void                        setName(const std::string& name);
-
+    int                         getMove() const;
+    void                        setMove(int mv);
+    
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void                step();
@@ -50,6 +53,7 @@ protected:
     std::deque<sf::Vector2f>    path_;
     sf::Sprite*                 portrait_;
     std::string                 name_;
+    int                         attrMove_;
 };
 
 #endif

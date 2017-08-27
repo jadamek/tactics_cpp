@@ -14,7 +14,8 @@ Actor::Actor(const sf::Texture& texture, const Map* ground) :
     sprite_(0),
     baseSprite_(new SpriteDirected(texture, 20, 32)),
     portrait_(0),
-    name_("Combatant")
+    name_("Combatant"),
+    attrMove_(4)
 {
     baseSprite_->setOrigin(10, 28);
     baseSprite_->setPosition(0, 0);
@@ -92,7 +93,7 @@ void Actor::stopWalking()
 }
 
 //----------------------------------------------------------------------------
-// - Structure for BFS Search during shortest path and reach computation
+// - Structure for BFS Search during reach computation
 //----------------------------------------------------------------------------
 struct BFSToken{
     sf::Vector2f position;
@@ -107,17 +108,14 @@ struct BFSToken{
 //----------------------------------------------------------------------------
 std::vector<sf::Vector2f> Actor::reach() const
 {
-    // Replace later (MovementStyle?)
-    int move = 6;
-    
     std::vector<sf::Vector2f> area;
-    sf::Vector2f origin = sf::Vector2f(position().x, position().y) - sf::Vector2f(move, move);
-    int width = 2 * move + 1;
+    sf::Vector2f origin = sf::Vector2f(position().x, position().y) - sf::Vector2f(attrMove_, attrMove_);
+    int width = 2 * attrMove_ + 1;
     std::vector<bool> visited(width * width, false);
     std::queue<BFSToken> queue;
 
-    queue.push(BFSToken{sf::Vector2f(position().x, position().y), move});
-    visited[move * (1 +  width)] = true;
+    queue.push(BFSToken{sf::Vector2f(position().x, position().y), attrMove_});
+    visited[attrMove_ * (1 +  width)] = true;
 
     // Loop variables    
     BFSToken token;
@@ -184,6 +182,120 @@ std::vector<sf::Vector2f> Actor::reach() const
     }
 
     return area;
+}
+
+//----------------------------------------------------------------------------
+// - Structure for BFS Search during shortest path computation
+//----------------------------------------------------------------------------
+struct BFSNode{
+    bool visited;
+    int parent;
+    sf::Vector2f position;
+};
+
+//----------------------------------------------------------------------------
+// - Compute Shorest Path
+//----------------------------------------------------------------------------
+// Returns a deque of the shortest path to a given destination given this
+// unit's movement using breadth-first search guided by passability laws
+//----------------------------------------------------------------------------
+std::deque<sf::Vector2f> Actor::shortestPath(const sf::Vector2f& destination) const
+{    
+    std::deque<sf::Vector2f> path;
+    sf::Vector2f source(position().x, position().y);
+    int tracer = -1;
+    
+    // Make sure the destination is reachable, as well as not the current position
+    int distance = abs(position().x - destination.x) + abs(position().y - destination.y);
+
+    if(source != destination && distance <= attrMove_)
+    {        
+        std::vector<sf::Vector2f> area;
+        sf::Vector2f origin = source - sf::Vector2f(attrMove_, attrMove_);
+        int width = 2 * attrMove_ + 1;
+        std::vector<BFSNode> visited(width * width, {false, -1, sf::Vector2f()});
+        std::queue<BFSToken> queue;
+    
+        // Add the source position
+        queue.push(BFSToken{source, attrMove_});
+        visited[attrMove_ * (1 +  width)] = {true, -1, source};
+    
+        // Loop variables    
+        BFSToken token;
+        sf::Vector2f adjacent;
+        int v_i;
+    
+        // BFS Search until the destination is found
+        while(!queue.empty())
+        {
+            token = queue.front();
+            queue.pop();
+
+            v_i = int(token.position.x - origin.x) + int(token.position.y - origin.y) * width;
+            
+            // Once found, end BFS search
+            if(token.position == destination)
+            {
+                tracer = v_i;
+                break;
+            }
+    
+            if(token.distance > 0)
+            {    
+                // Check Rightward Position
+                adjacent.x = token.position.x + 1;
+                adjacent.y = token.position.y;
+                if((adjacent.x >= 0 && adjacent.y >= 0))
+                {
+                    if(!visited[v_i + 1].visited && passable(token.position, adjacent)){
+                        visited[v_i + 1] = {true, v_i, adjacent};
+                        queue.push(BFSToken{adjacent, token.distance - 1});
+                    }
+                }
+                
+                // Check Leftward Position
+                adjacent.x = token.position.x - 1;
+                adjacent.y = token.position.y;
+                if((adjacent.x >= 0 && adjacent.y >= 0))
+                {
+                    if(!visited[v_i - 1].visited && passable(token.position, adjacent)){
+                        visited[v_i - 1] = {true, v_i, adjacent};
+                        queue.push(BFSToken{adjacent, token.distance - 1});
+                    }
+                }
+        
+                // Check Downward Position
+                adjacent.x = token.position.x;
+                adjacent.y = token.position.y + 1;
+                {
+                    if(!visited[v_i + width].visited && passable(token.position, adjacent)){
+                        visited[v_i + width] = {true, v_i, adjacent};
+                        queue.push(BFSToken{adjacent, token.distance - 1});
+                    }
+                }
+        
+                // Check Upward Position
+                adjacent.x = token.position.x;
+                adjacent.y = token.position.y - 1;
+                if((adjacent.x >= 0 && adjacent.y >= 0))
+                {
+                    if(!visited[v_i - width].visited && passable(token.position, adjacent)){
+                        visited[v_i - width] = {true, v_i, adjacent};
+                        queue.push(BFSToken{adjacent, token.distance - 1});
+                    }
+                }
+            }        
+        }
+
+        // If the destination was found, trace backward to discover the path from the source
+        while(tracer != -1)
+        {
+            path.push_front(visited[tracer].position);
+            tracer = visited[tracer].parent;
+        }
+    }
+
+    return path;
 }
 
 //----------------------------------------------------------------------------
@@ -318,6 +430,27 @@ const std::string& Actor::getName() const
 void Actor::setName(const std::string& name)
 {
     name_ = name;
+}
+
+//----------------------------------------------------------------------------
+// - Get Move Attribute
+//----------------------------------------------------------------------------
+int Actor::getMove() const
+{
+    return attrMove_;
+}
+
+//----------------------------------------------------------------------------
+// - Set Move Attribute
+//----------------------------------------------------------------------------
+// mv : maximum number of spaces this actor can move in a single turn
+//----------------------------------------------------------------------------
+void Actor::setMove(int mv)
+{
+    if(mv >= 0)
+    {
+        attrMove_ = mv;
+    }
 }
 
 //----------------------------------------------------------------------------
