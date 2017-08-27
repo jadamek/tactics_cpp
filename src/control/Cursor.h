@@ -16,7 +16,7 @@ class Cursor : public MobileObject, public InputHandler
 {
 // Methods
 public:
-    Cursor(const sf::Sprite& cursor, Map& map, std::function<void()> action);
+    Cursor(const sf::Sprite& cursor, Map& map);
     virtual ~Cursor();
 
     virtual void            goTo(const sf::Vector2f& position);
@@ -24,6 +24,9 @@ public:
     virtual sf::FloatRect   getGlobalBounds() const;
     virtual void            poll();
     virtual bool            busy() const;
+    void                    setOnConfirm(std::function<void(const sf::Vector3f&)> action);
+    void                    setOnCancel(std::function<void()> action);
+    void                    setOnMove(std::function<void(const sf::Vector3f&)> action);
     
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -33,7 +36,9 @@ protected:
     sf::Sprite              sprite_;
     Map*                    map_;
     int                     throttle_;
-    std::function<void()>   action_;
+    std::function<void(const sf::Vector3f&)>    actionConfirm_;
+    std::function<void()>                       actionCancel_;
+    std::function<void(const sf::Vector3f&)>    actionMove_;
 };
 
 #endif

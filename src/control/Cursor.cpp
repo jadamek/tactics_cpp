@@ -7,11 +7,10 @@
 // * map : map this cursor belongs to and moves within
 // * action, callable to execute when the cursor is "clicked"
 //----------------------------------------------------------------------------
-Cursor::Cursor(const sf::Sprite& cursor, Map& map, std::function<void()> action) :
+Cursor::Cursor(const sf::Sprite& cursor, Map& map) :
     map_(&map),
     sprite_(cursor),
-    throttle_(0),
-    action_(action)
+    throttle_(0)
 {  
     setPosition(sf::Vector3f(0, 0, std::max(0.f, map_->height(0, 0))));
     setSpeed(10);
@@ -32,7 +31,9 @@ void Cursor::goTo(const sf::Vector2f& position)
 {
     if(map_->valid(position.x, position.y))
     {
-        moveTo(sf::Vector3f(position.x, position.y, map_->height(position.x, position.y)));
+        sf::Vector3f target(position.x, position.y, map_->height(position.x, position.y));
+        moveTo(target);
+        actionMove_(target);        
     }
 }
 
@@ -138,7 +139,14 @@ void Cursor::poll()
         // Keyboard Input handle : Enter - select current position
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
         {
-            action_();
+            actionConfirm_(position());
+            throttle_ = throttle;            
+        }
+
+        // Keyboard Input handle : Esc - cancel selector
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            actionCancel_();
             throttle_ = throttle;            
         }
     }    
@@ -150,6 +158,36 @@ void Cursor::poll()
 bool Cursor::busy() const
 {
     return busy_ || moving();
+}
+
+//----------------------------------------------------------------------------
+// Set Confirm Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the cursor selects a position
+//----------------------------------------------------------------------------
+void Cursor::setOnConfirm(std::function<void(const sf::Vector3f&)> action)
+{
+    actionConfirm_ = action;
+}
+
+//----------------------------------------------------------------------------
+// Set Cancel Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the 'go back' (esc, e.g) is pressed
+//----------------------------------------------------------------------------
+void Cursor::setOnCancel(std::function<void()> action)
+{
+    actionCancel_ = action;
+}
+
+//----------------------------------------------------------------------------
+// Set Move Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the cursor moves to a target position
+//----------------------------------------------------------------------------
+void Cursor::setOnMove(std::function<void(const sf::Vector3f&)> action)
+{
+    actionMove_ = action;
 }
 
 //----------------------------------------------------------------------------

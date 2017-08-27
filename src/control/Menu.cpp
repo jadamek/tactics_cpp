@@ -99,6 +99,13 @@ void Menu::poll()
             }
             throttle_ = throttle;            
         }
+
+        // Keyboard Input handle : Esc - cancel menu
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            actionCancel_();
+            throttle_ = throttle;            
+        }
     }
 }
 
@@ -108,6 +115,16 @@ void Menu::poll()
 bool Menu::busy() const
 {
     return busy_;
+}
+
+//----------------------------------------------------------------------------
+// Set Cancel Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the 'go back' (esc, e.g) is pressed
+//----------------------------------------------------------------------------
+void Menu::setOnCancel(std::function<void()> action)
+{
+    actionCancel_ = action;
 }
 
 //----------------------------------------------------------------------------

@@ -1,6 +1,15 @@
 #include "game/Scene.h"
+#include "game/InputManager.h"
+#include "game/Animations.h"
 #include <iostream>
 
+//================================================================================
+// ** Tactics Main Game Loop
+//================================================================================
+// The main program loop. Here, the Scene is created, setup and drawn. Animations
+// are brought to life using the central game clock, and input is redirected to
+// the input manager using polling
+//================================================================================
 int main()
 {
     std::cout << "Starting game ... " << std::endl;
@@ -32,7 +41,9 @@ int main()
         }
 
         // Timing updates
+        InputManager::instance().poll();
         elapsed = clock.restart().asSeconds();
+        Animations::instance().update(elapsed);
 
         // Draw calls
         window.clear(sf::Color::Black);

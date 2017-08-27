@@ -23,6 +23,7 @@ public:
     void                addOption(const std::string& label, std::function<void()> action);
     virtual void        poll();
     virtual bool        busy() const;
+    void                setOnCancel(std::function<void()> action);    
 
 protected:
     void                step();
@@ -36,6 +37,7 @@ protected:
     sf::RectangleShape  body_;
     unsigned int        width_;
     sf::Font            font_;
+    std::function<void()> actionCancel_;    
     std::vector<std::pair<sf::Text, std::function<void()>>> options_;
 };
 
