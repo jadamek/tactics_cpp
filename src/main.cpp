@@ -37,7 +37,9 @@ int main()
         while(window.pollEvent(event))
         {
             if(event.type == sf::Event::Closed)
-                scene.close();
+            {
+                scene.close();                
+            }
         }
 
         // Timing updates

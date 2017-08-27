@@ -37,6 +37,7 @@ protected:
     void                setupMap();
     void                setupActors();
     void                setupStaging();
+    void                setupControls();
 
     virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;
     

@@ -59,6 +59,8 @@ SpriteTile::SpriteTile(const sf::Texture& texture, float width, float length, fl
 //----------------------------------------------------------------------------
 SpriteTile::~SpriteTile()
 {
+    delete top_;
+    
     if(body_)
     {
         delete body_;

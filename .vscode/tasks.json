@@ -43,6 +43,12 @@
             "args" :["${workspaceRoot}\\Tactics.exe"],
             "type": "shell",
             "problemMatcher": []
+        },
+        {
+            "taskName": "memtest",
+            "command": "drmemory",
+            "args" :["--","${workspaceRoot}\\Tactics.exe"],
+            "problemMatcher": []
         }
     ]
 }

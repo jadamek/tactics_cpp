@@ -85,7 +85,7 @@ int main()
     cursor_sprite.setOrigin(cursor_texture.getSize().x / 2, cursor_texture.getSize().y / 2);
     
 
-    Cursor* cursor = new Cursor(cursor_sprite, map, [](){std::cout << "Hey." << std::endl;});
+    Cursor* cursor = new Cursor(cursor_sprite, map);
     map.addObject(cursor);
     InputManager::instance().push(cursor);
     
