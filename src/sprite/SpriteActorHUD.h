@@ -16,6 +16,9 @@ public:
     virtual ~SpriteActorHUD();
 
     void                setActor(const Actor& actor);
+    bool                visible() const;
+    void                show();
+    void                hide();
     
 protected:
     virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -30,6 +33,7 @@ protected:
     sf::Text            mpLabel_;
     sf::Text            mpValue_;
     sf::Font            font_;
+    bool                visible_;
 };
 
 #endif

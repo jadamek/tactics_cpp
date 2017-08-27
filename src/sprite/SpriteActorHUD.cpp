@@ -6,7 +6,8 @@
 // * actor : player this HUD displays information for
 //----------------------------------------------------------------------------
 SpriteActorHUD::SpriteActorHUD(const Actor& actor) :
-    body_(sf::Vector2f(180, 80))        
+    body_(sf::Vector2f(180, 80)),
+    visible_(true)
 {
     font_.loadFromFile("resources/fonts/Arial.ttf");
     
@@ -65,29 +66,49 @@ void SpriteActorHUD::setActor(const Actor& actor)
 }
 
 //----------------------------------------------------------------------------
+// - HUD Is Visible?
+//----------------------------------------------------------------------------
+bool SpriteActorHUD::visible() const
+{
+    return visible_;
+}
+
+//----------------------------------------------------------------------------
+// - Show HUD
+//----------------------------------------------------------------------------
+void SpriteActorHUD::show()
+{
+    visible_ = true;
+}
+
+//----------------------------------------------------------------------------
+// - Hide HUD
+//----------------------------------------------------------------------------
+void SpriteActorHUD::hide()
+{
+    visible_ = false;
+}
+
+//----------------------------------------------------------------------------
 // - Draw (Override)
 //----------------------------------------------------------------------------
 void SpriteActorHUD::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-
-    sf::View original = target.getView();    
-    target.setView(sf::View(sf::FloatRect(0, 120 - original.getSize().y, original.getSize().x, original.getSize().y)));
-
-    states.transform *= getTransform();
-    
-    target.draw(body_, states);
-
-    if(portrait_)
+    if(visible_)
     {
-        target.draw(*portrait_, states);
+        states.transform *= getTransform();
+        target.draw(body_, states);
+
+        if(portrait_)
+        {
+            target.draw(*portrait_, states);
+        }
+    
+        target.draw(name_, states);
+        target.draw(lvl_, states);
+        target.draw(hpLabel_, states);
+        target.draw(hpValue_, states);
+        target.draw(mpLabel_, states);
+        target.draw(mpValue_, states);
     }
-
-    target.draw(name_, states);
-    target.draw(lvl_, states);
-    target.draw(hpLabel_, states);
-    target.draw(hpValue_, states);
-    target.draw(mpLabel_, states);
-    target.draw(mpValue_, states);
-
-    target.setView(original);    
 }
