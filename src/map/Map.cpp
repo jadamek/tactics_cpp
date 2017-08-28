@@ -15,14 +15,14 @@ Map::Map(int width, int length) :
     tiles_.resize(width_, std::vector<std::vector<Tile*>>(length_));
 
     // 2-D player array
-    players_ = new Actor**[width_];
+    actors_ = new Actor**[width_];
     for(int x = 0; x < width_; x++)
     {
-        players_[x] = new Actor*[length_];
+        actors_[x] = new Actor*[length_];
 
         for(int y = 0; y < length_; y++)
         {
-            players_[x][y] = 0;
+            actors_[x][y] = 0;
         }
     }
 }
@@ -32,6 +32,7 @@ Map::Map(int width, int length) :
 //----------------------------------------------------------------------------
 Map::~Map()
 {
+    // Delete all tiles
     for(std::vector<std::vector<Tile*>> &column : tiles_)
     {
         for(std::vector<Tile*> &row : column)
@@ -42,6 +43,12 @@ Map::~Map()
             }
         }
     }
+    // Delete 3-D actor array (not the actors themselves)
+    for(int i = 0; i < width(); i++){
+        delete [] actors_[i];
+    }
+    
+    delete [] actors_;
 }
 
 //----------------------------------------------------------------------------
@@ -340,7 +347,7 @@ Actor* Map::playerAt(int x, int y) const
 {
     if((x >= 0 && x < width_) || (y >= 0 || y < length_))    
     {
-        return players_[x][y];
+        return actors_[x][y];
     }
     else{
         return 0;
@@ -358,7 +365,7 @@ void Map::enter(Actor* actor, int x, int y)
 {
     if((x >= 0 && x < width_) || (y >= 0 || y < length_))
     {
-        players_[x][y] = actor;        
+        actors_[x][y] = actor;        
     }
 }
 
@@ -372,7 +379,7 @@ void Map::exit(int x, int y)
 {
     if((x >= 0 && x < width_) || (y >= 0 || y < length_))
     {
-        players_[x][y] = 0;        
+        actors_[x][y] = 0;        
     }
 }
 

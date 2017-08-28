@@ -13,7 +13,7 @@ Cursor::Cursor(const sf::Sprite& cursor, Map& map) :
     throttle_(0)
 {  
     setPosition(sf::Vector3f(0, 0, std::max(0.f, map_->height(0, 0))));
-    setSpeed(10);
+    setSpeed(20);
 }
 
 //----------------------------------------------------------------------------

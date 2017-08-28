@@ -47,7 +47,7 @@ protected:
     int                 length_;
     IsometricBuffer     images_;
     std::vector<std::vector<std::vector<Tile*>>> tiles_;
-    Actor***            players_;
+    Actor***            actors_;
 };
 
 #endif

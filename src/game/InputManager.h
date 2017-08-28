@@ -25,6 +25,7 @@ public:
     void                    push(InputHandler* handler);
     void                    pop();
     void                    popTo(InputHandler* handler);
+    void                    clear();
     InputHandler*           getHandler() const;
 
 // Members

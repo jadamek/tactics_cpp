@@ -85,7 +85,7 @@ void Scene::start()
     // Initiate resource catalogs
     textures_ = new TextureManager;
 
-    //setupMap();
+    setupMap();
     setupActors();
     setupStaging();
     setupControls();
@@ -196,7 +196,7 @@ void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
         
         // Map & Actors
         target.setView(view_);
-
+        
         if(map_)
         {
             target.draw(*map_, states);

@@ -12,8 +12,9 @@ class SkillAttack : Skill
 {
 // Methods
     virtual void use(Actor& caster, const std::vector<Actor*>& targets);
-    virtual std::vector<sf::Vector2i> range(Actor& caster) const;
-    virtual std::vector<sf::Vector2i> area(const sf::Vector2i& source, Map& map) const;
+    virtual std::vector<sf::Vector2f> range(Actor& caster) const;
+    virtual std::vector<sf::Vector2f> area(const sf::Vector2f& target) const;
+    virtual std::vector<Actor*> affected(const sf::Vector2f& target, const Map* map = 0) const;
 };
 
 #endif

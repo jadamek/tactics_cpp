@@ -88,6 +88,17 @@ void InputManager::popTo(InputHandler* handler)
 }
 
 //----------------------------------------------------------------------------
+// - Clear Handler Stack
+//----------------------------------------------------------------------------
+void InputManager::clear()
+{
+    while(!handlerStack_.empty())
+    {
+        handlerStack_.pop();
+    }
+}
+
+//----------------------------------------------------------------------------
 // - Get Top Handler
 //----------------------------------------------------------------------------
 InputHandler* InputManager::getHandler() const

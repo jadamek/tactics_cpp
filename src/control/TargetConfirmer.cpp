@@ -9,21 +9,24 @@
 // * caster : actor casting the skill in question
 // * targets : chosen targets to confirm
 //----------------------------------------------------------------------------
-TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const std::vector<Actor*>& targets) :
+TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const sf::Vector2f& target) :
 sprite_(cursor),
 throttle_(0),
 skill_(&skill),
 caster_(&caster),
-targets_(targets),
+targets_(skill.affected(target, caster.getEnvironment())),
 current_(0)
-{    
+{
     if(!targets_.empty())
     {
+        // Start cursor on the first victim
         setPosition(targets_[0]->position());    
     }
+    else{
+        setPosition(caster_->position());        
+    }
 
-    setPosition(caster_->position());
-    setSpeed(10);
+    setSpeed(20);
 }
 
 //----------------------------------------------------------------------------
@@ -96,8 +99,16 @@ void TargetConfirmer::poll()
         // Keyboard Input handle : Enter - confirm cast
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
         {
-            skill_->use(*caster_, targets_);
-            //setBusy(true);
+            actionConfirm_();
+            skill_->use(*caster_, targets_);            
+            throttle_ = throttle;                
+        }
+
+        // Keyboard Input handle : Esc - cancel menu
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        {
+            actionCancel_();
+            throttle_ = throttle;            
         }
     }    
 }
@@ -108,6 +119,26 @@ void TargetConfirmer::poll()
 bool TargetConfirmer::busy() const
 {
     return busy_ || moving();
+}
+
+//----------------------------------------------------------------------------
+// Set Confirm Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the target is confirmed
+//----------------------------------------------------------------------------
+void TargetConfirmer::setOnConfirm(std::function<void()> action)
+{
+    actionConfirm_ = action;
+}
+
+//----------------------------------------------------------------------------
+// Set Cancel Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the 'go back' (esc, e.g) is pressed
+//----------------------------------------------------------------------------
+void TargetConfirmer::setOnCancel(std::function<void()> action)
+{
+    actionCancel_ = action;
 }
 
 //----------------------------------------------------------------------------
