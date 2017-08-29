@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "../sprite/map/SpriteTile.h"
 #include <iostream>
+#include <cstdlib>
 
 //----------------------------------------------------------------------------
 // - Scene Constructor
@@ -20,6 +21,7 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     targetSelector_(0),
     targetSelection_(0),
     targetConfirmer_(0),
+    confirmedTargets_(0),
     active_(false),
     closed_(false),
     textures_(0)
@@ -41,7 +43,9 @@ Scene::~Scene()
     if(moveSelection_)      delete moveSelection_;
     if(targetSelector_)     delete targetSelector_;
     if(targetConfirmer_)    delete targetConfirmer_;
-    if(textures_)           delete textures_;
+    if(confirmedTargets_)   delete confirmedTargets_;
+    if(textures_)           delete textures_;    
+    for(Actor* actor : actors_) delete actor;
 }
 
 //----------------------------------------------------------------------------
@@ -156,7 +160,29 @@ void Scene::setupMap()
 //----------------------------------------------------------------------------
 void Scene::setupActors()
 {
+    // Create the Assassin actor
+    Actor* actor = new Actor(textures_->load("resources/graphics/Assassin.png"), map_);
+    actors_.push_back(actor);
+    
+    // Create the Paladin actor
+    actor = new Actor(textures_->load("resources/graphics/Paladin.png"), map_);
+    actors_.push_back(actor);
 
+    int x, y;
+
+    // Randomly place all actors
+    for(auto actor : actors_)
+    {
+        do{
+            x = rand() % map_->width();
+            y = rand() % map_->length();
+        }while(map_->playerAt(x, y));
+
+        actor->setPosition(sf::Vector3f(x, y, map_->height(x, y)));
+        actor->face(sf::Vector2f(map_->width() / 2, map_->length() / 2));
+        map_->addObject(actor);
+        map_->enter(actor, x, y);
+    }
 }
 
 //----------------------------------------------------------------------------

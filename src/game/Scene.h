@@ -61,6 +61,7 @@ protected:
     Cursor*             targetSelector_;
     SpriteArea*         targetSelection_;
     TargetConfirmer*    targetConfirmer_;
+    SpriteArea*         confirmedTargets_;
     bool                active_;
     bool                closed_;
 

@@ -11,7 +11,10 @@
 //----------------------------------------------------------------------------
 void SkillAttack::use(Actor& caster, const std::vector<Actor*>& targets)
 {
-    std::cout << "ATTACK!!!" << std::endl;
+    for(auto target : targets)
+    {
+        std::cout << caster.getName() << " ATTACKS " << target->getName() << "!!!" << std::endl;        
+    }
 }
 
 //----------------------------------------------------------------------------
