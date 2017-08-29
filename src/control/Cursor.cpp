@@ -63,7 +63,7 @@ sf::FloatRect Cursor::getGlobalBounds() const
 void Cursor::poll()
 {
     // Consecutive keyboard input for cursors is throttled by 5 frames
-    static int throttle = 10;
+    static int throttle = 8;
     
     
     if(throttle_ <= 0)

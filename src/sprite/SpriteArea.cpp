@@ -28,9 +28,7 @@ SpriteArea::~SpriteArea()
 }
 
 //----------------------------------------------------------------------------
-// - Get Global Bounding Rectangle (Override)
-//----------------------------------------------------------------------------
-// Returns the rectangle this actor's sprite inscribes
+// - Get Global Bounding Rectangle (Override, Undefined)
 //----------------------------------------------------------------------------
 sf::FloatRect SpriteArea::getGlobalBounds() const
 {

@@ -1,19 +1,27 @@
 #include "SpriteActorHUD.h"
 
 //----------------------------------------------------------------------------
-// - Sprite Actor HUD Constructor
+// - Sprite Actor HUD Default Constructor
+//----------------------------------------------------------------------------
+SpriteActorHUD::SpriteActorHUD() :
+portrait_(0),
+body_(sf::Vector2f(180, 80)),
+visible_(true)
+{
+    font_.loadFromFile("resources/fonts/Arial.ttf");
+
+    body_.setPosition(0, 40);
+    body_.setFillColor(sf::Color(50, 50, 170, 200));
+}
+
+//----------------------------------------------------------------------------
+// - Sprite Actor HUD Actor Constructor
 //----------------------------------------------------------------------------
 // * actor : player this HUD displays information for
 //----------------------------------------------------------------------------
 SpriteActorHUD::SpriteActorHUD(const Actor& actor) :
-    body_(sf::Vector2f(180, 80)),
-    visible_(true)
-{
-    font_.loadFromFile("resources/fonts/Arial.ttf");
-    
-    body_.setPosition(0, 40);
-    body_.setFillColor(sf::Color(50, 50, 170, 200));
-
+    SpriteActorHUD()
+{    
     setActor(actor);
 }
 
@@ -87,6 +95,16 @@ void SpriteActorHUD::show()
 void SpriteActorHUD::hide()
 {
     visible_ = false;
+}
+
+//----------------------------------------------------------------------------
+// - Get Global Bounding Rectangle
+//----------------------------------------------------------------------------
+// Returns the rectangle this HUD inscribes
+//----------------------------------------------------------------------------
+sf::FloatRect SpriteActorHUD::getGlobalBounds() const
+{
+    return sf::FloatRect(0, 0, 180, 120);
 }
 
 //----------------------------------------------------------------------------

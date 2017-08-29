@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "../sprite/map/SpriteTile.h"
+#include "InputManager.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -10,10 +11,12 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     map_(0),
     view_(sf::FloatRect(0, 0, dimensions.x, dimensions.y)),
     screen_(sf::FloatRect(0, 0, dimensions.x, dimensions.y)),
+    actorHUD_(0),
     battleMenu_(0),
     actionMenu_(0),
     acting_(0),
     cursor_(0),
+    cursorSprite_(0),
     moved_(false),
     acted_(false),
     moveSelector_(0),
@@ -36,9 +39,11 @@ Scene::Scene(const sf::Vector2f& dimensions) :
 Scene::~Scene()
 {
     if(map_)                delete map_;
+    if(actorHUD_)           delete actorHUD_;
     if(battleMenu_)         delete battleMenu_;
     if(actionMenu_)         delete actionMenu_;
     if(cursor_)             delete cursor_;
+    if(cursorSprite_)       delete cursorSprite_;
     if(moveSelector_)       delete moveSelector_;
     if(moveSelection_)      delete moveSelection_;
     if(targetSelector_)     delete targetSelector_;
@@ -94,6 +99,8 @@ void Scene::start()
     setupStaging();
     setupControls();
 
+    InputManager::instance().push(cursor_);
+    
     // Set active status to begin drawing and updating
     active_ = true;
 }
@@ -162,12 +169,16 @@ void Scene::setupActors()
 {
     // Create the Assassin actor
     Actor* actor = new Actor(textures_->load("resources/graphics/Assassin.png"), map_);
+    actor->setPortrait(textures_->load("resources/graphics/AssassinPortrait_64x104.png"));
+    actor->setName("Assassin");
     actors_.push_back(actor);
     
     // Create the Paladin actor
     actor = new Actor(textures_->load("resources/graphics/Paladin.png"), map_);
+    actor->setPortrait(textures_->load("resources/graphics/PaladinPortrait_64x104.png"));
     actors_.push_back(actor);
-
+    actor->setName("Paladin");
+    
     int x, y;
 
     // Randomly place all actors
@@ -202,7 +213,45 @@ void Scene::setupStaging()
 //----------------------------------------------------------------------------
 void Scene::setupControls()
 {
+    // Actor HUD - placed in the lower-left corner of the screen
+    actorHUD_ = new SpriteActorHUD;
+    actorHUD_->setOrigin(0, actorHUD_->getGlobalBounds().height);
+    actorHUD_->setPosition(screen_.getSize().x / -2, screen_.getSize().y / 2);
+    actorHUD_->hide();
 
+    // Cursor sprite which is shared between all cursors/selectors
+    const sf::Texture& texture = textures_->load("resources/graphics/Cursor_32x16.png");
+    cursorSprite_ = new sf::Sprite(texture);
+    cursorSprite_->setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
+
+    // Main cursor object and callback actions
+    cursor_ = new Cursor(*cursorSprite_, *map_);
+    cursor_->setPosition(sf::Vector3f(0, 0, map_->height(0, 0)));
+    map_->addObject(cursor_);
+
+    // Show the HUD for any actor present in the current location, if present
+    cursor_->setOnMove(
+        [this](const sf::Vector3f& destination)
+        {
+            Actor* actor;
+
+            if((actor = this->map_->playerAt(destination.x, destination.y)))
+            {
+                actorHUD_->setActor(*actor);
+                actorHUD_->show();
+            }
+            else
+            {
+                actorHUD_->hide();
+            }
+        });
+
+    // Exit the scene<!>
+    cursor_->setOnCancel(
+        [this]()
+        {
+            this->close();
+        });
 }
 
 //----------------------------------------------------------------------------
@@ -218,8 +267,7 @@ void Scene::setupControls()
 void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(active_ && !closed_)
-    {
-        
+    {        
         // Map & Actors
         target.setView(view_);
         
@@ -230,5 +278,10 @@ void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
         // HUD & Menus
         target.setView(screen_);
+
+        if(actorHUD_)
+        {
+            target.draw(*actorHUD_, states);
+        }
     }
 }

@@ -12,6 +12,7 @@ class SpriteActorHUD : public sf::Drawable, public sf::Transformable
 {
 // Methods
 public:
+    SpriteActorHUD();
     SpriteActorHUD(const Actor& actor);
     virtual ~SpriteActorHUD();
 
@@ -19,6 +20,8 @@ public:
     bool                visible() const;
     void                show();
     void                hide();
+    sf::FloatRect       getGlobalBounds() const;
+    
     
 protected:
     virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;

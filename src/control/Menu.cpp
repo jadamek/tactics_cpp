@@ -64,7 +64,7 @@ void Menu::addOption(const std::string& label, std::function<void()> action)
 void Menu::poll()
 {
     // Consecutive keyboard input for menus is throttled by 10 frames
-    static int throttle = 15;
+    static int throttle = 10;
 
     // Consecutive keyboard input is throttled by 20 frames
     if(throttle_ <= 0)

@@ -48,12 +48,14 @@ protected:
     
 // Members - HUD & Menus
     sf::View            screen_;
+    SpriteActorHUD*     actorHUD_;
     Menu*               battleMenu_;
     Menu*               actionMenu_;
 
 // Members - Control Flow
     int                 acting_;
     Cursor*             cursor_;
+    sf::Sprite*         cursorSprite_;
     bool                moved_;
     bool                acted_;
     Cursor*             moveSelector_;
