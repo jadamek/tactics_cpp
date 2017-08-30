@@ -56,7 +56,13 @@ void Menu::addOption(const std::string& label, std::function<void()> action)
     frame_.setSize(sf::Vector2u(width_ + 8, options_.size() * 20 + 12));
 }
 
-#include <iostream>
+//----------------------------------------------------------------------------
+// - Clear All Options
+//----------------------------------------------------------------------------
+void Menu::clear()
+{
+    options_.clear();
+}
 
 //----------------------------------------------------------------------------
 // - Handle Input (Override)
@@ -125,6 +131,16 @@ bool Menu::busy() const
 void Menu::setOnCancel(std::function<void()> action)
 {
     actionCancel_ = action;
+}
+
+//----------------------------------------------------------------------------
+// - Get Global Bounding Rectangle (Override)
+//----------------------------------------------------------------------------
+// Returns the rectangle this Menu inscribes
+//----------------------------------------------------------------------------
+sf::FloatRect Menu::getGlobalBounds() const
+{
+    return frame_.getGlobalBounds();
 }
 
 //----------------------------------------------------------------------------

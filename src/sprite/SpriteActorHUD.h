@@ -2,13 +2,14 @@
 #define TACTICS_SPRITE_ACTOR_HUD_H
 
 #include "../objects/Actor.h"
+#include "Sprite.h"
 
 //================================================================================
 // ** Sprite Actor HUD
 //================================================================================
 // Displays the actor's portrait, name and other vital stats in an overlay HUD
 //================================================================================
-class SpriteActorHUD : public sf::Drawable, public sf::Transformable
+class SpriteActorHUD : public Sprite
 {
 // Methods
 public:

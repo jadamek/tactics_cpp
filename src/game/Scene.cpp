@@ -1,6 +1,7 @@
 #include "Scene.h"
 #include "../sprite/map/SpriteTile.h"
 #include "InputManager.h"
+#include "ActionScheduler.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -17,8 +18,6 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     acting_(0),
     cursor_(0),
     cursorSprite_(0),
-    moved_(false),
-    acted_(false),
     moveSelector_(0),
     moveSelection_(0),
     targetSelector_(0),
@@ -27,6 +26,9 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     confirmedTargets_(0),
     active_(false),
     closed_(false),
+    moved_(false),
+    acted_(false),
+    originalFacing_(0),
     textures_(0)
 {
     view_.setCenter(0, 0);
@@ -61,7 +63,12 @@ Scene::~Scene()
 //----------------------------------------------------------------------------
 void Scene::nextTurn()
 {
+    Actor* actor = actors_[acting_ = acting_++ % actors_.size()];
 
+    // Scroll to acting player
+    view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 0.5);
+    cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
+    ActionScheduler::instance().schedule(Action([this](){InputManager::instance().push(cursor_);}, 0.5 * FPS));    
 }
 
 //----------------------------------------------------------------------------
@@ -99,10 +106,11 @@ void Scene::start()
     setupStaging();
     setupControls();
 
-    InputManager::instance().push(cursor_);
-    
     // Set active status to begin drawing and updating
     active_ = true;
+
+    view_.fadeIn(1);
+    ActionScheduler::instance().schedule(Action([this](){nextTurn();}, FPS * 1));
 }
 
 //----------------------------------------------------------------------------
@@ -209,7 +217,7 @@ void Scene::setupStaging()
 //----------------------------------------------------------------------------
 // - Setup Controls
 //----------------------------------------------------------------------------
-// Creates the main cursor and actor HUD for the scene
+// Creates the main cursor, actor HUD and battle menu for the scene
 //----------------------------------------------------------------------------
 void Scene::setupControls()
 {
@@ -250,8 +258,31 @@ void Scene::setupControls()
     cursor_->setOnCancel(
         [this]()
         {
-            this->close();
+            InputManager::instance().clear();
+            view_.fadeOut(2);
+            ActionScheduler::instance().schedule(Action([this](){close();}, FPS * 2));
         });
+
+    // Battle Menu (options filled in during turn)
+    battleMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
+    battleMenu_->setOnCancel(
+        [this]()
+        {
+            if(moved_)
+            {
+                view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.5);
+                actors_[acting_]->setPosition(originalPosition_);
+                actors_[acting_]->face(originalFacing_);
+                moved_ = false;
+                InputManager::instance().popTo(cursor_);
+                // display
+            }
+            else{
+                InputManager::instance().pop();
+            }
+        });
+    battleMenu_->setOrigin(battleMenu_->getGlobalBounds().width, battleMenu_->getGlobalBounds().height);
+    battleMenu_->setPosition(screen_.getSize().x / 2, screen_.getSize().y / 2);
 }
 
 //----------------------------------------------------------------------------
@@ -283,5 +314,8 @@ void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
         {
             target.draw(*actorHUD_, states);
         }
+
+        // Tint/Flash Overlays
+        view_.drawOverlays(target);
     }
 }

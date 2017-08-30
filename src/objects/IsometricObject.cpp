@@ -68,9 +68,20 @@ void IsometricObject::setPosition(const sf::Vector3f& position)
 // its 3-Dimensional isometric coordinate position
 //----------------------------------------------------------------------------
 sf::Vector2f IsometricObject::getGlobalPosition() const
+{    
+    return isoToGlobal(position());
+}
+
+//----------------------------------------------------------------------------
+// - Get Global Position from Isometric
+//----------------------------------------------------------------------------
+// Returns the a 2-Dimensional pixel coordinate position by converting the
+// 3-Dimensional isometric coordinate position
+//----------------------------------------------------------------------------
+sf::Vector2f IsometricObject::isoToGlobal(const sf::Vector3f& position)
 {
-    float x = 0.5 * MAP_SCALE.x * (position_.x - position_.y);
-    float y = 0.5 * MAP_SCALE.y * (position_.x + position_.y) - MAP_SCALE.z * position_.z;
+    float x = 0.5 * MAP_SCALE.x * (position.x - position.y);
+    float y = 0.5 * MAP_SCALE.y * (position.x + position.y) - MAP_SCALE.z * position.z;
 
     return sf::Vector2f(x, y);
 }

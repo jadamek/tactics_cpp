@@ -98,7 +98,7 @@ void SpriteActorHUD::hide()
 }
 
 //----------------------------------------------------------------------------
-// - Get Global Bounding Rectangle
+// - Get Global Bounding Rectangle (Override)
 //----------------------------------------------------------------------------
 // Returns the rectangle this HUD inscribes
 //----------------------------------------------------------------------------

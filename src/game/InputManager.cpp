@@ -74,17 +74,20 @@ void InputManager::pop()
 //----------------------------------------------------------------------------
 // - Pop All Before
 //----------------------------------------------------------------------------
-// handler : input controller that  all higher in the stack should be popped
-//      up until
+// handler : input controller to become the new top after popping all higher
+//      controllers
 //----------------------------------------------------------------------------
 void InputManager::popTo(InputHandler* handler)
 {
-    while(handlerStack_.top() != handler)
+    pop();
+    while(!handlerStack_.empty())
     {
-        handlerStack_.top()->setActive(false);
-        handlerStack_.pop();
+        if(handlerStack_.top() != handler)
+        {
+            pop();
+        }
+        else break;
     }
-    handlerStack_.top()->setActive(true);
 }
 
 //----------------------------------------------------------------------------

@@ -56,8 +56,6 @@ protected:
     int                 acting_;
     Cursor*             cursor_;
     sf::Sprite*         cursorSprite_;
-    bool                moved_;
-    bool                acted_;
     Cursor*             moveSelector_;
     SpriteArea*         moveSelection_;
     Cursor*             targetSelector_;
@@ -66,6 +64,12 @@ protected:
     SpriteArea*         confirmedTargets_;
     bool                active_;
     bool                closed_;
+
+// Members - Actor Control
+bool                moved_;
+bool                acted_;
+int                 originalFacing_;
+sf::Vector3f        originalPosition_;
 
 // Members - Resources
     TextureManager*     textures_;

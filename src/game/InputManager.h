@@ -1,7 +1,7 @@
 #ifndef TACTICS_INPUT_MANAGER_H
 #define TACTICS_INPUT_MANAGER_H
 
-#include "InputHandler.h"
+#include "../control/InputHandler.h"
 #include <stack>
 
 //================================================================================

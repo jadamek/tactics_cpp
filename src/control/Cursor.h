@@ -1,7 +1,7 @@
 #ifndef TACTICS_CURSOR_H
 #define TACTICS_CURSOR_H
 
-#include "../game/InputHandler.h"
+#include "InputHandler.h"
 #include "../map/Map.h"
 #include "../objects/MobileObject.h"
 #include <functional>

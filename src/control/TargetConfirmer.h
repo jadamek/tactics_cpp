@@ -3,7 +3,7 @@
 
 #include "../player/skill/Skill.h"
 #include "../objects/Actor.h"
-#include "../game/InputHandler.h"
+#include "InputHandler.h"
 #include "../objects/MobileObject.h"
 #include "../sprite/SpriteArea.h"
 #include <vector>

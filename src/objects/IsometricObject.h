@@ -24,6 +24,8 @@ public:
     void                    setPosition(const sf::Vector3f& position);
     sf::Vector2f            getGlobalPosition() const;
     virtual void            join(IsometricBuffer* buffer) const;
+
+    static sf::Vector2f     isoToGlobal(const sf::Vector3f& position);
     
     friend class            IsometricNode;
     friend class            IsometricBuffer;
