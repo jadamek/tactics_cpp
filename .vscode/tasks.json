@@ -14,6 +14,7 @@
                 "src/sprite/map/*.cpp",
                 "src/screen/*.cpp",
                 "src/control/*.cpp",
+                "src/player/skill/*.cpp",
                 "-o", "Tactics",
                 "-IE:/Documents/Projects/SFML-2.4.2/include",
                 "-LE:/Documents/Projects/SFML-2.4.2/lib",

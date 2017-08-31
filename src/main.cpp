@@ -43,7 +43,6 @@ int main()
         }
 
         // Timing updates
-        InputManager::instance().poll();
         elapsed = clock.restart().asSeconds();
         Animations::instance().update(elapsed);
 

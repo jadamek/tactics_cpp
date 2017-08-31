@@ -28,7 +28,8 @@ public:
     virtual bool                busy() const;
     void                        setOnConfirm(std::function<void()> action);
     void                        setOnCancel(std::function<void()> action);
-
+    void                        setOnMove(std::function<void(Actor*)> action);    
+    
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
     virtual void                step();
@@ -43,6 +44,7 @@ protected:
     int                         current_;
     std::function<void()>       actionConfirm_;
     std::function<void()>       actionCancel_;
+    std::function<void(Actor*)> actionMove_;    
 };
 
 

@@ -13,8 +13,10 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     view_(sf::FloatRect(0, 0, dimensions.x, dimensions.y)),
     screen_(sf::FloatRect(0, 0, dimensions.x, dimensions.y)),
     actorHUD_(0),
+    targetHUD_(0),
     battleMenu_(0),
     actionMenu_(0),
+    mainMenu_(0),
     acting_(0),
     cursor_(0),
     cursorSprite_(0),
@@ -42,8 +44,10 @@ Scene::~Scene()
 {
     if(map_)                delete map_;
     if(actorHUD_)           delete actorHUD_;
+    if(targetHUD_)          delete targetHUD_;
     if(battleMenu_)         delete battleMenu_;
     if(actionMenu_)         delete actionMenu_;
+    if(mainMenu_)           delete mainMenu_;
     if(cursor_)             delete cursor_;
     if(cursorSprite_)       delete cursorSprite_;
     if(moveSelector_)       delete moveSelector_;
@@ -104,6 +108,7 @@ void Scene::start()
     setupMap();
     setupActors();
     setupStaging();
+    setupMenus();
     setupControls();
 
     // Set active status to begin drawing and updating
@@ -215,54 +220,25 @@ void Scene::setupStaging()
 }
 
 //----------------------------------------------------------------------------
-// - Setup Controls
+// - Setup Menus
 //----------------------------------------------------------------------------
-// Creates the main cursor, actor HUD and battle menu for the scene
+// Creates the actor and target HUDs, and all menus for the scene
 //----------------------------------------------------------------------------
-void Scene::setupControls()
+void Scene::setupMenus()
 {
     // Actor HUD - placed in the lower-left corner of the screen
     actorHUD_ = new SpriteActorHUD;
     actorHUD_->setOrigin(0, actorHUD_->getGlobalBounds().height);
-    actorHUD_->setPosition(screen_.getSize().x / -2, screen_.getSize().y / 2);
+    actorHUD_->setPosition(screen_.getSize().x / -2 + 16, screen_.getSize().y / 2 - 16);
     actorHUD_->hide();
 
-    // Cursor sprite which is shared between all cursors/selectors
-    const sf::Texture& texture = textures_->load("resources/graphics/Cursor_32x16.png");
-    cursorSprite_ = new sf::Sprite(texture);
-    cursorSprite_->setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
+    // Target HUD - placed in the lower-right corner of the screen
+    targetHUD_ = new SpriteActorHUD;
+    targetHUD_->setOrigin(targetHUD_->getGlobalBounds().width, targetHUD_->getGlobalBounds().height);
+    targetHUD_->setPosition(screen_.getSize().x / 2 - 16, screen_.getSize().y / 2 - 16);
+    targetHUD_->hide();
 
-    // Main cursor object and callback actions
-    cursor_ = new Cursor(*cursorSprite_, *map_);
-    cursor_->setPosition(sf::Vector3f(0, 0, map_->height(0, 0)));
-    map_->addObject(cursor_);
-
-    // Show the HUD for any actor present in the current location, if present
-    cursor_->setOnMove(
-        [this](const sf::Vector3f& destination)
-        {
-            Actor* actor;
-
-            if((actor = this->map_->playerAt(destination.x, destination.y)))
-            {
-                actorHUD_->setActor(*actor);
-                actorHUD_->show();
-            }
-            else
-            {
-                actorHUD_->hide();
-            }
-        });
-
-    // Exit the scene<!>
-    cursor_->setOnCancel(
-        [this]()
-        {
-            InputManager::instance().clear();
-            view_.fadeOut(2);
-            ActionScheduler::instance().schedule(Action([this](){close();}, FPS * 2));
-        });
-
+    /*
     // Battle Menu (options filled in during turn)
     battleMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
     battleMenu_->setOnCancel(
@@ -282,7 +258,74 @@ void Scene::setupControls()
             }
         });
     battleMenu_->setOrigin(battleMenu_->getGlobalBounds().width, battleMenu_->getGlobalBounds().height);
-    battleMenu_->setPosition(screen_.getSize().x / 2, screen_.getSize().y / 2);
+    battleMenu_->setPosition(screen_.getSize().x / 2 - 32, screen_.getSize().y / 2 - 32);
+    */
+
+    // Main Menu - placed in the center of the screen
+    mainMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
+    mainMenu_->setPosition(mainMenu_->getGlobalBounds().width / -2, mainMenu_->getGlobalBounds().height / -2);
+    mainMenu_->addOption("Quit Game", [this](){
+        InputManager::instance().clear();
+        view_.fadeOut(2);
+        ActionScheduler::instance().schedule(Action([this](){close();}, FPS * 2));
+    });
+    mainMenu_->setOnCancel([this](){
+        InputManager::instance().pop();
+    });
+}
+
+//----------------------------------------------------------------------------
+// - Setup Controls
+//----------------------------------------------------------------------------
+// Creates the main cursor, movement and target selectors and the target
+// confirmer cursor
+//----------------------------------------------------------------------------
+void Scene::setupControls()
+{
+    // Cursor sprite which is shared between all cursors/selectors
+    const sf::Texture& texture = textures_->load("resources/graphics/Cursor_32x16.png");
+    cursorSprite_ = new sf::Sprite(texture);
+    cursorSprite_->setOrigin(texture.getSize().x / 2, texture.getSize().y / 2);
+
+    // Main cursor object and callback actions
+    cursor_ = new Cursor(*cursorSprite_, *map_);
+    cursor_->setPosition(sf::Vector3f(0, 0, map_->height(0, 0)));
+    map_->addObject(cursor_);
+
+    // Show the HUD for any actor present in the current location, if present
+    cursor_->setOnMove(
+        [this](const sf::Vector3f& destination)
+        {
+            showHUD(actorHUD_, destination);            
+        });
+
+    // Exit the scene<!>
+    cursor_->setOnCancel(
+        [this]()
+        {
+            InputManager::instance().push(mainMenu_);
+        });
+}
+
+//----------------------------------------------------------------------------
+// Show HUD
+//----------------------------------------------------------------------------
+// * hud : HUD object to reveal or hide if an actor is present at the position
+// * position : 2-D coordinate where an actor may or may not be present
+//----------------------------------------------------------------------------
+void Scene::showHUD(SpriteActorHUD* hud, const sf::Vector3f& position)
+{
+    Actor* actor;
+    
+    if((actor = this->map_->playerAt(position.x, position.y)))
+    {
+        hud->setActor(*actor);
+        hud->show();
+    }
+    else
+    {
+        hud->hide();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -313,6 +356,16 @@ void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
         if(actorHUD_)
         {
             target.draw(*actorHUD_, states);
+        }
+
+        if(targetHUD_)
+        {
+            target.draw(*targetHUD_, states);
+        }
+
+        if(mainMenu_)
+        {
+            target.draw(*mainMenu_, states);
         }
 
         // Tint/Flash Overlays

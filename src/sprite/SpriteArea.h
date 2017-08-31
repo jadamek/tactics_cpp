@@ -21,10 +21,14 @@ public:
     virtual sf::FloatRect   getGlobalBounds() const;
     virtual void            join(IsometricBuffer* buffer) const;
     bool                    contains(const sf::Vector2f& position) const;
-    
+    bool                    visible() const;
+    void                    show();
+    void                    hide();
+
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
+    bool                    visible_;
+    
 // Members
     std::vector<SpriteAreaSquare> area_;    
 };

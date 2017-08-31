@@ -3,6 +3,7 @@
 
 #include<SFML/Graphics.hpp>
 #include<vector>
+#include<string>
 
 class Actor;
 class Map;
@@ -24,11 +25,13 @@ public:
     virtual std::vector<sf::Vector2f> area(const sf::Vector2f& target) const = 0;
     virtual std::vector<Actor*> affected(const sf::Vector2f& target, const Map* map = 0) const = 0;
     
-    bool    casting() const;
+    bool        casting() const;
+    std::string name() const;    
 
-private:
-    void    setCastingStatus(bool casting);
-    bool    casting_;
+protected:
+    void        setCastingStatus(bool casting);
+    bool        casting_;
+    std::string name_;
 };
 
 #endif

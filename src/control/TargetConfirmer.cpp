@@ -15,6 +15,9 @@ throttle_(0),
 skill_(&skill),
 caster_(&caster),
 targets_(skill.affected(target, caster.getEnvironment())),
+actionConfirm_([](){}),
+actionMove_([](Actor*){}),
+actionCancel_([](){}),
 current_(0)
 {
     if(!targets_.empty())
@@ -69,29 +72,37 @@ void TargetConfirmer::poll()
         if(!targets_.empty()){
             // Keyboard Input handle : Down - move cursor to previous target
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            {           
-                moveTo(targets_[(current_ - 1) % targets_.size()]->position());
+            {
+                Actor* next = targets_[(current_ - 1) % targets_.size()];
+                moveTo(next->position());
+                actionMove_(next);
                 throttle_ = throttle;                
             }
 
             // Keyboard Input handle : Up - move cursor to next target
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
             {           
-                moveTo(targets_[(current_ + 1) % targets_.size()]->position());
+                Actor* next = targets_[(current_ + 1) % targets_.size()];
+                moveTo(next->position());
+                actionMove_(next);
                 throttle_ = throttle;                
             }
 
             // Keyboard Input handle : Left - move cursor to previous target
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             {
-                moveTo(targets_[(current_ - 1) % targets_.size()]->position());
+                Actor* next = targets_[(current_ - 1) % targets_.size()];
+                moveTo(next->position());
+                actionMove_(next);
                 throttle_ = throttle;                
             }
 
             // Keyboard Input handle : Right - move cursor  to next target
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
             {
-                moveTo(targets_[(current_ + 1) % targets_.size()]->position());
+                Actor* next = targets_[(current_ + 1) % targets_.size()];
+                moveTo(next->position());
+                actionMove_(next);
                 throttle_ = throttle;                
             }
         }
@@ -100,7 +111,7 @@ void TargetConfirmer::poll()
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
         {
             actionConfirm_();
-            skill_->use(*caster_, targets_);            
+            skill_->use(*caster_, targets_);
             throttle_ = throttle;                
         }
 
@@ -149,6 +160,16 @@ void TargetConfirmer::draw(sf::RenderTarget& target, sf::RenderStates states) co
     if(active()){
         target.draw(sprite_, states);        
     }
+}
+
+//----------------------------------------------------------------------------
+// Set Move Action
+//----------------------------------------------------------------------------
+// * action : callable to execute when the selector moves to the next target
+//----------------------------------------------------------------------------
+void TargetConfirmer::setOnMove(std::function<void(Actor*)> action)
+{
+    actionMove_ = action;
 }
 
 //----------------------------------------------------------------------------

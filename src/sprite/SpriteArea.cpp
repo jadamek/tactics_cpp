@@ -71,12 +71,38 @@ bool SpriteArea::contains(const sf::Vector2f& position) const
 }
 
 //----------------------------------------------------------------------------
+// - Sprite Is Visible?
+//----------------------------------------------------------------------------
+bool SpriteArea::visible() const
+{
+    return visible_;
+}
+
+//----------------------------------------------------------------------------
+// - Show Sprite
+//----------------------------------------------------------------------------
+void SpriteArea::show()
+{
+    visible_ = true;
+}
+
+//----------------------------------------------------------------------------
+// - Hide Sprite
+//----------------------------------------------------------------------------
+void SpriteArea::hide()
+{
+    visible_ = false;
+}
+
+//----------------------------------------------------------------------------
 // - Draw (Override)
 //----------------------------------------------------------------------------
 void SpriteArea::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    for(int i = 0; i < area_.size(); area_)
-    {
-        target.draw(area_[i], states);        
+    if(visible_){
+        for(int i = 0; i < area_.size(); area_)
+        {
+            target.draw(area_[i], states);        
+        }
     }
 }

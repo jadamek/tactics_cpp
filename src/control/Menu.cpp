@@ -13,7 +13,8 @@ Menu::Menu(const sf::Texture& frameTexture) :
     throttle_(0),
     frame_(frameTexture),
     width_(32),
-    body_(sf::Vector2f(32, 32))
+    body_(sf::Vector2f(32, 32)),
+    actionCancel_([](){})
 {
     body_.setFillColor(sf::Color::Blue);
     font_.loadFromFile("resources/fonts/Arial.ttf");
@@ -35,7 +36,7 @@ void Menu::addOption(const std::string& label, std::function<void()> action)
 {
     sf::Text labelSprite(label, font_, 16);
     labelSprite.setPosition(4, 20 * options_.size() + 4);
-    labelSprite.setStyle(sf::Text::Bold);\
+    labelSprite.setStyle(sf::Text::Bold);
 
     // Increase the width of the menu to hold a bolded label
     unsigned int textWidth = ceil(labelSprite.getGlobalBounds().width);
@@ -178,12 +179,14 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states) const
     if(active() && !options_.empty())
     {
         states.transform *= getTransform();
+        states.transform.translate(frame_.getPosition());
+        
         target.draw(frame_, states);
         target.draw(body_, states);
         
         for(int i = 0; i < options_.size(); i++)
         {
-            target.draw(options_[i].first);
+            target.draw(options_[i].first, states);
         }
     }
 }

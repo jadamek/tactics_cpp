@@ -30,7 +30,7 @@ void ActionScheduler::step()
 {
     for(auto action = schedule_.begin(); action != schedule_.end();)
     {
-        if(action->countdown() < 1 || action->triggered())
+        if(action->countdown() == 0 || action->triggered())
         {
             action->execute();
             action = schedule_.erase(action);

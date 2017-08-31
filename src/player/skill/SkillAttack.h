@@ -8,9 +8,12 @@
 //================================================================================
 // A basic attack using the player's weapon(s)
 //================================================================================
-class SkillAttack : Skill
+class SkillAttack : public Skill
 {
 // Methods
+public:
+    SkillAttack();
+
     virtual void use(Actor& caster, const std::vector<Actor*>& targets);
     virtual std::vector<sf::Vector2f> range(Actor& caster) const;
     virtual std::vector<sf::Vector2f> area(const sf::Vector2f& target) const;

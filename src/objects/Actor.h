@@ -4,6 +4,7 @@
 #include "MobileObject.h"
 #include "../sprite/SpriteAnimated.h"
 #include "../sprite/SpriteDirected.h"
+#include "../player/skill/Skill.h"
 #include <deque>
 
 //================================================================================
@@ -40,6 +41,8 @@ public:
     void                        setName(const std::string& name);
     int                         getMove() const;
     void                        setMove(int mv);
+    void                        focus();
+    void                        unfocus();
     
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -54,6 +57,7 @@ protected:
     sf::Sprite*                 portrait_;
     std::string                 name_;
     int                         attrMove_;
+    std::vector<Skill*>         skills_;
 };
 
 #endif

@@ -3,6 +3,15 @@
 #include "../../map/Map.h"
 
 #include <iostream>
+
+//----------------------------------------------------------------------------
+// Skill Constructor
+//----------------------------------------------------------------------------
+SkillAttack::SkillAttack()
+{
+    name_ = "Attack";
+}
+    
 //----------------------------------------------------------------------------
 // - Basic Attack Cast (Override)
 //----------------------------------------------------------------------------
@@ -67,7 +76,7 @@ std::vector<sf::Vector2f> SkillAttack::area(const sf::Vector2f& target) const
 // * map : map the intended targets of the skill inhabit
 // Returns a vector of all actors caught in the area of effect for this skill
 //----------------------------------------------------------------------------
-std::vector<Actor*> SkillAttack::affected(const sf::Vector2f& target, const Map* map = 0) const
+std::vector<Actor*> SkillAttack::affected(const sf::Vector2f& target, const Map* map) const
 {
     std::vector<Actor*> targets;
 

@@ -1,15 +1,20 @@
 #include "InputManager.h"
+#include "../settings.h"
 
 //----------------------------------------------------------------------------
 // - Input Manager Constructor (private)
 //----------------------------------------------------------------------------
-InputManager::InputManager()
+InputManager::InputManager() :
+    AnimatedObject(FPS),
+    delay_(0),
+    throttle_(FPS / 3)
 {}
 
 //----------------------------------------------------------------------------
 // - Input Manager Constructor (private, empty)
 //----------------------------------------------------------------------------
-InputManager::InputManager(const InputManager&)
+InputManager::InputManager(const InputManager&) :
+    throttle_(FPS / 3)
 {}
 
 //----------------------------------------------------------------------------
@@ -28,22 +33,6 @@ InputManager& InputManager::instance()
 }
 
 //----------------------------------------------------------------------------
-// - Poll Current Handler
-//----------------------------------------------------------------------------
-// Signals the top handler to poll for input events
-//----------------------------------------------------------------------------
-void InputManager::poll()
-{
-    if(!handlerStack_.empty())
-    {
-        if(!handlerStack_.top()->busy() && handlerStack_.top()->active())
-        {
-            handlerStack_.top()->poll();
-        }
-    }
-}
-
-//----------------------------------------------------------------------------
 // - Push Handler
 //----------------------------------------------------------------------------
 // * handler : new input handling object to push onto the handler stack
@@ -54,8 +43,9 @@ void InputManager::push(InputHandler* handler)
     {
         handlerStack_.top()->setActive(false);           
     }
+    delay_ = throttle_;
     handlerStack_.push(handler);
-    handlerStack_.top()->setActive(true); 
+    handlerStack_.top()->setActive(true);
 }
 
 //----------------------------------------------------------------------------
@@ -67,6 +57,7 @@ void InputManager::pop()
     {
         handlerStack_.top()->setActive(false);
         handlerStack_.pop();
+        delay_ = throttle_;
         handlerStack_.top()->setActive(true);    
     }
 }
@@ -113,4 +104,29 @@ InputHandler* InputManager::getHandler() const
     {
         return 0;
     }
+}
+
+//----------------------------------------------------------------------------
+// - Poll Current Handler
+//----------------------------------------------------------------------------
+// Signals the top handler to poll for input events
+//----------------------------------------------------------------------------
+void InputManager::poll()
+{
+    if(!handlerStack_.empty() && delay_ <= 0)
+    {
+        if(!handlerStack_.top()->busy() && handlerStack_.top()->active())
+        {
+            handlerStack_.top()->poll();
+        }
+    }
+}
+
+//----------------------------------------------------------------------------
+// - Increment Frame (Override)
+//----------------------------------------------------------------------------
+void InputManager::step()
+{
+    poll();
+    if(delay_ > 0) delay_--;    
 }

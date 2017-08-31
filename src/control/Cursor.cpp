@@ -10,7 +10,10 @@
 Cursor::Cursor(const sf::Sprite& cursor, Map& map) :
     map_(&map),
     sprite_(cursor),
-    throttle_(0)
+    throttle_(0),
+    actionConfirm_([](const sf::Vector3f&){}),
+    actionMove_([](const sf::Vector3f&){}),
+    actionCancel_([](){})
 {  
     setPosition(sf::Vector3f(0, 0, std::max(0.f, map_->height(0, 0))));
     setSpeed(20);
@@ -62,9 +65,8 @@ sf::FloatRect Cursor::getGlobalBounds() const
 //----------------------------------------------------------------------------
 void Cursor::poll()
 {
-    // Consecutive keyboard input for cursors is throttled by 5 frames
-    static int throttle = 8;
-    
+    // Consecutive keyboard input for cursors is throttled for some frames
+    static int throttle = 8;    
     
     if(throttle_ <= 0)
     {

@@ -1,4 +1,5 @@
 #include "Actor.h"
+#include "../player/skill/SkillAttack.h"
 #include <math.h>
 #include <queue>
 
@@ -20,7 +21,9 @@ Actor::Actor(const sf::Texture& texture, const Map* ground) :
     baseSprite_->setOrigin(10, 28);
     baseSprite_->setPosition(0, 0);
     sprite_ = new SpriteAnimated(baseSprite_);
-    sprite_->play("default", true);        
+    sprite_->play("default", true);
+
+    skills_.push_back(new SkillAttack);
 }
 
 //----------------------------------------------------------------------------
@@ -451,6 +454,25 @@ void Actor::setMove(int mv)
     {
         attrMove_ = mv;
     }
+}
+
+//----------------------------------------------------------------------------
+// - Highlight Actor
+//----------------------------------------------------------------------------
+// Produces a visual effect on the player's sprite to indicate it is being
+// targetted by a skill
+//----------------------------------------------------------------------------
+void Actor::focus()
+{
+    baseSprite_->setColor(sf::Color(255, 150, 150));
+}
+
+//----------------------------------------------------------------------------
+// - Remove Actor Highlighting
+//----------------------------------------------------------------------------
+void Actor::unfocus()
+{
+    baseSprite_->setColor(sf::Color::White);
 }
 
 //----------------------------------------------------------------------------

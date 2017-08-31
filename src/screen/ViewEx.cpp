@@ -225,18 +225,11 @@ void ViewEx::stopScrolling()
 //----------------------------------------------------------------------------
 // - Focus
 //----------------------------------------------------------------------------
-// * object : object to continually scroll to
-// * duration : time in seconds every scroll will be completed in    
-// Causes the view to always scroll to a given target if ever it is not
-// currently centered on it
+// * object : object to always be centered on
 //----------------------------------------------------------------------------
-void ViewEx::focus(const IsometricObject* object, float duration)
+void ViewEx::focus(const IsometricObject* object)
 {
-    if(duration > 0)
-    {
-        focusTarget_ = object;
-        focusDur_ = duration;
-    }
+    focusTarget_ = object;
 }
 
 //----------------------------------------------------------------------------
@@ -252,12 +245,10 @@ bool ViewEx::focusing() const
 //----------------------------------------------------------------------------
 // - Stop Focusing
 //----------------------------------------------------------------------------
-// Ceases any focusing and scrolling motion by setting the target to null and
-// the scroll duration to 0.
+// Ceases focusing on a single object
 //----------------------------------------------------------------------------
 void ViewEx::stopFocusing()
 {
-    stopScrolling();
     focusTarget_ = 0;
 }
 
@@ -507,13 +498,13 @@ void ViewEx::drawOverlays(sf::RenderTarget& target) const
 void ViewEx::step()
 {
     // Update Focusing
-    if((focusTarget_ && !scrolling()) && center_ != focusTarget_->getGlobalPosition())
+    if(focusTarget_)
     {
-        scrollTo(focusTarget_->getGlobalPosition(), focusDur_);
+        center_ = focusTarget_->getGlobalPosition();
     }
 
-    // Update Scrolling
-    if(scrollLength_ > 0)
+    // Update Scrolling (Does not occur when focused on an object)
+    else if(scrollLength_ > 0)
     {
         center_ += (scrollTarget_ - center_) / (float)scrollLength_--;
         sf::View::setCenter(center_);

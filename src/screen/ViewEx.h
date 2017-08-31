@@ -49,7 +49,7 @@ public:
     void                stopScrolling();
     
     // Enhanced functions - Focusing
-    void                focus(const IsometricObject* object, float duration);
+    void                focus(const IsometricObject* object);
     bool                focusing() const;
     void                stopFocusing();
 
@@ -101,7 +101,6 @@ protected:
     int                 scrollLength_;
 
     const IsometricObject* focusTarget_;
-    float               focusDur_;
 
     float               shakeAmp_;
     float               shakeFreq_;
