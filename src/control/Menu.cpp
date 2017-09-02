@@ -8,9 +8,7 @@
 // * frameTexture : bitmap to use for the menu's frame (replace w/ Menu::Style)
 //----------------------------------------------------------------------------
 Menu::Menu(const sf::Texture& frameTexture) :
-    AnimatedObject(FPS),
     current_(0),
-    throttle_(0),
     frame_(frameTexture),
     width_(32),
     body_(sf::Vector2f(32, 32)),
@@ -18,6 +16,7 @@ Menu::Menu(const sf::Texture& frameTexture) :
 {
     body_.setFillColor(sf::Color::Blue);
     font_.loadFromFile("resources/fonts/Arial.ttf");
+    setOrigin(frame_.getPosition());    
 }
 
 //----------------------------------------------------------------------------
@@ -70,49 +69,37 @@ void Menu::clear()
 //----------------------------------------------------------------------------
 void Menu::poll()
 {
-    // Consecutive keyboard input for menus is throttled by 10 frames
-    static int throttle = 10;
-
-    // Consecutive keyboard input is throttled by 20 frames
-    if(throttle_ <= 0)
+    // Keyboard Input handle : Down - highlight next option
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        // Keyboard Input handle : Down - highlight next option
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        highlight((current_ + 1) % options_.size());            
+    }
+
+    // Keyboard Input handle : Up - highlight previous option
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    {
+        int previous = current_ - 1;
+        if(previous < 0)
         {
-            highlight((current_ + 1) % options_.size());            
-            throttle_ = throttle;
+            previous = options_.size() - 1;
         }
 
-        // Keyboard Input handle : Up - highlight previous option
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        highlight(previous);
+    }
+
+    // Keyboard Input handle : Enter - select current option
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+    {
+        if(!options_.empty())
         {
-            int previous = current_ - 1;
-            if(previous < 0)
-            {
-                previous = options_.size() - 1;
-            }
-
-            highlight(previous);
-
-            throttle_ = throttle;            
+            options_[current_].second();
         }
+    }
 
-        // Keyboard Input handle : Enter - select current option
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-        {
-            if(!options_.empty())
-            {
-                options_[current_].second();
-            }
-            throttle_ = throttle;            
-        }
-
-        // Keyboard Input handle : Esc - cancel menu
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        {
-            actionCancel_();
-            throttle_ = throttle;            
-        }
+    // Keyboard Input handle : Esc - cancel menu
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+    {
+        actionCancel_();
     }
 }
 
@@ -145,17 +132,6 @@ sf::FloatRect Menu::getGlobalBounds() const
 }
 
 //----------------------------------------------------------------------------
-// - Increment Frame (Override)
-//----------------------------------------------------------------------------
-void Menu::step()
-{
-    if(throttle_ > 0)
-    {
-        throttle_--;
-    }
-}
-
-//----------------------------------------------------------------------------
 // - Highlight Option
 //----------------------------------------------------------------------------
 // * optionIndex : index in the options vector to highlight as selected
@@ -179,7 +155,6 @@ void Menu::draw(sf::RenderTarget& target, sf::RenderStates states) const
     if(active() && !options_.empty())
     {
         states.transform *= getTransform();
-        states.transform.translate(frame_.getPosition());
         
         target.draw(frame_, states);
         target.draw(body_, states);

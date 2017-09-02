@@ -10,7 +10,6 @@
 Cursor::Cursor(const sf::Sprite& cursor, Map& map) :
     map_(&map),
     sprite_(cursor),
-    throttle_(0),
     actionConfirm_([](const sf::Vector3f&){}),
     actionMove_([](const sf::Vector3f&){}),
     actionCancel_([](){})
@@ -65,93 +64,81 @@ sf::FloatRect Cursor::getGlobalBounds() const
 //----------------------------------------------------------------------------
 void Cursor::poll()
 {
-    // Consecutive keyboard input for cursors is throttled for some frames
-    static int throttle = 8;    
-    
-    if(throttle_ <= 0)
+    // Keyboard Input handle : Down - move cursor downward
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    {           
+        // Move to the next valid position downward of this
+        int y = position().y + 1;
+        while(!map_->valid(position().x, y) && y < map_->length())
+        {
+            y++;
+        }
+
+        if(y < map_->length())
+        {
+            goTo(sf::Vector2f(position().x, y));
+        }
+    }
+
+    // Keyboard Input handle : Up - move cursor upward
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    {           
+        // Move to the next valid position upward of this
+        int y = position().y - 1;
+        while(!map_->valid(position().x, y) && y >= 0)
+        {
+            y--;
+        }
+
+        if(y >= 0)
+        {
+            goTo(sf::Vector2f(position().x, y));
+        }
+    }
+
+    // Keyboard Input handle : Left - move cursor left
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        // Keyboard Input handle : Down - move cursor downward
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {           
-            // Move to the next valid position downward of this
-            int y = position().y + 1;
-            while(!map_->valid(position().x, y) && y < map_->length())
-            {
-                y++;
-            }
-
-            if(y < map_->length())
-            {
-                goTo(sf::Vector2f(position().x, y));
-                throttle_ = throttle;                
-            }
-        }
-
-        // Keyboard Input handle : Up - move cursor upward
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {           
-            // Move to the next valid position upward of this
-            int y = position().y - 1;
-            while(!map_->valid(position().x, y) && y >= 0)
-            {
-                y--;
-            }
-
-            if(y >= 0)
-            {
-                goTo(sf::Vector2f(position().x, y));
-                throttle_ = throttle;                
-            }
-        }
-
-        // Keyboard Input handle : Left - move cursor left
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        // Move to the next valid position left of this
+        int x = position().x - 1;
+        while(!map_->valid(x, position().y) && x >= 0)
         {
-            // Move to the next valid position left of this
-            int x = position().x - 1;
-            while(!map_->valid(x, position().y) && x >= 0)
-            {
-                x--;
-            }
-
-            if(x >= 0)
-            {
-                goTo(sf::Vector2f(x, position().y));
-                throttle_ = throttle;                
-            }
+            x--;
         }
 
-        // Keyboard Input handle : Right - move cursor right
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        if(x >= 0)
         {
-            // Move to the next valid position right of this
-            int x = position().x + 1;
-            while(!map_->valid(x, position().y) && x < map_->width())
-            {
-                x++;
-            }
-
-            if(x < map_->width())
-            {
-                goTo(sf::Vector2f(x, position().y));
-                throttle_ = throttle;                
-            }
+            goTo(sf::Vector2f(x, position().y));
         }
+    }
 
-        // Keyboard Input handle : Enter - select current position
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+    // Keyboard Input handle : Right - move cursor right
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    {
+        // Move to the next valid position right of this
+        int x = position().x + 1;
+        while(!map_->valid(x, position().y) && x < map_->width())
         {
-            actionConfirm_(position());
-            throttle_ = throttle;            
+            x++;
         }
 
-        // Keyboard Input handle : Esc - cancel selector
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+        if(x < map_->width())
         {
-            actionCancel_();
-            throttle_ = throttle;            
+            goTo(sf::Vector2f(x, position().y));
         }
-    }    
+    }
+
+    // Keyboard Input handle : Enter - select current position
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+    {
+        actionConfirm_(position());
+    }
+
+    // Keyboard Input handle : Esc - cancel selector
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+    {
+        actionCancel_();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -199,18 +186,5 @@ void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     if(active()){
         target.draw(sprite_, states);        
-    }
-}
-
-//----------------------------------------------------------------------------
-// - Increment Frame (Override)
-//----------------------------------------------------------------------------
-void Cursor::step()
-{
-    MobileObject::step();
-
-    if(throttle_ > 0)
-    {
-        throttle_--;
     }
 }

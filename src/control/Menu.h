@@ -14,7 +14,7 @@
 //================================================================================
 // Simple menu with a set of actions that may selected using the keyboard or mouse
 //================================================================================
-class Menu : public InputHandler, public Sprite, public AnimatedObject
+class Menu : public InputHandler, public Sprite
 {
 // Methods
 public:
@@ -28,13 +28,11 @@ public:
     void                    setOnCancel(std::function<void()> action);    
     virtual sf::FloatRect   getGlobalBounds() const;
 protected:
-    void                    step();
     void                    highlight(int optionIndex);
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
     
 // Members
     int                     current_;
-    int                     throttle_;
     SpriteMenuFrame         frame_;
     sf::RectangleShape      body_;
     unsigned int            width_;

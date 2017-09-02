@@ -11,7 +11,6 @@
 //----------------------------------------------------------------------------
 TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const sf::Vector2f& target) :
 sprite_(cursor),
-throttle_(0),
 skill_(&skill),
 caster_(&caster),
 targets_(skill.affected(target, caster.getEnvironment())),
@@ -62,66 +61,55 @@ sf::FloatRect TargetConfirmer::getGlobalBounds() const
 // Poll Input Event (Override)
 //----------------------------------------------------------------------------
 void TargetConfirmer::poll()
-{
-    // Consecutive keyboard input for cursors is throttled by 5 frames
-    static int throttle = 10;   
-    
-    if(throttle_ <= 0)
+{    
+    // Cannot cycle through an empty target list
+    if(!targets_.empty()){
+        // Keyboard Input handle : Down - move cursor to previous target
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            Actor* next = targets_[(current_ - 1) % targets_.size()];
+            moveTo(next->position());
+            actionMove_(next);
+        }
+
+        // Keyboard Input handle : Up - move cursor to next target
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {           
+            Actor* next = targets_[(current_ + 1) % targets_.size()];
+            moveTo(next->position());
+            actionMove_(next);
+        }
+
+        // Keyboard Input handle : Left - move cursor to previous target
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+            Actor* next = targets_[(current_ - 1) % targets_.size()];
+            moveTo(next->position());
+            actionMove_(next);
+        }
+
+        // Keyboard Input handle : Right - move cursor  to next target
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            Actor* next = targets_[(current_ + 1) % targets_.size()];
+            moveTo(next->position());
+            actionMove_(next);
+        }
+    }
+
+    // Keyboard Input handle : Enter - confirm cast
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
     {
-        // Cannot cycle through an empty target list
-        if(!targets_.empty()){
-            // Keyboard Input handle : Down - move cursor to previous target
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-            {
-                Actor* next = targets_[(current_ - 1) % targets_.size()];
-                moveTo(next->position());
-                actionMove_(next);
-                throttle_ = throttle;                
-            }
+        actionConfirm_();
+        skill_->use(*caster_, targets_);
+    }
 
-            // Keyboard Input handle : Up - move cursor to next target
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-            {           
-                Actor* next = targets_[(current_ + 1) % targets_.size()];
-                moveTo(next->position());
-                actionMove_(next);
-                throttle_ = throttle;                
-            }
-
-            // Keyboard Input handle : Left - move cursor to previous target
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-            {
-                Actor* next = targets_[(current_ - 1) % targets_.size()];
-                moveTo(next->position());
-                actionMove_(next);
-                throttle_ = throttle;                
-            }
-
-            // Keyboard Input handle : Right - move cursor  to next target
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-            {
-                Actor* next = targets_[(current_ + 1) % targets_.size()];
-                moveTo(next->position());
-                actionMove_(next);
-                throttle_ = throttle;                
-            }
-        }
-
-        // Keyboard Input handle : Enter - confirm cast
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-        {
-            actionConfirm_();
-            skill_->use(*caster_, targets_);
-            throttle_ = throttle;                
-        }
-
-        // Keyboard Input handle : Esc - cancel menu
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        {
-            actionCancel_();
-            throttle_ = throttle;            
-        }
-    }    
+    // Keyboard Input handle : Esc - cancel menu
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+    {
+        actionCancel_();
+    }
+    
 }
 
 //----------------------------------------------------------------------------
@@ -170,17 +158,4 @@ void TargetConfirmer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 void TargetConfirmer::setOnMove(std::function<void(Actor*)> action)
 {
     actionMove_ = action;
-}
-
-//----------------------------------------------------------------------------
-// - Increment Frame (Override)
-//----------------------------------------------------------------------------
-void TargetConfirmer::step()
-{
-    MobileObject::step();
-
-    if(throttle_ > 0)
-    {
-        throttle_--;
-    }
 }

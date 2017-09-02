@@ -36,6 +36,10 @@ Actor::~Actor()
     {
         delete portrait_;
     }
+    for(Skill* skill : skills_)
+    {
+        delete skill;
+    }
 }
 
 //----------------------------------------------------------------------------

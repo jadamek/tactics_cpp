@@ -30,12 +30,10 @@ public:
     
 protected:
     virtual void            draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    virtual void            step();
 
 // Members
     sf::Sprite              sprite_;
     Map*                    map_;
-    int                     throttle_;
     std::function<void(const sf::Vector3f&)>    actionConfirm_;
     std::function<void()>                       actionCancel_;
     std::function<void(const sf::Vector3f&)>    actionMove_;

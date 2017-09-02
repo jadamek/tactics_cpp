@@ -32,12 +32,10 @@ public:
     
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
-    virtual void                step();
 
 // Members
     sf::Sprite                  sprite_;
     SpriteArea**                targetArea_;
-    int                         throttle_;
     Skill*                      skill_;
     Actor*                      caster_;
     const std::vector<Actor*>&  targets_;

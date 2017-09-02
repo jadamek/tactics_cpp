@@ -1,20 +1,21 @@
 #include "InputManager.h"
 #include "../settings.h"
+#include <math.h>
 
 //----------------------------------------------------------------------------
 // - Input Manager Constructor (private)
 //----------------------------------------------------------------------------
 InputManager::InputManager() :
-    AnimatedObject(FPS),
+    AnimatedObject(FPS / 6),
     delay_(0),
-    throttle_(FPS / 3)
+    throttle_(ceil(15 * getFPS() / FPS))
 {}
 
 //----------------------------------------------------------------------------
 // - Input Manager Constructor (private, empty)
 //----------------------------------------------------------------------------
 InputManager::InputManager(const InputManager&) :
-    throttle_(FPS / 3)
+    throttle_(0)
 {}
 
 //----------------------------------------------------------------------------
@@ -39,11 +40,12 @@ InputManager& InputManager::instance()
 //----------------------------------------------------------------------------
 void InputManager::push(InputHandler* handler)
 {
+    delay_ = throttle_;
+    
     if(!handlerStack_.empty())
     {
         handlerStack_.top()->setActive(false);           
     }
-    delay_ = throttle_;
     handlerStack_.push(handler);
     handlerStack_.top()->setActive(true);
 }
@@ -55,9 +57,10 @@ void InputManager::pop()
 {
     if(!handlerStack_.empty())
     {
+        delay_ = throttle_;
+
         handlerStack_.top()->setActive(false);
         handlerStack_.pop();
-        delay_ = throttle_;
         handlerStack_.top()->setActive(true);    
     }
 }
@@ -128,5 +131,6 @@ void InputManager::poll()
 void InputManager::step()
 {
     poll();
-    if(delay_ > 0) delay_--;    
+
+    if(delay_ > 0) delay_--;
 }
