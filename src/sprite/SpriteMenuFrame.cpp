@@ -97,7 +97,7 @@ sf::FloatRect SpriteMenuFrame::getGlobalBounds() const
 {
     if(frame_)
     {
-        sf::FloatRect rect(frame_[0].getPosition(), sf::Vector2f(frame_[5].getPosition().x + width_x, frame_[5].getPosition().y + width_y));
+        sf::FloatRect rect(frame_[0].getPosition(), sf::Vector2f(frame_[5].getPosition().x + width_x * 2, frame_[5].getPosition().y + width_y * 2));
         return getTransform().transformRect(rect);
     }
 }

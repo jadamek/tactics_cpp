@@ -97,8 +97,8 @@ void TargetConfirmer::poll()
         }
     }
 
-    // Keyboard Input handle : Enter - confirm cast
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+    // Keyboard Input handle : Enter|Space - confirm cast
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
         actionConfirm_();
         skill_->use(*caster_, targets_);

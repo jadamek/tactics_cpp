@@ -34,11 +34,15 @@ public:
     void                close();
 
 protected:
+// Methods - Setup
     void                setupMap();
     void                setupActors();
     void                setupStaging();
     void                setupMenus();
     void                setupControls();
+
+// Methods - Menu/Control Displays
+    void                displayBattleMenu(Actor* actor);
 
     void                showHUD(SpriteActorHUD* hud, const sf::Vector3f& position);
     
@@ -78,6 +82,11 @@ protected:
 
 // Members - Resources
     TextureManager*     textures_;
+    FontManager*        fonts_;
+
+    sf::Texture         spot_;
+    sf::RectangleShape* grid_;
+    sf::Text*           gridLabels_;
 };
 
 #endif

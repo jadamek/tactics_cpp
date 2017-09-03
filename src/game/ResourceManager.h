@@ -32,7 +32,8 @@ protected:
 };
 
 // Common Resource Containers
-typedef ResourceManager<sf::Texture> TextureManager;
+typedef ResourceManager<sf::Texture> 	TextureManager;
+typedef ResourceManager<sf::Font> 		FontManager;
 
 #endif
 

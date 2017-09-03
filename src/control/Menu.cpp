@@ -16,7 +16,7 @@ Menu::Menu(const sf::Texture& frameTexture) :
 {
     body_.setFillColor(sf::Color::Blue);
     font_.loadFromFile("resources/fonts/Arial.ttf");
-    setOrigin(frame_.getPosition());    
+    setOrigin(frame_.getGlobalBounds().left, frame_.getGlobalBounds().top);
 }
 
 //----------------------------------------------------------------------------
@@ -62,6 +62,7 @@ void Menu::addOption(const std::string& label, std::function<void()> action)
 void Menu::clear()
 {
     options_.clear();
+    current_ = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -87,8 +88,8 @@ void Menu::poll()
         highlight(previous);
     }
 
-    // Keyboard Input handle : Enter - select current option
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+    // Keyboard Input handle : Enter|Space - select current option
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
         if(!options_.empty())
         {

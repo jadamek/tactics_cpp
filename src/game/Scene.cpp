@@ -31,10 +31,14 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     moved_(false),
     acted_(false),
     originalFacing_(0),
-    textures_(0)
+    textures_(0),
+    fonts_(0),
+    grid_(0),
+    gridLabels_(0)
 {
     view_.setCenter(0, 0);
     screen_.setCenter(0, 0);
+    spot_.create(2, 2);    
 }
 
 //----------------------------------------------------------------------------
@@ -56,7 +60,17 @@ Scene::~Scene()
     if(targetConfirmer_)    delete targetConfirmer_;
     if(confirmedTargets_)   delete confirmedTargets_;
     if(textures_)           delete textures_;    
+    if(fonts_)              delete fonts_;
     for(Actor* actor : actors_) delete actor;
+
+    if(grid_)
+    {
+        delete [] grid_;
+    }
+    if(gridLabels_)
+    {
+        delete [] gridLabels_;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -67,12 +81,14 @@ Scene::~Scene()
 //----------------------------------------------------------------------------
 void Scene::nextTurn()
 {
-    Actor* actor = actors_[acting_ = acting_++ % actors_.size()];
-
+    Actor* actor = actors_[(acting_ = ((acting_ + 1) % actors_.size()))];
+    
     // Scroll to acting player
     view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 0.5);
     cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
-    ActionScheduler::instance().schedule(Action([this](){InputManager::instance().push(cursor_);}, 0.5 * FPS));    
+    ActionScheduler::instance().schedule(Action([this, actor](){
+        InputManager::instance().push(cursor_); displayBattleMenu(actor);
+    }, 0.5 * FPS));    
 }
 
 //----------------------------------------------------------------------------
@@ -83,7 +99,11 @@ void Scene::nextTurn()
 //----------------------------------------------------------------------------
 void Scene::endTurn()
 {
+    InputManager::instance().clear();
+    moved_ = false;
+    acted_ = false;
 
+    nextTurn();
 }
 
 //----------------------------------------------------------------------------
@@ -104,7 +124,8 @@ void Scene::start()
 {
     // Initiate resource catalogs
     textures_ = new TextureManager;
-
+    fonts_ = new FontManager;
+    
     setupMap();
     setupActors();
     setupStaging();
@@ -208,6 +229,7 @@ void Scene::setupActors()
         map_->enter(actor, x, y);
     }
 }
+#include <sstream>
 
 //----------------------------------------------------------------------------
 // - Setup Staging
@@ -216,7 +238,24 @@ void Scene::setupActors()
 //----------------------------------------------------------------------------
 void Scene::setupStaging()
 {
+    grid_ = new sf::RectangleShape[320];
+    gridLabels_ = new sf::Text[320];
 
+    for(int x = 0; x < 20; x++)
+    {
+        for(int y = 0; y < 16; y++)
+        {
+            grid_[x + y * 20] = sf::RectangleShape(sf::Vector2f(2, 2));
+            grid_[x + y * 20].setFillColor(sf::Color::Red);
+            grid_[x + y * 20].setPosition((x - 10) * 32, (y - 8) * 32);
+            
+            std::stringstream ss;
+            ss << "(" << (x - 10) << "," << (y - 8) << ")";
+            gridLabels_[x + y * 20] = sf::Text(ss.str(), fonts_->load("resources/fonts/Arial.ttf"), 8);
+            gridLabels_[x + y * 20].setColor(sf::Color::Red);
+            gridLabels_[x + y * 20].setPosition((x - 10) * 32 + 4, (y - 8) * 32 + 4);
+        }        
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -238,32 +277,8 @@ void Scene::setupMenus()
     targetHUD_->setPosition(screen_.getSize().x / 2 - 16, screen_.getSize().y / 2 - 16);
     targetHUD_->hide();
 
-    /*
-    // Battle Menu (options filled in during turn)
-    battleMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
-    battleMenu_->setOnCancel(
-        [this]()
-        {
-            if(moved_)
-            {
-                view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.5);
-                actors_[acting_]->setPosition(originalPosition_);
-                actors_[acting_]->face(originalFacing_);
-                moved_ = false;
-                InputManager::instance().popTo(cursor_);
-                // display
-            }
-            else{
-                InputManager::instance().pop();
-            }
-        });
-    battleMenu_->setOrigin(battleMenu_->getGlobalBounds().width, battleMenu_->getGlobalBounds().height);
-    battleMenu_->setPosition(screen_.getSize().x / 2 - 32, screen_.getSize().y / 2 - 32);
-    */
-
     // Main Menu - placed in the center of the screen
     mainMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
-    mainMenu_->setPosition(mainMenu_->getGlobalBounds().width / -2, mainMenu_->getGlobalBounds().height / -2);
     mainMenu_->addOption("Quit Game", [this](){
         InputManager::instance().clear();
         view_.fadeOut(2);
@@ -272,6 +287,27 @@ void Scene::setupMenus()
     mainMenu_->setOnCancel([this](){
         InputManager::instance().pop();
     });
+    mainMenu_->setPosition(mainMenu_->getGlobalBounds().width / -2.f, mainMenu_->getGlobalBounds().height / -2.f);
+    
+    // Battle Menu (options filled in during turn)
+    battleMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
+    battleMenu_->setOnCancel(
+        [this]()
+        {
+            if(moved_)
+            {
+                //view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.5);
+                //actors_[acting_]->setPosition(originalPosition_);
+                //actors_[acting_]->face(originalFacing_);
+                //moved_ = false;
+                InputManager::instance().popTo(cursor_);
+                // display
+            }
+            else{
+                InputManager::instance().pop();
+            }
+        });
+    
 }
 
 //----------------------------------------------------------------------------
@@ -292,6 +328,17 @@ void Scene::setupControls()
     cursor_->setPosition(sf::Vector3f(0, 0, map_->height(0, 0)));
     map_->addObject(cursor_);
 
+    // Scroll to the acting player and show the main battle menu
+    cursor_->setOnConfirm(
+        [this](const sf::Vector3f& selection)
+        {
+            Actor* actor = actors_[acting_];
+            cursor_->setBusy(true);
+            cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
+            view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 1);
+            ActionScheduler::instance().schedule(Action([this, actor](){displayBattleMenu(actor); cursor_->setBusy(false);}, 1));
+        });
+
     // Show the HUD for any actor present in the current location, if present
     cursor_->setOnMove(
         [this](const sf::Vector3f& destination)
@@ -305,6 +352,26 @@ void Scene::setupControls()
         {
             InputManager::instance().push(mainMenu_);
         });
+}
+
+//----------------------------------------------------------------------------
+// Display Battle Menu
+//----------------------------------------------------------------------------
+// actor : current acting player
+// Shows the main battle menu for this actor, populating the menu with the
+// appropriate options and placing it at the lower-right corner of the screen
+//----------------------------------------------------------------------------
+void Scene::displayBattleMenu(Actor* actor)
+{
+    battleMenu_->clear();
+    // Populate options
+    if(!moved_) battleMenu_->addOption("Move", [](){std::cout << "Move." << std::endl;});
+    if(!acted_) battleMenu_->addOption("Action", [](){std::cout << "Act." << std::endl;});
+    battleMenu_->addOption("Wait", [this](){endTurn();});
+
+    // Place in corner
+    battleMenu_->setPosition(screen_.getSize().x / 2 - battleMenu_->getGlobalBounds().width - 16, screen_.getSize().y / 2 - battleMenu_->getGlobalBounds().height - 16);
+    InputManager::instance().push(battleMenu_);
 }
 
 //----------------------------------------------------------------------------
@@ -368,7 +435,20 @@ void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
             target.draw(*mainMenu_, states);
         }
 
+        if(battleMenu_)
+        {
+            target.draw(*battleMenu_, states);
+        }
+
         // Tint/Flash Overlays
         view_.drawOverlays(target);
+
+        if(grid_){
+            for(int i = 0; i < 320; i++)
+            {
+                target.draw(grid_[i]);
+                target.draw(gridLabels_[i]);
+            }
+        }
     }
 }

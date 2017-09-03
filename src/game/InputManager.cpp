@@ -89,8 +89,11 @@ void InputManager::popTo(InputHandler* handler)
 //----------------------------------------------------------------------------
 void InputManager::clear()
 {
+    delay_ = throttle_;
+    
     while(!handlerStack_.empty())
     {
+        handlerStack_.top()->setActive(false);
         handlerStack_.pop();
     }
 }

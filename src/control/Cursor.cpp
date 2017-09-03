@@ -128,8 +128,8 @@ void Cursor::poll()
         }
     }
 
-    // Keyboard Input handle : Enter - select current position
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+    // Keyboard Input handle : Enter|Space - select current position
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
         actionConfirm_(position());
     }
@@ -184,7 +184,7 @@ void Cursor::setOnMove(std::function<void(const sf::Vector3f&)> action)
 //----------------------------------------------------------------------------
 void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if(active()){
+    if(active() && !busy()){
         target.draw(sprite_, states);        
     }
 }
