@@ -501,6 +501,7 @@ void ViewEx::step()
     if(focusTarget_)
     {
         center_ = focusTarget_->getGlobalPosition();
+        sf::View::setCenter(center_);
     }
 
     // Update Scrolling (Does not occur when focused on an object)

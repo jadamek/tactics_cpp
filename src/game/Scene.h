@@ -43,6 +43,7 @@ protected:
 
 // Methods - Menu/Control Displays
     void                displayBattleMenu(Actor* actor);
+    void                selectDestination(Actor* actor);
 
     void                showHUD(SpriteActorHUD* hud, const sf::Vector3f& position);
     

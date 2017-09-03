@@ -99,6 +99,13 @@ void Scene::nextTurn()
 //----------------------------------------------------------------------------
 void Scene::endTurn()
 {
+    // Update map positioning if the player took a move this turn
+    if(moved_)
+    {
+        map_->exit(originalPosition_.x, originalPosition_.y);
+        map_->enter(actors_[acting_], actors_[acting_]->position().x, actors_[acting_]->position().y);
+    }
+
     InputManager::instance().clear();
     moved_ = false;
     acted_ = false;
@@ -225,6 +232,7 @@ void Scene::setupActors()
 
         actor->setPosition(sf::Vector3f(x, y, map_->height(x, y)));
         actor->face(sf::Vector2f(map_->width() / 2, map_->length() / 2));
+        actor->setSpeed(3);
         map_->addObject(actor);
         map_->enter(actor, x, y);
     }
@@ -294,14 +302,23 @@ void Scene::setupMenus()
     battleMenu_->setOnCancel(
         [this]()
         {
+            // Cancel the users movement action, returning to their original placement
+            // and facing at the turn's start
             if(moved_)
             {
-                //view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.5);
-                //actors_[acting_]->setPosition(originalPosition_);
-                //actors_[acting_]->face(originalFacing_);
-                //moved_ = false;
-                InputManager::instance().popTo(cursor_);
-                // display
+                battleMenu_->setActive(false);
+                view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.4);
+                cursor_->goTo(sf::Vector2f(originalPosition_.x, originalPosition_.y));
+                actors_[acting_]->setPosition(originalPosition_);
+                actors_[acting_]->face(originalFacing_);
+                moved_ = false;
+
+                ActionScheduler::instance().schedule(Action(
+                    [this](){
+                        InputManager::instance().popTo(cursor_);
+                        displayBattleMenu(actors_[acting_]);                        
+                    }, 0.5 * FPS
+                ));
             }
             else{
                 InputManager::instance().pop();
@@ -328,50 +345,142 @@ void Scene::setupControls()
     cursor_->setPosition(sf::Vector3f(0, 0, map_->height(0, 0)));
     map_->addObject(cursor_);
 
-    // Scroll to the acting player and show the main battle menu
-    cursor_->setOnConfirm(
-        [this](const sf::Vector3f& selection)
-        {
-            Actor* actor = actors_[acting_];
-            cursor_->setBusy(true);
-            cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
-            view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 1);
-            ActionScheduler::instance().schedule(Action([this, actor](){displayBattleMenu(actor); cursor_->setBusy(false);}, 1));
-        });
+    {
+        // Scroll to the acting player and show the main battle menu
+        cursor_->setOnConfirm(
+            [this](const sf::Vector3f& selection)
+            {
+                Actor* actor = actors_[acting_];
+                cursor_->setBusy(true);
+                cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
+                view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 1);
+                ActionScheduler::instance().schedule(Action([this, actor](){displayBattleMenu(actor); cursor_->setBusy(false);}, 1));
+            });
 
-    // Show the HUD for any actor present in the current location, if present
-    cursor_->setOnMove(
-        [this](const sf::Vector3f& destination)
-        {
-            showHUD(actorHUD_, destination);            
-        });
+        // Show the HUD for any actor present in the current location, if present
+        cursor_->setOnMove(
+            [this](const sf::Vector3f& destination)
+            {
+                showHUD(actorHUD_, destination);            
+            });
 
-    // Exit the scene<!>
-    cursor_->setOnCancel(
-        [this]()
-        {
-            InputManager::instance().push(mainMenu_);
-        });
+        // Exit the scene<!>
+        cursor_->setOnCancel(
+            [this]()
+            {
+                InputManager::instance().push(mainMenu_);
+            });
+    }
+
+    // Movement selector object and callback actions
+    moveSelector_ = new Cursor(*cursorSprite_, *map_);
+    map_->addObject(moveSelector_);
+
+    {
+        // Move to the indicated position then display the battle menu, if the position is reachable
+        moveSelector_->setOnConfirm(
+            [this](const sf::Vector3f& selection)
+            {               
+                if(moveSelection_->contains(sf::Vector2f(selection.x, selection.y)))
+                {
+                    // Remove the reachable area sprites
+                    delete moveSelection_;
+                    moveSelection_ = 0;
+
+                    Actor* actor = actors_[acting_];
+                
+                    moveSelector_->setBusy(true);
+                    view_.focus(actor);
+
+                    // Set turn control flow variables to allow player to cancel their movement
+                    originalFacing_ = actor->facing();
+                    originalPosition_ = actor->position();
+                    moved_ = true;
+                    
+                    actor->walkAlong(actor->shortestPath(sf::Vector2f(selection.x, selection.y)));
+
+                    // When the actor has finished walking to their destination (triggered action, infinite delay),
+                    // display the battle menu
+                    Action action([this, actor](){                        
+                        moveSelector_->setBusy(false);
+                        view_.stopFocusing();
+                        showHUD(actorHUD_, originalPosition_);
+                        InputManager::instance().popTo(cursor_);
+
+                        displayBattleMenu(actor);
+                    }, -1);
+
+                    action.setTrigger(
+                        [actor]()
+                        {
+                            return !actor->walking();
+                        }
+                    );
+
+                    ActionScheduler::instance().schedule(action);
+                }
+                else
+                {
+                    // Make a 'nope' noise
+                }
+            });
+
+        // Show the HUD for any actor present in the current location, if present
+        moveSelector_->setOnMove(
+            [this](const sf::Vector3f& destination)
+            {
+                showHUD(actorHUD_, destination);            
+            });
+
+        // Remove the movement selection area and scroll to the active player and return to the battle menu
+        moveSelector_->setOnCancel(
+            [this]()
+            {
+                delete moveSelection_;
+                moveSelection_ = 0;
+                InputManager::instance().pop();
+
+                showHUD(actorHUD_, actors_[acting_]->position());
+                view_.scrollTo(IsometricObject::isoToGlobal(actors_[acting_]->position()), 0.1);
+            });
+    }    
 }
 
 //----------------------------------------------------------------------------
 // Display Battle Menu
 //----------------------------------------------------------------------------
-// actor : current acting player
+// * actor : current acting player
 // Shows the main battle menu for this actor, populating the menu with the
 // appropriate options and placing it at the lower-right corner of the screen
 //----------------------------------------------------------------------------
 void Scene::displayBattleMenu(Actor* actor)
 {
     battleMenu_->clear();
+
     // Populate options
-    if(!moved_) battleMenu_->addOption("Move", [](){std::cout << "Move." << std::endl;});
+    if(!moved_) battleMenu_->addOption("Move", [this, actor](){selectDestination(actor);});
     if(!acted_) battleMenu_->addOption("Action", [](){std::cout << "Act." << std::endl;});
     battleMenu_->addOption("Wait", [this](){endTurn();});
 
     // Place in corner
     battleMenu_->setPosition(screen_.getSize().x / 2 - battleMenu_->getGlobalBounds().width - 16, screen_.getSize().y / 2 - battleMenu_->getGlobalBounds().height - 16);
     InputManager::instance().push(battleMenu_);
+}
+
+//----------------------------------------------------------------------------
+// Select Move Destination
+//----------------------------------------------------------------------------
+// * actor : current acting player
+// Displays an area depicting all positions where the user can move in blue,
+// as well as a cursor to select one of those positions
+//----------------------------------------------------------------------------
+void Scene::selectDestination(Actor* actor)
+{
+    moveSelector_->setPosition(actor->position());
+    moveSelection_ = new SpriteArea(textures_->load("resources/graphics/AreaSquare.png"), actor->reach(), *map_, sf::Color(120, 120, 255));
+    map_->addObject(moveSelection_);
+
+    InputManager::instance().push(moveSelector_);
 }
 
 //----------------------------------------------------------------------------

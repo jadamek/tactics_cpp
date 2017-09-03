@@ -14,7 +14,7 @@ std::function<bool()>   trigger_;
 //----------------------------------------------------------------------------
 Action::Action(std::function<void()> action, int delay, void* sender) :
     action_(action),
-    delay_(std::max(0, delay)),
+    delay_(delay),
     sender_(sender),
     trigger_([](){return false;})
 {}
