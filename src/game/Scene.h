@@ -45,7 +45,8 @@ protected:
     void                displayBattleMenu(Actor* actor);
     void                displayActionMenu(Actor* actor);
     void                selectDestination(Actor* actor);
-    void                confirmMovement(Actor* actor);    
+    void                selectTargets(Actor* actor, Skill* skill);
+    void                confirmTargets(Actor* actor, Skill* skill, const sf::Vector3f& target);
 
     void                showHUD(SpriteActorHUD* hud, const sf::Vector3f& position);
     

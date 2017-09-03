@@ -20,13 +20,14 @@ public:
     Skill();
     virtual ~Skill();
 
-    virtual void use(Actor& caster, const std::vector<Actor*>& targets) = 0;
-    virtual std::vector<sf::Vector2f> range(Actor& caster) const = 0;
-    virtual std::vector<sf::Vector2f> area(const sf::Vector2f& target) const = 0;
-    virtual std::vector<Actor*> affected(const sf::Vector2f& target, const Map* map = 0) const = 0;
+    virtual void                        use(Actor& caster, const std::vector<Actor*>& targets) = 0;
+    virtual std::vector<sf::Vector2f>   range(Actor& caster) const = 0;
+    virtual std::vector<sf::Vector2f>   area(const sf::Vector3f& target) const = 0;
+    virtual std::vector<Actor*>         affected(const sf::Vector3f& target, const Map* map = 0) const;
+    virtual bool                        effective(const sf::Vector3f& target, const Map* map = 0) const;
     
-    bool        casting() const;
-    std::string name() const;    
+    bool                                casting() const;
+    std::string                         name() const;    
 
 protected:
     void        setCastingStatus(bool casting);

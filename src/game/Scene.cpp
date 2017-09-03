@@ -58,6 +58,7 @@ Scene::~Scene()
     if(moveSelector_)       delete moveSelector_;
     if(moveSelection_)      delete moveSelection_;
     if(targetSelector_)     delete targetSelector_;
+    if(targetSelection_)    delete targetSelection_;
     if(targetConfirmer_)    delete targetConfirmer_;
     if(confirmedTargets_)   delete confirmedTargets_;
     if(textures_)           delete textures_;    
@@ -105,7 +106,7 @@ void Scene::endTurn()
     // Update map positioning if the player took a move this turn
     if(!confirmedMove_)
     {
-        confirmMovement(actors_[acting_]);
+        confirmedMove_;
     }
 
     InputManager::instance().clear();
@@ -226,18 +227,18 @@ void Scene::setupActors()
     int x, y;
 
     // Randomly place all actors
-    for(auto actor : actors_)
+    for(int a = 0; a < actors_.size(); a++)
     {
         do{
-            x = rand() % map_->width();
-            y = rand() % map_->length();
+            x = rand() % map_->width() / 3;
+            y = rand() % map_->length() / 3;
         }while(map_->playerAt(x, y));
 
-        actor->setPosition(sf::Vector3f(x, y, map_->height(x, y)));
-        actor->face(sf::Vector2f(map_->width() / 2, map_->length() / 2));
-        actor->setSpeed(3);
-        map_->addObject(actor);
-        map_->enter(actor, x, y);
+        actors_[a]->setPosition(sf::Vector3f(x, y, map_->height(x, y)));
+        actors_[a]->face(sf::Vector2f(map_->width() / 2, map_->length() / 2));
+        actors_[a]->setSpeed(3);
+        map_->addObject(actors_[a]);
+        map_->enter(actors_[a], x, y);
     }
 }
 #include <sstream>
@@ -310,6 +311,8 @@ void Scene::setupMenus()
             if(moved_ && !confirmedMove_)
             {
                 battleMenu_->setActive(false);
+                map_->exit(actors_[acting_]->position().x, actors_[acting_]->position().y);
+                map_->enter(actors_[acting_], originalPosition_.x, originalPosition_.y);
                 view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.4);
                 cursor_->goTo(sf::Vector2f(originalPosition_.x, originalPosition_.y));
                 actors_[acting_]->setPosition(originalPosition_);
@@ -332,7 +335,7 @@ void Scene::setupMenus()
     actionMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
     actionMenu_->setOnCancel(
         [this]()
-        {            
+        {
             InputManager::instance().pop();            
         });
 }
@@ -400,7 +403,9 @@ void Scene::setupControls()
                     moveSelection_ = 0;
 
                     Actor* actor = actors_[acting_];
-                
+
+                    map_->exit(originalPosition_.x, originalPosition_.y);
+                    map_->enter(actor, selection.x, selection.y);
                     moveSelector_->setBusy(true);
                     view_.focus(actor);
                     
@@ -408,10 +413,10 @@ void Scene::setupControls()
 
                     // When the actor has finished walking to their destination (triggered action, infinite delay),
                     // display the battle menu
-                    Action action([this, actor](){                        
+                    Action action([this, actor, &selection](){                        
                         moveSelector_->setBusy(false);
                         view_.stopFocusing();
-                        showHUD(actorHUD_, originalPosition_);
+                        showHUD(actorHUD_, selection);
                         InputManager::instance().popTo(cursor_);
 
                         displayBattleMenu(actor);
@@ -430,8 +435,8 @@ void Scene::setupControls()
                 {
                     // Make a 'nope' noise
                 }
-            });
-
+            });    
+        
         // Show the HUD for any actor present in the current location, if present
         moveSelector_->setOnMove(
             [this](const sf::Vector3f& destination)
@@ -450,7 +455,32 @@ void Scene::setupControls()
                 showHUD(actorHUD_, actors_[acting_]->position());
                 view_.scrollTo(IsometricObject::isoToGlobal(actors_[acting_]->position()), 0.1);
             });
-    }    
+    }
+
+    // Attack target selector object and callback actions
+    targetSelector_ = new Cursor(*cursorSprite_, *map_);
+    map_->addObject(targetSelector_);
+
+    {
+        // Show the HUD for any actor present in the current location, if present
+        targetSelector_->setOnMove(
+            [this](const sf::Vector3f& destination)
+            {
+                showHUD(actorHUD_, destination);            
+            });
+
+        // Remove the target selection area and scroll to the active player and return to the action menu
+        targetSelector_->setOnCancel(
+            [this]()
+            {
+                delete targetSelection_;
+                targetSelection_ = 0;
+                InputManager::instance().pop();
+
+                showHUD(actorHUD_, actors_[acting_]->position());
+                view_.scrollTo(IsometricObject::isoToGlobal(actors_[acting_]->position()), 0.1);
+            });
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -486,19 +516,10 @@ void Scene::displayActionMenu(Actor* actor)
     actionMenu_->clear();
 
     // Populate options
-    for(Skill* skill : actor->getSkills())
+    for(int s = 0; s < actor->getSkills().size(); s++)
     {
-        actionMenu_->addOption(skill->name(),[this, actor, skill](){
-            std::cout << actor->getName() << " casts " << skill->name() << "!!!" << std::endl;
-
-            acted_ = true;
-            confirmMovement(actor);            
-            cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
-
-            ActionScheduler::instance().schedule(Action([this, actor](){
-                InputManager::instance().popTo(cursor_);
-                displayBattleMenu(actor);
-            }, 0.5));
+        actionMenu_->addOption(actor->getSkills()[s]->name(),[this, actor, s](){
+            selectTargets(actor, actor->getSkills()[s]);
         });
     }
 
@@ -524,17 +545,128 @@ void Scene::selectDestination(Actor* actor)
 }
 
 //----------------------------------------------------------------------------
-// Confirm Movement
+// Select Skill Target
 //----------------------------------------------------------------------------
 // * actor : current acting player
-// Confirms the actor's movement choice so they can no longer Go Back and move
-// again, while also updating their position on the map
+// * skill : chosen skill to cast
+// Displays an area depicting all positions where the user can cast the skill
+// in red, as well as a cursor to select one of those positions
 //----------------------------------------------------------------------------
-void Scene::confirmMovement(Actor* actor)
+void Scene::selectTargets(Actor* actor, Skill* skill)
 {
-    confirmedMove_ = true;
-    map_->exit(originalPosition_.x, originalPosition_.y);
-    map_->enter(actors_[acting_], actors_[acting_]->position().x, actors_[acting_]->position().y);
+    targetSelector_->setPosition(actor->position());
+
+    // Confirm target position and display affected players
+    targetSelector_->setOnConfirm(
+        [this, actor, skill](const sf::Vector3f& selection)
+        {
+            if(targetSelection_->contains(sf::Vector2f(selection.x, selection.y)) && skill->effective(selection, map_))
+            {
+                InputManager::instance().pop();
+                delete targetSelection_;
+                targetSelection_ = 0;
+    
+                confirmTargets(actor, skill, selection);
+            }
+            else
+            {
+                // Make a 'nope' noise
+            }           
+        });
+
+    targetSelection_ = new SpriteArea(textures_->load("resources/graphics/AreaSquare.png"), skill->range(*actor), *map_, sf::Color(255, 120, 120));
+    map_->addObject(targetSelection_);
+
+    InputManager::instance().push(targetSelector_);
+}
+
+//----------------------------------------------------------------------------
+// Confirm Target Selection
+//----------------------------------------------------------------------------
+// * actor : current acting player
+// * skill : chosen skill to cast
+// * target : position chosen as the center of the cast
+// Displays red squares under all affected players, as well as a cursor that
+// that cycles through each player
+//----------------------------------------------------------------------------
+void Scene::confirmTargets(Actor* actor, Skill* skill, const sf::Vector3f& target)
+{    
+    // Setup target confirmation cursor object and callback actions
+    targetConfirmer_ = new TargetConfirmer(*cursorSprite_, *skill, *actor, target);
+    map_->addObject(targetConfirmer_);
+
+    // Scroll to first target
+    view_.scrollTo(IsometricObject::isoToGlobal(targetConfirmer_->position()), 0.1);
+    showHUD(actorHUD_, actor->position());
+    showHUD(targetHUD_, targetConfirmer_->position());
+
+    {
+        // Cast the skill on all current targets
+        targetConfirmer_->setOnConfirm(
+            [this, actor, skill]()
+            {
+                // Remove target area sprite
+                delete confirmedTargets_;
+                confirmedTargets_ = 0;
+
+                // Hide HUDs, Cursors
+                targetConfirmer_->setActive(false);
+                actorHUD_->hide();
+                targetHUD_->hide();
+
+                cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
+                confirmedMove_ = moved_;
+                acted_ = true;
+                
+                // After casting is finished, this triggered action will return to the main battle menu                
+                Action action([this, actor](){
+                    InputManager::instance().popTo(cursor_);
+                    view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 0.1);
+                    displayBattleMenu(actor);
+
+                    // Remove target confirmation cursor
+                    delete targetConfirmer_;
+                    targetConfirmer_ = 0;
+                }, -1);
+                action.setTrigger([skill](){return !skill->casting();});
+
+                ActionScheduler::instance().schedule(action);
+            });
+
+        // Show the target HUD the current targeted player
+        targetConfirmer_->setOnMove(
+            [this](Actor* victim)
+            {
+                targetHUD_->setActor(*victim);
+            });
+            
+        // Remove the affected target area and scroll to the active player and return to target selection
+        targetConfirmer_->setOnCancel(
+            [this, actor, skill, target]()
+            {
+                delete confirmedTargets_;
+                confirmedTargets_ = 0;
+                InputManager::instance().pop();
+
+                // Re-display the target area
+                selectTargets(actor, skill);
+                targetSelector_->goTo(sf::Vector2f(target.x, target.y));
+                
+                targetHUD_->hide();
+                view_.scrollTo(IsometricObject::isoToGlobal(target), 0.1);
+            });       
+    }
+
+    InputManager::instance().push(targetConfirmer_);
+
+    // Show affected target area
+    std::vector<sf::Vector2f> area;
+    for(int a = 0; a < targetConfirmer_->getTargets().size(); a++)
+    {
+        area.push_back(sf::Vector2f(targetConfirmer_->getTargets()[a]->position().x, targetConfirmer_->getTargets()[a]->position().y));
+    }
+    confirmedTargets_ = new SpriteArea(textures_->load("resources/graphics/AreaSquare.png"), area, *map_, sf::Color(255, 120, 120));
+    map_->addObject(confirmedTargets_);    
 }
 
 //----------------------------------------------------------------------------

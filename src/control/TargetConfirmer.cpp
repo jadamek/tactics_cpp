@@ -9,7 +9,7 @@
 // * caster : actor casting the skill in question
 // * targets : chosen targets to confirm
 //----------------------------------------------------------------------------
-TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const sf::Vector2f& target) :
+TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const sf::Vector3f& target) :
 sprite_(cursor),
 skill_(&skill),
 caster_(&caster),
@@ -158,4 +158,12 @@ void TargetConfirmer::draw(sf::RenderTarget& target, sf::RenderStates states) co
 void TargetConfirmer::setOnMove(std::function<void(Actor*)> action)
 {
     actionMove_ = action;
+}
+
+//----------------------------------------------------------------------------
+// Get Affected Targets
+//----------------------------------------------------------------------------
+const std::vector<Actor*>& TargetConfirmer::getTargets() const
+{
+    return targets_;
 }

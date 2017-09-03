@@ -20,10 +20,14 @@ SkillAttack::SkillAttack()
 //----------------------------------------------------------------------------
 void SkillAttack::use(Actor& caster, const std::vector<Actor*>& targets)
 {
+    setCastingStatus(true);
+
     for(auto target : targets)
     {
         std::cout << caster.getName() << " ATTACKS " << target->getName() << "!!!" << std::endl;        
     }
+
+    setCastingStatus(false);    
 }
 
 //----------------------------------------------------------------------------
@@ -55,6 +59,8 @@ std::vector<sf::Vector2f> SkillAttack::range(Actor& caster) const
     {
         result.push_back(sf::Vector2f(caster.position().x, caster.position().y - 1));
     }
+
+    return result;
 }
 
 //----------------------------------------------------------------------------
@@ -64,34 +70,8 @@ std::vector<sf::Vector2f> SkillAttack::range(Actor& caster) const
 // Returns a vector of all positions that will be affected by a cast of the
 // skill
 //----------------------------------------------------------------------------
-std::vector<sf::Vector2f> SkillAttack::area(const sf::Vector2f& target) const
+std::vector<sf::Vector2f> SkillAttack::area(const sf::Vector3f& target) const
 {
-    std::vector<sf::Vector2f>(1, target);
+    return std::vector<sf::Vector2f>(1, sf::Vector2f(target.x, target.y));
 }
 
-//----------------------------------------------------------------------------
-// - Calculate Affected Targets
-//----------------------------------------------------------------------------
-// * target : position where the skill is being cast onto
-// * map : map the intended targets of the skill inhabit
-// Returns a vector of all actors caught in the area of effect for this skill
-//----------------------------------------------------------------------------
-std::vector<Actor*> SkillAttack::affected(const sf::Vector2f& target, const Map* map) const
-{
-    std::vector<Actor*> targets;
-
-    if(map)
-    {
-        auto aoe = area(target);
-        
-        for(auto position : aoe)
-        {
-            if(map->playerAt(position.x, position.y))
-            {
-                targets.push_back(map->playerAt(position.y, position.y));
-            }
-        }
-    }
-    
-    return targets;
-}
