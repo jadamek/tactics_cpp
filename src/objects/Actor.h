@@ -41,6 +41,7 @@ public:
     void                        setName(const std::string& name);
     int                         getMove() const;
     void                        setMove(int mv);
+    const std::vector<Skill*>&  getSkills() const;
     void                        focus();
     void                        unfocus();
     

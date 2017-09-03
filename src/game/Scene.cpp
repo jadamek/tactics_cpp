@@ -30,6 +30,7 @@ Scene::Scene(const sf::Vector2f& dimensions) :
     closed_(false),
     moved_(false),
     acted_(false),
+    confirmedMove_(false),
     originalFacing_(0),
     textures_(0),
     fonts_(0),
@@ -82,6 +83,8 @@ Scene::~Scene()
 void Scene::nextTurn()
 {
     Actor* actor = actors_[(acting_ = ((acting_ + 1) % actors_.size()))];
+    originalPosition_ = actor->position();
+    originalFacing_ = actor->facing();
     
     // Scroll to acting player
     view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 0.5);
@@ -100,15 +103,15 @@ void Scene::nextTurn()
 void Scene::endTurn()
 {
     // Update map positioning if the player took a move this turn
-    if(moved_)
+    if(!confirmedMove_)
     {
-        map_->exit(originalPosition_.x, originalPosition_.y);
-        map_->enter(actors_[acting_], actors_[acting_]->position().x, actors_[acting_]->position().y);
+        confirmMovement(actors_[acting_]);
     }
 
     InputManager::instance().clear();
     moved_ = false;
     acted_ = false;
+    confirmedMove_ = false;
 
     nextTurn();
 }
@@ -304,7 +307,7 @@ void Scene::setupMenus()
         {
             // Cancel the users movement action, returning to their original placement
             // and facing at the turn's start
-            if(moved_)
+            if(moved_ && !confirmedMove_)
             {
                 battleMenu_->setActive(false);
                 view_.scrollTo(IsometricObject::isoToGlobal(originalPosition_), 0.4);
@@ -324,7 +327,14 @@ void Scene::setupMenus()
                 InputManager::instance().pop();
             }
         });
-    
+        
+    // Action Menu (options filled in during turn)
+    actionMenu_ = new Menu(textures_->load("resources/graphics/MenuFrame.png"));
+    actionMenu_->setOnCancel(
+        [this]()
+        {            
+            InputManager::instance().pop();            
+        });
 }
 
 //----------------------------------------------------------------------------
@@ -351,10 +361,10 @@ void Scene::setupControls()
             [this](const sf::Vector3f& selection)
             {
                 Actor* actor = actors_[acting_];
-                cursor_->setBusy(true);
+                cursor_->setActive(false);
                 cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
                 view_.scrollTo(IsometricObject::isoToGlobal(actor->position()), 1);
-                ActionScheduler::instance().schedule(Action([this, actor](){displayBattleMenu(actor); cursor_->setBusy(false);}, 1));
+                ActionScheduler::instance().schedule(Action([this, actor](){displayBattleMenu(actor);}, 1));
             });
 
         // Show the HUD for any actor present in the current location, if present
@@ -383,6 +393,8 @@ void Scene::setupControls()
             {               
                 if(moveSelection_->contains(sf::Vector2f(selection.x, selection.y)))
                 {
+                    moved_ = true;
+
                     // Remove the reachable area sprites
                     delete moveSelection_;
                     moveSelection_ = 0;
@@ -391,11 +403,6 @@ void Scene::setupControls()
                 
                     moveSelector_->setBusy(true);
                     view_.focus(actor);
-
-                    // Set turn control flow variables to allow player to cancel their movement
-                    originalFacing_ = actor->facing();
-                    originalPosition_ = actor->position();
-                    moved_ = true;
                     
                     actor->walkAlong(actor->shortestPath(sf::Vector2f(selection.x, selection.y)));
 
@@ -459,12 +466,45 @@ void Scene::displayBattleMenu(Actor* actor)
 
     // Populate options
     if(!moved_) battleMenu_->addOption("Move", [this, actor](){selectDestination(actor);});
-    if(!acted_) battleMenu_->addOption("Action", [](){std::cout << "Act." << std::endl;});
+    if(!acted_) battleMenu_->addOption("Action", [this, actor](){displayActionMenu(actor);});
     battleMenu_->addOption("Wait", [this](){endTurn();});
 
     // Place in corner
     battleMenu_->setPosition(screen_.getSize().x / 2 - battleMenu_->getGlobalBounds().width - 16, screen_.getSize().y / 2 - battleMenu_->getGlobalBounds().height - 16);
     InputManager::instance().push(battleMenu_);
+}
+
+//----------------------------------------------------------------------------
+// Display Action Menu
+//----------------------------------------------------------------------------
+// * actor : current acting player
+// Shows the action menu for this actor, populating the menu with the
+// available skills the actor has. Places menu at at the lower-right corner
+//----------------------------------------------------------------------------
+void Scene::displayActionMenu(Actor* actor)
+{
+    actionMenu_->clear();
+
+    // Populate options
+    for(Skill* skill : actor->getSkills())
+    {
+        actionMenu_->addOption(skill->name(),[this, actor, skill](){
+            std::cout << actor->getName() << " casts " << skill->name() << "!!!" << std::endl;
+
+            acted_ = true;
+            confirmMovement(actor);            
+            cursor_->goTo(sf::Vector2f(actor->position().x, actor->position().y));
+
+            ActionScheduler::instance().schedule(Action([this, actor](){
+                InputManager::instance().popTo(cursor_);
+                displayBattleMenu(actor);
+            }, 0.5));
+        });
+    }
+
+    // Place in corner
+    actionMenu_->setPosition(screen_.getSize().x / 2 - actionMenu_->getGlobalBounds().width - 16, screen_.getSize().y / 2 - actionMenu_->getGlobalBounds().height - 16);
+    InputManager::instance().push(actionMenu_);
 }
 
 //----------------------------------------------------------------------------
@@ -481,6 +521,20 @@ void Scene::selectDestination(Actor* actor)
     map_->addObject(moveSelection_);
 
     InputManager::instance().push(moveSelector_);
+}
+
+//----------------------------------------------------------------------------
+// Confirm Movement
+//----------------------------------------------------------------------------
+// * actor : current acting player
+// Confirms the actor's movement choice so they can no longer Go Back and move
+// again, while also updating their position on the map
+//----------------------------------------------------------------------------
+void Scene::confirmMovement(Actor* actor)
+{
+    confirmedMove_ = true;
+    map_->exit(originalPosition_.x, originalPosition_.y);
+    map_->enter(actors_[acting_], actors_[acting_]->position().x, actors_[acting_]->position().y);
 }
 
 //----------------------------------------------------------------------------
@@ -547,6 +601,11 @@ void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
         if(battleMenu_)
         {
             target.draw(*battleMenu_, states);
+        }
+
+        if(actionMenu_)
+        {
+            target.draw(*actionMenu_, states);
         }
 
         // Tint/Flash Overlays

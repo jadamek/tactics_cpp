@@ -461,6 +461,14 @@ void Actor::setMove(int mv)
 }
 
 //----------------------------------------------------------------------------
+// - Get Learned Skills
+//----------------------------------------------------------------------------
+const std::vector<Skill*>& Actor::getSkills() const
+{
+    return skills_;
+}
+
+//----------------------------------------------------------------------------
 // - Highlight Actor
 //----------------------------------------------------------------------------
 // Produces a visual effect on the player's sprite to indicate it is being

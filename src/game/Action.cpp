@@ -1,10 +1,6 @@
 #include "Action.h"
 #include <algorithm>
 
-std::function<void()>   action_;
-int                     duration_;
-void*                   sender_;
-std::function<bool()>   trigger_;
 //----------------------------------------------------------------------------
 // - Action Scheduler Constructor
 //----------------------------------------------------------------------------

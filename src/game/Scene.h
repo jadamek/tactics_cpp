@@ -43,7 +43,9 @@ protected:
 
 // Methods - Menu/Control Displays
     void                displayBattleMenu(Actor* actor);
+    void                displayActionMenu(Actor* actor);
     void                selectDestination(Actor* actor);
+    void                confirmMovement(Actor* actor);    
 
     void                showHUD(SpriteActorHUD* hud, const sf::Vector3f& position);
     
@@ -78,6 +80,7 @@ protected:
 // Members - Actor Control
     bool                moved_;
     bool                acted_;
+    bool                confirmedMove_;
     int                 originalFacing_;
     sf::Vector3f        originalPosition_;
 
