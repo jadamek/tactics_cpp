@@ -23,7 +23,7 @@ Actor::Actor(const sf::Texture& texture, const Map* ground) :
     sprite_ = new SpriteAnimated(baseSprite_);
     sprite_->play("default", true);
 
-    skills_.push_back(new SkillAttack);
+    skills_.push_back(new SkillAttack(*this));
 }
 
 //----------------------------------------------------------------------------

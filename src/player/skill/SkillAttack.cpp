@@ -7,7 +7,8 @@
 //----------------------------------------------------------------------------
 // Skill Constructor
 //----------------------------------------------------------------------------
-SkillAttack::SkillAttack()
+SkillAttack::SkillAttack(Actor& caster) :
+    Skill(caster)
 {
     name_ = "Attack";
 }
@@ -15,16 +16,15 @@ SkillAttack::SkillAttack()
 //----------------------------------------------------------------------------
 // - Basic Attack Cast (Override)
 //----------------------------------------------------------------------------
-// * caster : player making the attack
 // * targets : set of intended targets for the attack
 //----------------------------------------------------------------------------
-void SkillAttack::use(Actor& caster, const std::vector<Actor*>& targets)
+void SkillAttack::use(const std::vector<Actor*>& targets)
 {
     setCastingStatus(true);
 
     for(auto target : targets)
     {
-        std::cout << caster.getName() << " ATTACKS " << target->getName() << "!!!" << std::endl;        
+        std::cout << caster_->getName() << " ATTACKS " << target->getName() << "!!!" << std::endl;        
     }
 
     setCastingStatus(false);    
@@ -33,31 +33,30 @@ void SkillAttack::use(Actor& caster, const std::vector<Actor*>& targets)
 //----------------------------------------------------------------------------
 // - Calculate Basic Attack Range
 //----------------------------------------------------------------------------
-// * caster : player making the attack
 // Returns a vector of possible positions the skill may be cast at
 //----------------------------------------------------------------------------
-std::vector<sf::Vector2f> SkillAttack::range(Actor& caster) const
+std::vector<sf::Vector2f> SkillAttack::range() const
 {
     std::vector<sf::Vector2f> result;
 
-    if(caster.getEnvironment()->valid(caster.position().x + 1, caster.position().y))
+    if(caster_->getEnvironment()->valid(caster_->position().x + 1, caster_->position().y))
     {
-        result.push_back(sf::Vector2f(caster.position().x + 1, caster.position().y));
+        result.push_back(sf::Vector2f(caster_->position().x + 1, caster_->position().y));
     }
 
-    if(caster.getEnvironment()->valid(caster.position().x - 1, caster.position().y))
+    if(caster_->getEnvironment()->valid(caster_->position().x - 1, caster_->position().y))
     {
-        result.push_back(sf::Vector2f(caster.position().x - 1, caster.position().y));
+        result.push_back(sf::Vector2f(caster_->position().x - 1, caster_->position().y));
     }
 
-    if(caster.getEnvironment()->valid(caster.position().x, caster.position().y + 1))
+    if(caster_->getEnvironment()->valid(caster_->position().x, caster_->position().y + 1))
     {
-        result.push_back(sf::Vector2f(caster.position().x, caster.position().y + 1));
+        result.push_back(sf::Vector2f(caster_->position().x, caster_->position().y + 1));
     }
 
-    if(caster.getEnvironment()->valid(caster.position().x, caster.position().y - 1))
+    if(caster_->getEnvironment()->valid(caster_->position().x, caster_->position().y - 1))
     {
-        result.push_back(sf::Vector2f(caster.position().x, caster.position().y - 1));
+        result.push_back(sf::Vector2f(caster_->position().x, caster_->position().y - 1));
     }
 
     return result;

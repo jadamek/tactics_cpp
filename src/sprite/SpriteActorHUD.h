@@ -14,10 +14,10 @@ class SpriteActorHUD : public Sprite
 // Methods
 public:
     SpriteActorHUD();
-    SpriteActorHUD(const Actor& actor);
+    SpriteActorHUD(const Actor* actor);
     virtual ~SpriteActorHUD();
 
-    void                setActor(const Actor& actor);
+    void                setActor(const Actor* actor);
     bool                visible() const;
     void                show();
     void                hide();
@@ -38,6 +38,7 @@ protected:
     sf::Text            mpValue_;
     sf::Font            font_;
     bool                visible_;
+    bool                empty_;
 };
 
 #endif

@@ -6,7 +6,8 @@
 SpriteActorHUD::SpriteActorHUD() :
 portrait_(0),
 body_(sf::Vector2f(180, 80)),
-visible_(true)
+visible_(true),
+empty_(true)
 {
     font_.loadFromFile("resources/fonts/Arial.ttf");
 
@@ -19,7 +20,7 @@ visible_(true)
 //----------------------------------------------------------------------------
 // * actor : player this HUD displays information for
 //----------------------------------------------------------------------------
-SpriteActorHUD::SpriteActorHUD(const Actor& actor) :
+SpriteActorHUD::SpriteActorHUD(const Actor* actor) :
     SpriteActorHUD()
 {    
     setActor(actor);
@@ -36,41 +37,46 @@ SpriteActorHUD::~SpriteActorHUD()
 //----------------------------------------------------------------------------
 // * actor : player this HUD displays information for
 //----------------------------------------------------------------------------
-void SpriteActorHUD::setActor(const Actor& actor)
+void SpriteActorHUD::setActor(const Actor* actor)
 {
-    // Portrait
-    portrait_ = actor.getPortrait();
-
-    if(portrait_)
+    if(actor != 0)
     {
-        portrait_->setPosition(0, 16);        
+        // Portrait
+    portrait_ = actor->getPortrait();
+    
+        if(portrait_)
+        {
+            portrait_->setPosition(0, 16);        
+        }
+    
+        // Level
+        lvl_ = sf::Text("Lvl 1", font_, 12);
+        lvl_.setStyle(sf::Text::Bold);
+        lvl_.setPosition(4, 112 - lvl_.getGlobalBounds().height);
+    
+        // Name
+        name_ = sf::Text(actor->getName(), font_, 12);
+        name_.setStyle(sf::Text::Bold);
+        name_.setPosition(124 - name_.getGlobalBounds().width / 2.f, 52);
+    
+        // HP
+        hpLabel_ = sf::Text("HP", font_, 12);
+        hpLabel_.setStyle(sf::Text::Bold);
+        hpLabel_.setPosition(72, 76);
+        hpValue_ = sf::Text("100 / 100", font_, 12);
+        hpValue_.setStyle(sf::Text::Bold);
+        hpValue_.setPosition(168 - hpValue_.getGlobalBounds().width, 76);
+    
+        // MP
+        mpLabel_ = sf::Text("MP", font_, 12);
+        mpLabel_.setStyle(sf::Text::Bold);
+        mpLabel_.setPosition(72, 96);
+        mpValue_ = sf::Text("10 / 10", font_, 12);
+        mpValue_.setStyle(sf::Text::Bold);
+        mpValue_.setPosition(168 - mpValue_.getGlobalBounds().width, 96);
     }
 
-    // Level
-    lvl_ = sf::Text("Lvl 1", font_, 12);
-    lvl_.setStyle(sf::Text::Bold);
-    lvl_.setPosition(4, 112 - lvl_.getGlobalBounds().height);
-
-    // Name
-    name_ = sf::Text(actor.getName(), font_, 12);
-    name_.setStyle(sf::Text::Bold);
-    name_.setPosition(124 - name_.getGlobalBounds().width / 2.f, 52);
-
-    // HP
-    hpLabel_ = sf::Text("HP", font_, 12);
-    hpLabel_.setStyle(sf::Text::Bold);
-    hpLabel_.setPosition(72, 76);
-    hpValue_ = sf::Text("100 / 100", font_, 12);
-    hpValue_.setStyle(sf::Text::Bold);
-    hpValue_.setPosition(168 - hpValue_.getGlobalBounds().width, 76);
-
-    // MP
-    mpLabel_ = sf::Text("MP", font_, 12);
-    mpLabel_.setStyle(sf::Text::Bold);
-    mpLabel_.setPosition(72, 96);
-    mpValue_ = sf::Text("10 / 10", font_, 12);
-    mpValue_.setStyle(sf::Text::Bold);
-    mpValue_.setPosition(168 - mpValue_.getGlobalBounds().width, 96);
+    empty_ = actor == 0;
 }
 
 //----------------------------------------------------------------------------
@@ -112,7 +118,7 @@ sf::FloatRect SpriteActorHUD::getGlobalBounds() const
 //----------------------------------------------------------------------------
 void SpriteActorHUD::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if(visible_)
+    if(visible_ && !empty_)
     {
         states.transform *= getTransform();
         target.draw(body_, states);

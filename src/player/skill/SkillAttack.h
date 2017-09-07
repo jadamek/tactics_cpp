@@ -12,10 +12,10 @@ class SkillAttack : public Skill
 {
 // Methods
 public:
-    SkillAttack();
+    SkillAttack(Actor& caster);
 
-    virtual void use(Actor& caster, const std::vector<Actor*>& targets);
-    virtual std::vector<sf::Vector2f> range(Actor& caster) const;
+    virtual void use(const std::vector<Actor*>& targets);
+    virtual std::vector<sf::Vector2f> range() const;
     virtual std::vector<sf::Vector2f> area(const sf::Vector3f& target) const;
 };
 

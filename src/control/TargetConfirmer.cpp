@@ -6,27 +6,17 @@
 //----------------------------------------------------------------------------
 // * cursor : sprite of the cursor to use for this selector
 // * skill : skill being confirmed for casting
-// * caster : actor casting the skill in question
-// * targets : chosen targets to confirm
+// * target : chosen position of the skill's cast source
 //----------------------------------------------------------------------------
-TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const sf::Vector3f& target) :
+TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, const sf::Vector3f& target) :
 sprite_(cursor),
 skill_(&skill),
-caster_(&caster),
-targets_(skill.affected(target, caster.getEnvironment())),
 actionConfirm_([](){}),
 actionMove_([](Actor*){}),
 actionCancel_([](){}),
 current_(0)
 {
-    if(!targets_.empty())
-    {
-        // Start cursor on the first victim
-        setPosition(targets_[0]->position());    
-    }
-    else{
-        setPosition(caster_->position());        
-    }
+    setTargets(*skill_, target);
 
     setSpeed(20);
 }
@@ -101,7 +91,7 @@ void TargetConfirmer::poll()
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
         actionConfirm_();
-        skill_->use(*caster_, targets_);
+        skill_->use(targets_);
     }
 
     // Keyboard Input handle : Esc - cancel menu
@@ -109,7 +99,6 @@ void TargetConfirmer::poll()
     {
         actionCancel_();
     }
-    
 }
 
 //----------------------------------------------------------------------------
@@ -166,4 +155,25 @@ void TargetConfirmer::setOnMove(std::function<void(Actor*)> action)
 const std::vector<Actor*>& TargetConfirmer::getTargets() const
 {
     return targets_;
+}
+
+//----------------------------------------------------------------------------
+// Compute Affected Targets
+//----------------------------------------------------------------------------
+// * skill : skill being confirmed for casting
+// * target : chosen position of the skill's cast source
+//----------------------------------------------------------------------------
+void TargetConfirmer::setTargets(Skill& skill, const sf::Vector3f& target)
+{
+    skill_ = &skill;
+    targets_ = skill_->affected(target);
+
+    if(!targets_.empty())
+    {
+        // Start cursor on the first victim
+        setPosition(targets_[0]->position());    
+    }
+    else{
+        setPosition(skill_->caster()->position());        
+    }
 }

@@ -48,7 +48,9 @@ protected:
     void                selectTargets(Actor* actor, Skill* skill);
     void                confirmTargets(Actor* actor, Skill* skill, const sf::Vector3f& target);
 
-    void                showHUD(SpriteActorHUD* hud, const sf::Vector3f& position);
+// Methods - Object Controls
+    void                highlightArea(const std::vector<sf::Vector2f>& area, const sf::Color& color);
+    void                clearHighlighting();
     
     virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;
     
@@ -67,16 +69,14 @@ protected:
     
 // Members - Control Flow
     int                 acting_;
-    Cursor*             cursor_;
-    sf::Sprite*         cursorSprite_;
-    Cursor*             moveSelector_;
-    SpriteArea*         moveSelection_;
-    Cursor*             targetSelector_;
-    SpriteArea*         targetSelection_;
-    TargetConfirmer*    targetConfirmer_;
-    SpriteArea*         confirmedTargets_;
     bool                active_;
     bool                closed_;
+    sf::Sprite*         cursorSprite_;
+    Cursor*             cursor_;
+    Cursor*             moveSelector_;
+    Cursor*             targetSelector_;
+    TargetConfirmer*    targetConfirmer_;
+    SpriteArea*         highlightArea_;
 
 // Members - Actor Control
     bool                moved_;

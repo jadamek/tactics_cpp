@@ -5,7 +5,8 @@
 //----------------------------------------------------------------------------
 // Skill Constructor
 //----------------------------------------------------------------------------
-Skill::Skill() : 
+Skill::Skill(Actor& caster) : 
+    caster_(&caster),
     name_("SKILL"),
     casting_(false)
 {}
@@ -16,6 +17,13 @@ Skill::Skill() :
 Skill::~Skill()
 {}
 
+//----------------------------------------------------------------------------
+// Get Skill's Caster
+//----------------------------------------------------------------------------
+Actor* Skill::caster()
+{
+    return caster_;
+}
 //----------------------------------------------------------------------------
 // Is Skill Casting?
 //----------------------------------------------------------------------------
@@ -46,12 +54,13 @@ void Skill::setCastingStatus(bool casting)
 // - Calculate Affected Targets
 //----------------------------------------------------------------------------
 // * target : position where the skill is being cast onto
-// * map : map the intended targets of the skill inhabit
 // Returns a vector of all actors caught in the area of effect for this skill
 //----------------------------------------------------------------------------
-std::vector<Actor*> Skill::affected(const sf::Vector3f& target, const Map* map) const
+std::vector<Actor*> Skill::affected(const sf::Vector3f& target) const
 {
     std::vector<Actor*> targets;
+    const Map* map = caster_->getEnvironment();
+    Actor* victim;
 
     if(map)
     {
@@ -59,9 +68,9 @@ std::vector<Actor*> Skill::affected(const sf::Vector3f& target, const Map* map) 
         
         for(auto position : aoe)
         {                    
-            if(map->playerAt(position.x, position.y))
+            if((victim = map->playerAt(position.x, position.y)))
             {
-                targets.push_back(map->playerAt(position.x, position.y));
+                targets.push_back(victim);
             }
         }
     }
@@ -73,19 +82,18 @@ std::vector<Actor*> Skill::affected(const sf::Vector3f& target, const Map* map) 
 // - Is Effective?
 //----------------------------------------------------------------------------
 // * target : position where the skill is being cast onto
-// * map : map the intended targets of the skill inhabit
 // Returns TRUE if at least one actor is affected by a cast of this skill at
 // the specified target position
 //----------------------------------------------------------------------------
-bool Skill::effective(const sf::Vector3f& target, const Map* map) const
+bool Skill::effective(const sf::Vector3f& target) const
 {
-    if(map)
+    if(caster_->getEnvironment())
     {
         auto aoe = area(target);
         
         for(auto position : aoe)
         {
-            if(map->playerAt(position.x, position.y))
+            if(caster_->getEnvironment()->playerAt(position.x, position.y))
             {
                 return true;
             }

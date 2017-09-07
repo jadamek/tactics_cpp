@@ -19,7 +19,7 @@ class TargetConfirmer : public MobileObject, public InputHandler
 {
 // Methods
 public:
-    TargetConfirmer(const sf::Sprite& cursor, Skill& skill, Actor& caster, const sf::Vector3f& target);
+    TargetConfirmer(const sf::Sprite& cursor, Skill& skill, const sf::Vector3f& target);
     virtual ~TargetConfirmer();
 
     virtual float               getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
@@ -30,6 +30,7 @@ public:
     void                        setOnCancel(std::function<void()> action);
     void                        setOnMove(std::function<void(Actor*)> action);
     const std::vector<Actor*>&  getTargets() const;
+    void                        setTargets(Skill& skill, const sf::Vector3f& target);
     
 protected:
     virtual void                draw(sf::RenderTarget& target, sf::RenderStates states) const;
@@ -37,7 +38,6 @@ protected:
 // Members
     sf::Sprite                  sprite_;
     Skill*                      skill_;
-    Actor*                      caster_;
     std::vector<Actor*>         targets_;
     int                         current_;
     std::function<void()>       actionConfirm_;
