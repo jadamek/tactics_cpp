@@ -411,8 +411,15 @@ void Scene::setupMoveSelector()
 
     // Select current position to have the actor move there
     moveSelector_->setOnConfirm([this](const sf::Vector3f& selection){
-        moved_ = true;
-        move(actors_[acting_], selection);
+        if(highlightArea_->contains(sf::Vector2f(selection.x, selection.y)))
+        {
+            moved_ = true;
+            move(actors_[acting_], selection);            
+        }
+        else
+        {
+            // play 'Nope' sound
+        }
     });
 
     // Display the HUD for any present actor in the current space
