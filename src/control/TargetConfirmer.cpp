@@ -5,20 +5,27 @@
 // - Target Confirmer Constructor
 //----------------------------------------------------------------------------
 // * cursor : sprite of the cursor to use for this selector
-// * skill : skill being confirmed for casting
-// * target : chosen position of the skill's cast source
 //----------------------------------------------------------------------------
-TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, Skill& skill, const sf::Vector3f& target) :
+TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor) :
 sprite_(cursor),
-skill_(&skill),
 actionConfirm_([](){}),
 actionMove_([](Actor*){}),
 actionCancel_([](){}),
 current_(0)
 {
-    setTargets(*skill_, target);
-
     setSpeed(20);
+}
+
+//----------------------------------------------------------------------------
+// - Target Confirmer Constructor
+//----------------------------------------------------------------------------
+// * cursor : sprite of the cursor to use for this selector
+// * targets : chosen victims of the skill to be cast
+//----------------------------------------------------------------------------
+TargetConfirmer::TargetConfirmer(const sf::Sprite& cursor, const std::vector<Actor*>& targets) :
+TargetConfirmer(cursor)
+{
+    setTargets(targets);
 }
 
 //----------------------------------------------------------------------------
@@ -91,7 +98,6 @@ void TargetConfirmer::poll()
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Return) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
         actionConfirm_();
-        skill_->use(targets_);
     }
 
     // Keyboard Input handle : Esc - cancel menu
@@ -163,17 +169,13 @@ const std::vector<Actor*>& TargetConfirmer::getTargets() const
 // * skill : skill being confirmed for casting
 // * target : chosen position of the skill's cast source
 //----------------------------------------------------------------------------
-void TargetConfirmer::setTargets(Skill& skill, const sf::Vector3f& target)
+void TargetConfirmer::setTargets(const std::vector<Actor*>& targets)
 {
-    skill_ = &skill;
-    targets_ = skill_->affected(target);
+    targets_ = targets;
 
     if(!targets_.empty())
     {
         // Start cursor on the first victim
         setPosition(targets_[0]->position());    
-    }
-    else{
-        setPosition(skill_->caster()->position());        
     }
 }

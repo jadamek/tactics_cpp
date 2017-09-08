@@ -184,7 +184,7 @@ void Cursor::setOnMove(std::function<void(const sf::Vector3f&)> action)
 //----------------------------------------------------------------------------
 void Cursor::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    if(active() && !busy()){
+    if(active()){
         target.draw(sprite_, states);        
     }
 }

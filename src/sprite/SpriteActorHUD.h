@@ -21,6 +21,7 @@ public:
     bool                visible() const;
     void                show();
     void                hide();
+    void                clear();
     sf::FloatRect       getGlobalBounds() const;
     
     

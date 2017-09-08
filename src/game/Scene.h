@@ -29,28 +29,42 @@ public:
     void                nextTurn();
     void                endTurn();
     bool                active() const;
-    void                start();
+    virtual void        start();
     bool                closed() const;
     void                close();
 
 protected:
-// Methods - Setup
+// Methods - Setup 
+    virtual void        setup();
     void                setupMap();
     void                setupActors();
     void                setupStaging();
-    void                setupMenus();
-    void                setupControls();
+
+// Methods - Setup Menus and UIs
+    void                setupMainMenu();
+    void                setupBattleMenu();
+    void                setupActionMenu();
+    void                setupHUDs();
+
+// Methods - Setup Cursors and Controllers
+    void                setupCursor();
+    void                setupMoveSelector();
+    void                setupTargetSelector();
+    void                setupTargetConfirmer();
 
 // Methods - Menu/Control Displays
     void                displayBattleMenu(Actor* actor);
     void                displayActionMenu(Actor* actor);
     void                selectDestination(Actor* actor);
-    void                selectTargets(Actor* actor, Skill* skill);
-    void                confirmTargets(Actor* actor, Skill* skill, const sf::Vector3f& target);
+    void                selectTargets(Skill* skill);
+    void                confirmTargets(Skill* skill, const sf::Vector3f& target);
 
 // Methods - Object Controls
-    void                highlightArea(const std::vector<sf::Vector2f>& area, const sf::Color& color);
-    void                clearHighlighting();
+    void                highlight(const std::vector<sf::Vector2f>& area, const sf::Color& color);
+    void                clearHighlight();
+    void                move(Actor* actor, const sf::Vector3f& destination);
+    void                cancelMove();
+    void                cast(Skill* skill, const std::vector<Actor*>& targets);
     
     virtual void        draw(sf::RenderTarget& target, sf::RenderStates states) const;
     
