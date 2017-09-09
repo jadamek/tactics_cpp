@@ -11,6 +11,7 @@
 // ** Actor
 //================================================================================
 // Represents a character in the world as a mobile directed sprite
+// TO DO : probably split this up
 //================================================================================
 class Actor : public MobileObject
 {
@@ -29,8 +30,8 @@ public:
     virtual float               getHeight(const sf::Vector2f& position = sf::Vector2f(0, 0)) const;
     virtual sf::FloatRect       getGlobalBounds() const;
     void                        setTexture(const sf::Texture& sprite);
-    Sprite*                     getSprite();
-    const Sprite*               getSprite() const;
+    SpriteAnimated*             getSprite();
+    const SpriteAnimated*       getSprite() const;
     void                        face(int direction);
     void                        face(const sf::Vector2f& target);
     int                         facing() const;

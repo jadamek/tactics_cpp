@@ -7,7 +7,7 @@
 // * sprite : indexed sprite on which all animations are played
 //----------------------------------------------------------------------------
 SpriteAnimated::SpriteAnimated(SpriteIndexed* sprite) :
-    AnimatedObject(2),
+    AnimatedObject(1),
     current_(0),
     playing_(""),
     length_(-1),

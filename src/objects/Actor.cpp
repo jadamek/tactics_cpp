@@ -13,14 +13,28 @@
 Actor::Actor(const sf::Texture& texture, const Map* ground) :
     MobileObject(ground),
     sprite_(0),
-    baseSprite_(new SpriteDirected(texture, 20, 32)),
+    baseSprite_(new SpriteDirected(texture, 48, 48)),
     portrait_(0),
     name_("Combatant"),
     attrMove_(4)
 {
-    baseSprite_->setOrigin(10, 28);
+    baseSprite_->setOrigin(24, 39);
     baseSprite_->setPosition(0, 0);
+
     sprite_ = new SpriteAnimated(baseSprite_);
+    sprite_->setFPS(10);
+    std::vector<int> defaultSequence(8), moveSequence(8), attackSequence(8);
+
+    for(int i = 0; i < 8; i++)
+    {
+        defaultSequence[i] = i / 2;
+        moveSequence[i] = i % 4;
+        attackSequence[i] = i + 4;
+    }
+
+    sprite_->add("default", defaultSequence);
+    sprite_->add("walk", moveSequence);
+    sprite_->add("attack", attackSequence);
     sprite_->play("default", true);
 
     skills_.push_back(new SkillAttack(*this));
@@ -338,7 +352,7 @@ void Actor::setTexture(const sf::Texture& texture)
 //----------------------------------------------------------------------------
 // - Get Sprite (Mutable)
 //----------------------------------------------------------------------------
-Sprite* Actor::getSprite()
+SpriteAnimated* Actor::getSprite()
 {
     return sprite_;
 }
@@ -346,7 +360,7 @@ Sprite* Actor::getSprite()
 //----------------------------------------------------------------------------
 // - Get Sprite
 //----------------------------------------------------------------------------
-const Sprite* Actor::getSprite() const
+const SpriteAnimated* Actor::getSprite() const
 {
     return sprite_;
 }

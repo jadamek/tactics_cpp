@@ -1,6 +1,7 @@
 #include "SkillAttack.h"
 #include "../../objects/Actor.h"
 #include "../../map/Map.h"
+#include "../../game/ActionScheduler.h"
 
 #include <iostream>
 
@@ -21,13 +22,16 @@ SkillAttack::SkillAttack(Actor& caster) :
 void SkillAttack::use(const std::vector<Actor*>& targets)
 {
     setCastingStatus(true);
+    
+    // Attack the first target with a basic slash
+    caster_->face(sf::Vector2f(targets[0]->position().x, targets[0]->position().y));
+    caster_->getSprite()->play("attack");
 
-    for(auto target : targets)
-    {
-        std::cout << caster_->getName() << " ATTACKS " << target->getName() << "!!!" << std::endl;        
-    }
-
-    setCastingStatus(false);    
+    // After the basic attack animation has finished, end the skill sequence
+    ActionScheduler::instance().schedule(Action([this](){
+        caster_->getSprite()->play("default", true);
+        setCastingStatus(false);
+    }, 54));
 }
 
 //----------------------------------------------------------------------------

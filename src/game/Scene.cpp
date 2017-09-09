@@ -677,6 +677,9 @@ void Scene::move(Actor* actor, const sf::Vector3f& destination)
     // Focus the view on the moving actor
     view_.focus(actor);
 
+    // Play actor's "walking" animation
+    actor->getSprite()->play("walk", true);
+
     // Send them walking to their destination along the shortest path there
     actor->walkAlong(actor->shortestPath(sf::Vector2f(destination.x, destination.y)));
 
@@ -684,12 +687,13 @@ void Scene::move(Actor* actor, const sf::Vector3f& destination)
     map_->exit(originalPosition_.x, originalPosition_.y);
     map_->enter(actor, destination.x, destination.y);
 
-    // When the actor is finished moving, unfocus the view, remove the highlighting
-    // and display the main battle menu
+    // When the actor is finished moving, unfocus the view, remove the highlighting,
+    // return the actor to its default animation and display the main battle menu
     Action action([this, actor, &destination]()
     {
         view_.stopFocusing();
         clearHighlight();
+        actor->getSprite()->play("default", true);
         displayBattleMenu(actor);
     }, -1);
     action.setTrigger([actor](){return !actor->walking();});
